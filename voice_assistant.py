@@ -32,7 +32,6 @@ def record_audio():
     print("Recording finished.")
 
 
-
 def clean_text(text):
 
     text = text.lower().strip()
@@ -41,7 +40,6 @@ def clean_text(text):
         text = text.replace(symbol, "")
 
     return text
-
 
 
 def should_shutdown(text):
@@ -58,11 +56,11 @@ def should_shutdown(text):
     ]
 
     for word in shutdown_words:
+
         if word in text:
             return True
 
     return False
-
 
 
 def main():
@@ -101,11 +99,9 @@ def main():
             break
 
 
-
         response = handle_command(text)
 
 
-        # Debugging response check
         print("DEBUG RESPONSE:", repr(response))
 
 

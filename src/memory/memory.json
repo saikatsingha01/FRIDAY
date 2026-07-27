@@ -1,22 +1,35 @@
 {
     "memories": [
         {
-            "id": 1,
-            "text": "my laptop has rtx 4050",
-            "category": "device",
-            "importance": 8
+            "id": 3,
+            "text": "i love her",
+            "category": "emotional",
+            "importance": 10
         },
         {
-            "id": 2,
+            "id": 3,
+            "text": "my name is chui got shin ho",
+            "category": "identity",
+            "importance": 10
+        },
+        {
+            "id": 4,
             "text": "i ate rice",
             "category": "general",
             "importance": 3
         },
         {
-            "id": 3,
-            "text": "i love her",
-            "category": "emotional",
-            "importance": 10
+            "id": 5,
+            "text": "my laptop has rtx 4050",
+            "category": "device",
+            "importance": 8
+        },
+        {
+            "id": 5,
+            "text": "my favorite game is sekiro",
+            "category": "preference",
+            "importance": 6,
+            "confidence": 75
         }
     ]
 }

@@ -1,45 +1,46 @@
-# Friday Architecture
+## Speech System (Updated)
 
-Core Layer
-- Identity
-- Ownership
-- Fundamental Rules
-- Moral Values
+Current pipeline:
 
-Governance Layer
-- Permissions
-- Decision Making
-- Approval System
+Microphone
+↓
+Voice Activity Detection (WebRTC VAD)
+↓
+Audio Capture
+↓
+Whisper Speech Recognition (GPU accelerated)
+↓
+Command Handler
+↓
+Response Generation
+↓
+Text To Speech (pyttsx3)
 
-Intelligence Layer
-- LLM Interface
-- Planning
-- Reasoning
 
-Memory Layer
-- Short-term Memory
-- Long-term Memory
-- Experience Memory
+Components:
 
-Perception Layer
-- Voice
-- Vision
-- Attention System
+- speech_recognizer.py
+    - Uses OpenAI Whisper
+    - Running on CUDA GPU
+    - Current model: Whisper small
 
-Tool Layer
-- File Manager
-- Coding
-- Testing
-- Automation
+- voice_detector.py
+    - Uses WebRTC VAD
+    - Detects speech start and end
+    - Replaces fixed duration recording
 
-Evolution Layer
-- Self Improvement
-- Testing
-- Approval
-- Rollback
+- speech_speaker.py
+    - Uses pyttsx3
+    - Converts responses into voice
 
-Security Layer
-- Authentication
-- Encryption
-- Audit Logs
-- Sandboxing
+
+Hardware acceleration:
+
+GPU:
+RTX 4050
+
+Framework:
+PyTorch CUDA
+
+Status:
+Working

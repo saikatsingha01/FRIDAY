@@ -1,62 +1,120 @@
 def evaluate_memory(fact):
 
-    fact = fact.lower()
+    print("DEBUG EVALUATOR INPUT:", repr(fact))
 
 
-    important_words = [
-        "name",
-        "called",
-        "laptop",
-        "computer",
-        "phone",
-        "project",
-        "working on",
-        "favorite",
-        "prefer",
-        "love",
-        "hate",
-        "important",
-        "family",
-        "friend"
-    ]
-
-
-    temporary_words = [
-        "today",
-        "just",
-        "right now",
-        "currently",
-        "for now"
-    ]
+    fact = fact.lower().strip()
 
 
     score = 50
 
 
-    for word in important_words:
+
+    # Strong personal identity facts
+    high_value_words = [
+        "my name",
+        "i am",
+        "i'm",
+        "called",
+        "my laptop",
+        "my phone",
+        "my pc",
+        "my project"
+    ]
+
+
+    for word in high_value_words:
 
         if word in fact:
+
+            print("DEBUG HIGH VALUE FOUND:", word)
+
+            score += 30
+
+
+
+    # Preferences and interests
+    preference_words = [
+        "favorite",
+        "favourite",
+        "prefer",
+        "like",
+        "love",
+        "hate",
+        "enjoy",
+        "interested in"
+    ]
+
+
+    for word in preference_words:
+
+        if word in fact:
+
+            print("DEBUG PREFERENCE FOUND:", word)
+
+            score += 25
+
+
+
+    # Life/project information
+    context_words = [
+        "working on",
+        "building",
+        "learning",
+        "studying",
+        "college",
+        "friend",
+        "family"
+    ]
+
+
+    for word in context_words:
+
+        if word in fact:
+
+            print("DEBUG CONTEXT FOUND:", word)
+
             score += 20
+
+
+
+    # Temporary information should not stay forever
+    temporary_words = [
+        "today",
+        "right now",
+        "currently",
+        "just now",
+        "for now"
+    ]
 
 
     for word in temporary_words:
 
         if word in fact:
+
+            print("DEBUG TEMPORARY FOUND:", word)
+
             score -= 30
 
 
 
-    if score >= 70:
+    # Very short messages are usually not memories
+    if len(fact.split()) <= 2:
 
-        return {
-            "should_remember": True,
-            "confidence": score
-        }
+        print("DEBUG TOO SHORT")
+
+        score -= 40
 
 
-    else:
 
-        return {
-            "should_remember": False,
-            "confidence": score
-        }
+    print("DEBUG FINAL SCORE:", score)
+
+
+
+    return {
+
+        "should_remember": score >= 60,
+
+        "confidence": min(score,100)
+
+    }

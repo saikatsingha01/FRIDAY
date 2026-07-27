@@ -1,45 +1,12 @@
 from src.speech.speech_speaker import speak
-import sounddevice as sd
-from scipy.io.wavfile import write
-
 from src.speech.speech_recognizer import transcribe
-from src.core.command_handler import handle_command
+from src.speech.voice_detector import listen
 
+from src.core.process import clean_text
+from src.core.input_validator import validate_input
+from src.core.conversation_manager import process_conversation
+from src.core.context_manager import add_context
 
-SAMPLE_RATE = 16000
-DURATION = 5
-
-
-def record_audio():
-
-    print("\nListening...")
-
-    audio = sd.rec(
-        int(SAMPLE_RATE * DURATION),
-        samplerate=SAMPLE_RATE,
-        channels=1,
-        dtype="int16"
-    )
-
-    sd.wait()
-
-    write(
-        "temp.wav",
-        SAMPLE_RATE,
-        audio
-    )
-
-    print("Recording finished.")
-
-
-def clean_text(text):
-
-    text = text.lower().strip()
-
-    for symbol in [".", ",", "?", "!", "'"]:
-        text = text.replace(symbol, "")
-
-    return text
 
 
 def should_shutdown(text):
@@ -63,6 +30,7 @@ def should_shutdown(text):
     return False
 
 
+
 def main():
 
     print("Friday voice mode activated.")
@@ -70,50 +38,129 @@ def main():
     speak("Friday voice mode activated.")
 
 
+
     while True:
 
-        record_audio()
+
+        # Voice activity detection
+        audio_file = listen()
 
 
-        text = transcribe("temp.wav")
+
+        # Speech to text
+        raw_text = transcribe(audio_file)
 
 
-        text = clean_text(text)
+
+        print(
+            "RAW WHISPER:",
+            repr(raw_text)
+        )
 
 
-        if not text:
+
+        # Cleanup
+        text = clean_text(raw_text)
+
+
+
+        # Validation
+        if not validate_input(text):
+
+            print(
+                "Input unclear, ignoring."
+            )
+
             continue
 
 
-        print("\nYou said:", text)
+
+        print(
+            "\nYou said:",
+            text
+        )
 
 
+
+        # Shutdown
         if should_shutdown(text):
 
             response = "Shutting down."
 
-            print("Friday:", response)
+
+            print(
+                "Friday:",
+                response
+            )
+
 
             speak(response)
+
+
+
+            add_context(
+                text,
+                response
+            )
+
 
             break
 
 
-        response = handle_command(text)
 
 
-        print("DEBUG RESPONSE:", repr(response))
+        # Conversation layer
+        conversation_result = process_conversation(text)
+
+
+
+        # Debug context reasoning
+        print(
+            "DEBUG CONTEXT:",
+            conversation_result["context"]
+        )
+
+
+
+        response = conversation_result["response"]
+
+
+
+        print(
+            "DEBUG RESPONSE:",
+            repr(response)
+        )
+
 
 
         if response:
 
-            print("Friday:", response)
 
-            speak(str(response))
+            print(
+                "Friday:",
+                response
+            )
+
+
+            speak(
+                str(response)
+            )
+
+
+
+            # Save short-term context
+            add_context(
+                text,
+                response
+            )
+
 
         else:
 
-            print("Friday did not generate a response.")
+            print(
+                "Friday did not generate a response."
+            )
+
 
 
 

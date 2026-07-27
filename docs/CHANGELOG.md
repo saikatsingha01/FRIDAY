@@ -1,25 +1,35 @@
-# Changelog
+## Session Update - Speech Pipeline Upgrade
 
-Version: v0.2.6.3
+Date:
+[Add date]
 
-Added
+Completed:
 
-- Project Bible v2.
-- Layered system architecture.
-- Security-first philosophy.
-- Controlled Self-Improvement design.
-- Attention System design.
-- Continuous Awareness design.
-- Updated long-term roadmap.
+- Migrated Whisper from CPU inference to CUDA GPU inference
+- Created separate CUDA Python environment
+- Installed CUDA-enabled PyTorch
+- Verified RTX 4050 acceleration
+- Upgraded Whisper model from base to small
+- Added WebRTC Voice Activity Detection
+- Removed fixed recording duration system
+- Improved voice interaction speed
+- Installed soundfile for audio processing
+- Fixed TTS response issue
 
-Changed
+Improvements:
 
-- Refined Friday's vision from an assistant toward a modular AI companion.
-- Clarified the separation between Core, Governance, Intelligence and Evolution layers.
-- Added Security Foundation as an early architectural priority.
+Before:
+- Fixed 3-5 second recording
+- Delayed response
+- Robotic interaction
 
-Known Limitations
+After:
+- Natural speech detection
+- Faster processing
+- Better conversation flow
 
-- Smart Memory Recall is not yet implemented.
-- Memory categorization has not yet been implemented.
-- Attention System is still in the design phase.
+Known issues:
+
+- Whisper still mishears some words
+- Command handler needs improvement
+- Console duplicate output bug remains

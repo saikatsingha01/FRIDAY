@@ -1,7 +1,23 @@
+# Virtual environments
 venv/
+venv_cuda/
+
+# Python cache
 __pycache__/
 *.pyc
-temp.wav
+
+# Environment files
 .env
+
+# Logs
 logs/
-output/
+
+# Temporary files
+temp.wav
+
+# IDE
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db

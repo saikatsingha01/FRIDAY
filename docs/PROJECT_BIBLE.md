@@ -48,6 +48,23 @@ Friday is never "finished."
 Every version should improve the previous one.
 
 ---
+Friday has evolved from a command-response script into a modular AI assistant foundation.
+
+Current capabilities:
+
+- Hearing through speech recognition
+- Understanding basic commands
+- Speaking responses
+- Remembering information
+- Using GPU acceleration
+- Detecting natural speech timing
+
+
+The current goal is not immediate AGI-level intelligence.
+
+The goal is continuous improvement through better architecture, models, and systems.
+
+---
 
 ## 5. Simplicity Wins
 

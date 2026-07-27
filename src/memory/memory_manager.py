@@ -298,6 +298,10 @@ def recall_from_question(question):
 
     question = question.lower()
 
+
+    memories = []
+
+
     # Device questions
     if any(word in question for word in [
         "laptop",
@@ -307,7 +311,10 @@ def recall_from_question(question):
         "ram",
         "phone"
     ]):
+
         memories = get_memories_by_category("device")
+
+
 
     # Preference questions
     elif any(word in question for word in [
@@ -318,7 +325,10 @@ def recall_from_question(question):
         "prefer",
         "hate"
     ]):
+
         memories = get_memories_by_category("preference")
+
+
 
     # Project questions
     elif any(word in question for word in [
@@ -326,11 +336,17 @@ def recall_from_question(question):
         "building",
         "working on"
     ]):
+
         memories = get_memories_by_category("project")
 
-   # Identity questions
+
+
+    # Identity questions
     elif "name" in question:
+
         memories = get_memories_by_category("identity")
+
+
 
     # Emotional questions
     elif any(word in question for word in [
@@ -339,18 +355,21 @@ def recall_from_question(question):
         "family",
         "friend"
     ]):
+
         memories = get_memories_by_category("emotional")
 
+
+
     else:
+
         return None
 
+
+
     if not memories:
-        return "I couldn't find anything about that."
+
+        return None
 
 
-    facts = []
 
-    for item in memories:
-        facts.append(item["text"])
-
-    return "You told me: " + ", ".join(facts)
+    return memories

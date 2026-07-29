@@ -1,8 +1,15 @@
 from src.core.response_generator import generate_response
 from src.core.command_handler import handle_command
+
 from src.core.context_manager import get_recent_context
 from src.core.context_reasoner import find_relevant_context
-from src.memory.memory_manager import recall_from_question
+
+from src.memory.memory_retriever import retrieve_relevant_memories
+
+from src.memory.episode_retriever import retrieve_relevant_episodes
+
+from src.ai.prompt_builder import build_prompt
+from src.ai.llm_interface import llm
 
 
 
@@ -11,11 +18,13 @@ def think(message):
     print("BRAIN: Processing input...")
 
 
-    # Get recent conversation
+    # =================================================
+    # SHORT TERM CONTEXT
+    # =================================================
+
     context = get_recent_context()
 
 
-    # Find related previous conversation
     relevant_context = find_relevant_context(
         message,
         context
@@ -28,100 +37,138 @@ def think(message):
     )
 
 
+    # =================================================
+    # LONG TERM FACT MEMORY
+    # =================================================
 
-    # --------------------------------
-    # MEMORY REASONING
-    # --------------------------------
-
-    memory_answer = recall_from_question(
+    relevant_memories = retrieve_relevant_memories(
         message
     )
 
 
-    if memory_answer:
+    print(
+        "BRAIN MEMORIES:",
+        relevant_memories
+    )
 
-        print(
-            "BRAIN: Memory answer found"
-        )
+
+
+    # =================================================
+    # EPISODE MEMORY
+    # =================================================
+
+    relevant_episodes = retrieve_relevant_episodes(
+        message
+    )
+
+
+    print(
+        "BRAIN EPISODES:",
+        relevant_episodes
+    )
+
+
+
+    # =================================================
+    # COMMAND ROUTE
+    # =================================================
+
+    command_response = handle_command(
+        message
+    )
+
+
+    if command_response != "I don't understand that yet.":
 
 
         response = generate_response(
-            memory_answer
+            command_response
         )
 
 
         return {
+
             "message": message,
+
             "context": relevant_context,
+
+            "memories": relevant_memories,
+
+            "episodes": relevant_episodes,
+
             "response": response
+
         }
 
 
 
-    # --------------------------------
-    # CONTEXT REASONING
-    # --------------------------------
 
-    if relevant_context:
+    # =================================================
+    # LLM REASONING
+    # =================================================
+
+
+    prompt = build_prompt(
+
+        message=message,
+
+        memories=relevant_memories,
+
+        context=relevant_context,
+
+        episodes=relevant_episodes
+
+    )
+
+
+    print("\n========== FINAL PROMPT ==========")
+
+    print(prompt)
+
+    print("==================================\n")
+
+
+
+    response = llm.generate(
+        prompt
+    )
+
+
+
+    if response:
+
 
         print(
-            "BRAIN: Using conversation context"
+            "BRAIN: LLM answered"
         )
 
 
-        context_text = ""
+        return {
 
+            "message": message,
 
-        for item in relevant_context:
+            "context": relevant_context,
 
-            context_text += (
-                item["user"]
-                + " "
-            )
+            "memories": relevant_memories,
 
+            "episodes": relevant_episodes,
 
+            "response": response
 
-        # Temporary reasoning
-        # Will be replaced by LLM later
+        }
 
-        if "game" in message:
-
-            memory_answer = recall_from_question(
-                "favorite game"
-            )
-
-
-            if memory_answer:
-
-                response = generate_response(
-                    memory_answer
-                )
-
-
-                return {
-                    "message": message,
-                    "context": relevant_context,
-                    "response": response
-                }
-
-
-
-    # --------------------------------
-    # NORMAL COMMAND ROUTE
-    # --------------------------------
-
-    response = handle_command(
-        message
-    )
-
-
-    response = generate_response(
-        response
-    )
 
 
     return {
+
         "message": message,
+
         "context": relevant_context,
-        "response": response
+
+        "memories": relevant_memories,
+
+        "episodes": relevant_episodes,
+
+        "response": "I don't understand that yet."
+
     }

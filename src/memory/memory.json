@@ -30,6 +30,76 @@
             "category": "preference",
             "importance": 6,
             "confidence": 75
+        },
+        {
+            "id": 6,
+            "text": "by memory i mean my name from chuigotchi no to suigotchi no",
+            "category": "identity",
+            "importance": 10,
+            "confidence": 80
+        },
+        {
+            "id": 7,
+            "text": "then whats my name",
+            "category": "identity",
+            "importance": 10,
+            "confidence": 80
+        },
+        {
+            "id": 8,
+            "text": "yes very like shwikar singh ho s-a-i-k-a-t s-i-n-g-h-a",
+            "category": "preference",
+            "importance": 6,
+            "confidence": 75
+        },
+        {
+            "id": 9,
+            "text": "tell me again whats my name",
+            "category": "identity",
+            "importance": 10,
+            "confidence": 80
+        },
+        {
+            "id": 10,
+            "text": "its okay you dont have to remember my name",
+            "category": "identity",
+            "importance": 10,
+            "confidence": 80
+        },
+        {
+            "id": 11,
+            "text": "now my favorite game is ghost of tsushima",
+            "category": "preference",
+            "importance": 7,
+            "confidence": 75
+        },
+        {
+            "id": 12,
+            "text": "tell me again whats my favorite game",
+            "category": "preference",
+            "importance": 7,
+            "confidence": 75
+        },
+        {
+            "id": 13,
+            "text": "tell me whats my favorite game",
+            "category": "preference",
+            "importance": 7,
+            "confidence": 75
+        },
+        {
+            "id": 14,
+            "text": "my favorite movie is avengers endgame",
+            "category": "preference",
+            "importance": 7,
+            "confidence": 75
+        },
+        {
+            "id": 15,
+            "text": "so sekiro was my favorite game before but now its ghost of tsushima",
+            "category": "preference",
+            "importance": 7,
+            "confidence": 75
         }
     ]
 }

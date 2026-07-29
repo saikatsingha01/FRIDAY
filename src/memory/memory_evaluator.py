@@ -1,120 +1,168 @@
+from src.utils.logger import debug
+
+
+
+QUESTION_WORDS = [
+
+    "what",
+    "why",
+    "how",
+    "when",
+    "where",
+    "who",
+    "can",
+    "do",
+    "does",
+    "did"
+
+]
+
+
+TEMPORARY_WORDS = [
+
+    "today",
+    "right now",
+    "currently",
+    "just now",
+    "yesterday",
+    "tomorrow",
+    "this morning",
+    "tonight"
+
+]
+
+
+FACT_INDICATORS = [
+
+    "my",
+    "i am",
+    "i'm",
+    "i have",
+    "i own",
+    "my favorite",
+    "i like",
+    "i love",
+    "i hate",
+    "i prefer"
+
+]
+
+
+
 def evaluate_memory(fact):
 
-    print("DEBUG EVALUATOR INPUT:", repr(fact))
+    text = fact.lower().strip()
 
 
-    fact = fact.lower().strip()
+    score = 0
 
 
-    score = 50
+    debug(
+        f"Evaluating memory candidate: {text}"
+    )
+
+
+    # -----------------------------
+    # Reject questions
+    # -----------------------------
+
+    words = text.split()
+
+
+    if words:
+
+        if words[0] in QUESTION_WORDS:
+
+            debug(
+                "Rejected: question"
+            )
+
+            return {
+
+                "should_remember": False,
+
+                "confidence": 0
+
+            }
 
 
 
-    # Strong personal identity facts
-    high_value_words = [
-        "my name",
-        "i am",
-        "i'm",
-        "called",
-        "my laptop",
-        "my phone",
-        "my pc",
-        "my project"
-    ]
+    # -----------------------------
+    # Stable fact indicators
+    # -----------------------------
 
 
-    for word in high_value_words:
+    for indicator in FACT_INDICATORS:
 
-        if word in fact:
-
-            print("DEBUG HIGH VALUE FOUND:", word)
+        if indicator in text:
 
             score += 30
 
 
 
-    # Preferences and interests
-    preference_words = [
-        "favorite",
-        "favourite",
-        "prefer",
-        "like",
-        "love",
-        "hate",
-        "enjoy",
-        "interested in"
+    # -----------------------------
+    # Temporary information
+    # -----------------------------
+
+
+    for word in TEMPORARY_WORDS:
+
+        if word in text:
+
+            score -= 40
+
+
+
+    # -----------------------------
+    # Length check
+    # -----------------------------
+
+
+    if len(words) <= 2:
+
+        score -= 50
+
+
+
+    # -----------------------------
+    # Conversation phrases
+    # -----------------------------
+
+
+    conversation_noise = [
+
+        "tell me",
+        "remember",
+        "what is",
+        "what was",
+        "can you"
+
     ]
 
 
-    for word in preference_words:
+    for phrase in conversation_noise:
 
-        if word in fact:
+        if phrase in text:
 
-            print("DEBUG PREFERENCE FOUND:", word)
-
-            score += 25
+            score -= 20
 
 
 
-    # Life/project information
-    context_words = [
-        "working on",
-        "building",
-        "learning",
-        "studying",
-        "college",
-        "friend",
-        "family"
-    ]
+    confidence = max(
+        0,
+        min(score,100)
+    )
 
 
-    for word in context_words:
-
-        if word in fact:
-
-            print("DEBUG CONTEXT FOUND:", word)
-
-            score += 20
-
-
-
-    # Temporary information should not stay forever
-    temporary_words = [
-        "today",
-        "right now",
-        "currently",
-        "just now",
-        "for now"
-    ]
-
-
-    for word in temporary_words:
-
-        if word in fact:
-
-            print("DEBUG TEMPORARY FOUND:", word)
-
-            score -= 30
-
-
-
-    # Very short messages are usually not memories
-    if len(fact.split()) <= 2:
-
-        print("DEBUG TOO SHORT")
-
-        score -= 40
-
-
-
-    print("DEBUG FINAL SCORE:", score)
-
+    debug(
+        f"Memory score: {confidence}"
+    )
 
 
     return {
 
-        "should_remember": score >= 60,
+        "should_remember": confidence >= 60,
 
-        "confidence": min(score,100)
+        "confidence": confidence
 
     }

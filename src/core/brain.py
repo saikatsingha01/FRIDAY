@@ -1,174 +1,170 @@
+from src.understanding.understanding_orchestrator import analyze
+
+from src.core.reasoning_engine import reasoning_engine
+
+from src.execution.execution_manager import execution_manager
+
+from src.core.tool_router import route_tool
+
+from src.memory.memory_decision import process_memory
+
 from src.core.response_generator import generate_response
-from src.core.command_handler import handle_command
-
-from src.core.context_manager import get_recent_context
-from src.core.context_reasoner import find_relevant_context
-
-from src.memory.memory_retriever import retrieve_relevant_memories
-
-from src.memory.episode_retriever import retrieve_relevant_episodes
 
 from src.ai.prompt_builder import build_prompt
+
 from src.ai.llm_interface import llm
 
 
+def think(user_message: str):
 
-def think(message):
+    # ============================================
+    # 1. UNDERSTANDING
+    # ============================================
 
-    print("BRAIN: Processing input...")
+    understanding = analyze(user_message)
 
-
-    # =================================================
-    # SHORT TERM CONTEXT
-    # =================================================
-
-    context = get_recent_context()
-
-
-    relevant_context = find_relevant_context(
-        message,
-        context
-    )
-
-
-    print(
-        "BRAIN CONTEXT:",
-        relevant_context
-    )
-
-
-    # =================================================
-    # LONG TERM FACT MEMORY
-    # =================================================
-
-    relevant_memories = retrieve_relevant_memories(
-        message
-    )
-
-
-    print(
-        "BRAIN MEMORIES:",
-        relevant_memories
-    )
-
-
-
-    # =================================================
-    # EPISODE MEMORY
-    # =================================================
-
-    relevant_episodes = retrieve_relevant_episodes(
-        message
-    )
-
-
-    print(
-        "BRAIN EPISODES:",
-        relevant_episodes
-    )
-
-
-
-    # =================================================
-    # COMMAND ROUTE
-    # =================================================
-
-    command_response = handle_command(
-        message
-    )
-
-
-    if command_response != "I don't understand that yet.":
-
-
-        response = generate_response(
-            command_response
-        )
-
+    if understanding is None:
 
         return {
 
-            "message": message,
-
-            "context": relevant_context,
-
-            "memories": relevant_memories,
-
-            "episodes": relevant_episodes,
-
-            "response": response
+            "response": "I couldn't understand the request."
 
         }
 
+    # ============================================
+    # 2. REASONING
+    # ============================================
 
+    reasoning = reasoning_engine.reason(
 
+        understanding
 
-    # =================================================
-    # LLM REASONING
-    # =================================================
+    )
 
+    # ============================================
+    # 3. EXECUTION
+    # ============================================
+
+    execution = execution_manager.execute(
+
+        user_message,
+
+        reasoning,
+
+    )
+
+    # ============================================
+    # 4. TOOLS
+    # ============================================
+
+    tool_result = route_tool(
+
+        user_message
+
+    )
+
+    print("\n========== BRAIN ==========")
+    print("Tool Result :", repr(tool_result))
+    print("===========================\n")
+
+    if tool_result is not None:
+
+        return {
+
+            "understanding": understanding,
+
+            "reasoning": reasoning,
+
+            "execution": execution,
+
+            "response": generate_response(
+
+                tool_result
+
+            ),
+
+        }
+
+    # ============================================
+    # 5. MEMORY DECISION
+    # ============================================
+
+    memory_instruction = {
+        "operation": understanding.memory.memory_operation,
+        "fact":      understanding.memory.memory_payload,
+    }
+
+    memory_result = process_memory(memory_instruction)
+
+    print("\n========== MEMORY ==========")
+    print("Operation :", understanding.memory.memory_operation)
+    print("Payload   :", understanding.memory.memory_payload)
+    print("Result    :", repr(memory_result))
+    print("============================\n")
+
+    if memory_result == "stored":
+
+        # Let the LLM generate a natural confirmation.
+        # Responses vary: "Got it.", "Noted.", "I'll keep that in mind."
+        # MemoryDecision never generates dialogue — that's the LLM's job.
+
+        prompt = build_prompt(understanding, execution)
+
+        response = llm.generate(prompt)
+
+        if not response:
+            response = "Got it, I'll remember that."
+
+        return {
+
+            "understanding": understanding,
+
+            "reasoning": reasoning,
+
+            "execution": execution,
+
+            "response": response,
+
+        }
+
+    # ============================================
+    # 6. PROMPT
+    # ============================================
 
     prompt = build_prompt(
 
-        message=message,
+        understanding,
 
-        memories=relevant_memories,
-
-        context=relevant_context,
-
-        episodes=relevant_episodes
+        execution,
 
     )
 
-
-    print("\n========== FINAL PROMPT ==========")
-
-    print(prompt)
-
-    print("==================================\n")
-
-
+    # ============================================
+    # 7. LLM
+    # ============================================
 
     response = llm.generate(
+
         prompt
+
     )
 
+    if not response:
 
+        response = "I'm not sure how to respond."
 
-    if response:
-
-
-        print(
-            "BRAIN: LLM answered"
-        )
-
-
-        return {
-
-            "message": message,
-
-            "context": relevant_context,
-
-            "memories": relevant_memories,
-
-            "episodes": relevant_episodes,
-
-            "response": response
-
-        }
-
-
+    # ============================================
+    # 8. RESULT
+    # ============================================
 
     return {
 
-        "message": message,
+        "understanding": understanding,
 
-        "context": relevant_context,
+        "reasoning": reasoning,
 
-        "memories": relevant_memories,
+        "execution": execution,
 
-        "episodes": relevant_episodes,
-
-        "response": "I don't understand that yet."
+        "response": response,
 
     }

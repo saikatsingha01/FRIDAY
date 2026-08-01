@@ -1,266 +1,527 @@
-# Project Friday Bible v2.1
+# PROJECT FRIDAY
+## Canonical Architecture Bible
+Version: 2.0
+Status: ACTIVE
 
-## Motto
+---
 
-"Build a trustworthy AI companion that grows with its creator while always remaining under the creator's authority."
+# Vision
+
+FRIDAY is not a chatbot.
+
+FRIDAY is an AI Operating System.
+
+The goal is to build a trustworthy AI companion capable of understanding, reasoning, planning, remembering, executing, learning and evolving while always remaining under the user's authority.
+
+Architecture comes before features.
+
+Long-term maintainability is valued over short-term speed.
 
 ---
 
 # Core Principles
 
-## 1. User First
+1. User Authority First
 
-The user is always the final authority.
+The user is always in control.
 
-Friday may:
-- Learn
-- Suggest
-- Assist
-- Improve
-- Plan
-
-Friday may never:
-- Override the owner's authority.
-- Remove user control.
-- Perform irreversible actions without permission.
+FRIDAY never performs sensitive actions without permission.
 
 ---
 
-## 2. Security Before Intelligence
+2. Security Before Intelligence
 
-Every feature must be designed securely before implementation.
+Security is never sacrificed for convenience.
 
-Security is part of every module.
-
----
-
-## 3. Architecture Before Features
-
-Never rush features.
-
-A strong architecture is more valuable than many unfinished features.
+Every powerful capability must be permission-controlled.
 
 ---
 
-## 4. Continuous Evolution
+3. Architecture Before Features
 
-Friday is never "finished."
+Features may change.
 
-Every version should improve the previous one.
+Architecture should not.
 
-Friday has evolved from a command-response script into a modular AI assistant foundation.
-
-Current capabilities:
-
-- Hearing through speech recognition
-- Understanding basic commands
-- Speaking responses
-- Remembering information
-- Automatic memory evaluation
-- Memory recall
-- Conversation context
-- Context reasoning
-- Brain layer reasoning
-- Using GPU acceleration
-- Detecting natural speech timing
-
-The current goal is not immediate AGI-level intelligence.
-
-The goal is continuous improvement through better architecture, models, and systems.
+Every feature must fit the architecture instead of modifying it.
 
 ---
 
-## 5. Simplicity Wins
+4. Modular Design
 
-Prefer:
+Every module owns exactly one responsibility.
 
-- Simple
-- Reliable
-- Maintainable
+Modules communicate through contracts.
 
-instead of
-
-- Complicated
-- Fragile
-- Over-engineered
+No module should perform another module's job.
 
 ---
 
-## 6. Brain Before Language
+5. Technology Independence
 
-Friday's intelligence must not depend on the LLM.
+FRIDAY must never depend on one AI model.
 
-The Brain is responsible for:
+Every external dependency should be replaceable.
 
-- Memory reasoning
-- Context reasoning
-- Decision making
-- Command routing
-- Planning future actions
+Examples
 
-The LLM is responsible only for:
+- Ollama
+- OpenAI
+- Claude
+- Gemini
+- DeepSeek
+- AirLLM
 
-- Natural language understanding
-- Natural language generation
-- Explaining decisions naturally
-
-The Brain decides **what** should happen.
-
-The LLM decides **how** to express it.
+must all be interchangeable.
 
 ---
 
-# Friday Architecture
+6. Long-Term Evolution
 
-Core Layer
-- Identity
-- Ownership
-- Fundamental Rules
-- Moral Values
+FRIDAY should continue improving for years.
 
-Governance Layer
-- Permissions
-- Decision Making
-- Approval System
+The architecture should support future capabilities without major rewrites.
 
-Brain Layer
-- Memory Reasoning
-- Context Reasoning
-- Decision Routing
-- Planning
-- Future LLM Orchestration
+---
 
-Intelligence Layer
-- LLM Interface
-- Advanced Planning
-- Long-term Reasoning
+# Architecture Philosophy
 
-Memory Layer
-- Short-term Memory
-- Long-term Memory
-- Experience Memory
+Everything inside FRIDAY follows this pipeline:
 
-Perception Layer
+User
+
+↓
+
+Input
+
+↓
+
+Understanding
+
+↓
+
+Reasoning
+
+↓
+
+Execution
+
+↓
+
+Prompt Construction
+
+↓
+
+LLM
+
+↓
+
+Response
+
+↓
+
+Reflection (future)
+
+↓
+
+Memory Update
+
+No layer may skip another layer.
+
+---
+
+# Folder Responsibilities
+
+## input/
+
+Receives user input.
+
+Responsibilities
+
+- Keyboard
 - Voice
+- Camera
+
+Does NOT
+
+- Understand language
+- Execute commands
+
+---
+
+## speech/
+
+Speech recognition and speech synthesis.
+
+Responsibilities
+
+- STT
+- TTS
+- Voice Activity Detection
+
+---
+
+## understanding/
+
+Purpose
+
+Understand language.
+
+Responsibilities
+
+- Semantic understanding
+- Conversation analysis
+- Emotion analysis
+- Context analysis
+- Memory analysis
+
+Never
+
+- Retrieve memory
+- Execute commands
+- Perform reasoning
+- Talk to tools
+
+Output
+
+LanguageUnderstanding
+
+---
+
+## contracts/
+
+Purpose
+
+Shared data models.
+
+Responsibilities
+
+- LanguageUnderstanding
+- ExecutionResult
+- PlannerContract
+- ReflectionContract
+
+Never
+
+- Execute logic
+
+---
+
+## reasoning/
+
+(Currently located in core)
+
+Purpose
+
+Convert understanding into execution decisions.
+
+Responsibilities
+
+- Decide which systems participate
+- Build execution plan
+
+Never
+
+- Parse English
+- Retrieve memory
+- Call tools
+
+Output
+
+ReasoningResult
+
+---
+
+## execution/
+
+Purpose
+
+Coordinate every execution subsystem.
+
+Responsibilities
+
+- Memory
+- Context
+- Tools
+- Web
 - Vision
-- Attention System
+- Planning
 
-Tool Layer
-- File Management
-- Coding
-- Testing
-- Automation
+Never
 
-Evolution Layer
-- Controlled Self Improvement
-- Testing
-- Rollback
-- Version Control
+- Understand language
 
-Security Layer
-- Authentication
-- Encryption
-- Audit Logs
-- Sandboxing
-- Recovery
+Output
+
+ExecutionResult
 
 ---
 
-# Memory Philosophy
+## memory/
 
-Friday should remember:
+Purpose
 
-- Goals
-- Projects
-- Preferences
-- Important experiences
-- Lessons learned
+Store and retrieve knowledge.
 
-Friday should forget:
+Responsibilities
 
-- Random conversations
-- Temporary information
-- Noise
+- Long-term memory
+- Episodic memory
+- Consolidation
+- Validation
 
-Memory should become smarter over time by learning what deserves permanent storage instead of relying only on fixed rules.
+Never
 
----
-
-# Continuous Awareness
-
-Friday should understand context, not spy.
-
-She observes only what is permitted.
-
-Privacy always overrides awareness.
+- Understand English
+- Generate responses
 
 ---
 
-# Adaptive Communication Evolution
+## ai/
 
-Friday should gradually improve the way she communicates through long-term interaction.
+Purpose
 
-She should naturally adapt:
+Interact with language models.
 
-- Tone
-- Humor
-- Response length
-- Vocabulary
-- Conversation style
+Responsibilities
 
-while preserving a stable identity.
+- Prompt construction
+- Model routing
+- Provider abstraction
 
-Communication should evolve through shared experiences rather than manually programmed personalities.
+Never
 
----
-
-# Self Improvement
-
-Basic Layer
-
-- Small optimizations
-- Performance improvements
-- Bug fixes
-
-Important Layer
-
-- User approval required
-
-Core Layer
-
-- Cannot self-modify
-
-Every improvement should be:
-
-- Tested
-- Reversible
-- Logged
-- Safe
+- Make decisions
 
 ---
 
-# Long-Term Vision
+## skills/
 
-Friday should become:
+Purpose
 
-- Personal AI Companion
-- Software Engineering Assistant
-- Universal Testing Assistant
-- Secure Autonomous Helper
-- Continuously Improving System
+Tool implementations.
 
-Eventually, Friday should be capable of reasoning, planning, learning, communicating naturally, and coordinating specialized subsystems while remaining fully aligned with the user's authority.
+Examples
+
+- Calculator
+- File Manager
+- Browser
+- Music
+
+Never
+
+- Decide when to execute
 
 ---
 
-# Final Rule
+## core/
 
-Every new feature must answer:
+Temporary orchestration layer.
 
-1. Does it improve Friday?
-2. Is it secure?
-3. Does it fit the architecture?
-4. Can it be maintained?
-5. Can it be safely rolled back?
+Contains
 
-If not, redesign first.
+- Brain
+- Conversation Manager
+- Response Generator
+
+Future
+
+Most orchestration will gradually move into dedicated architecture layers.
+
+---
+
+# Engineering Rules
+
+Rule 1
+
+Every module owns one responsibility.
+
+---
+
+Rule 2
+
+Never create a new file unless an existing file has become too large or gained multiple responsibilities.
+
+---
+
+Rule 3
+
+No premature abstraction.
+
+Architecture grows only when necessary.
+
+---
+
+Rule 4
+
+Brain orchestrates.
+
+Brain does not think.
+
+---
+
+Rule 5
+
+Understanding never executes.
+
+---
+
+Rule 6
+
+Execution never understands language.
+
+---
+
+Rule 7
+
+Memory never decides.
+
+---
+
+Rule 8
+
+Reasoning never parses English.
+
+---
+
+Rule 9
+
+LLMs are replaceable.
+
+The system must never depend on one provider.
+
+---
+
+Rule 10
+
+Architecture changes require updating this document.
+
+---
+
+# Development Philosophy
+
+Whenever adding a feature, ask:
+
+1. Which layer owns this responsibility?
+
+2. Does an existing module already own it?
+
+3. Can this be added without creating a new file?
+
+4. Does this violate any architecture rule?
+
+If any answer is uncertain:
+
+Stop.
+
+Review the architecture.
+
+---
+
+# Roadmap
+
+Phase 1
+
+✓ Voice Foundation
+
+✓ Memory Foundation
+
+✓ Understanding Engine
+
+✓ Contracts
+
+✓ Reasoning Engine
+
+✓ Execution Layer Foundation
+
+---
+
+Phase 2
+
+Execution Layer Expansion
+
+- Context Execution
+
+- Tool Execution
+
+- Web Execution
+
+- Vision Execution
+
+- Planner Integration
+
+---
+
+Phase 3
+
+Planning System
+
+- Planner
+
+- Task Graph
+
+- Scheduler
+
+- Executor
+
+---
+
+Phase 4
+
+Reflection Engine
+
+- Response Evaluation
+
+- Failure Analysis
+
+- Self Improvement
+
+---
+
+Phase 5
+
+Dynamic Model Routing
+
+- Local Models
+
+- Cloud Models
+
+- Automatic Model Selection
+
+---
+
+Phase 6
+
+Autonomous Workflows
+
+- Multi-agent execution
+
+- Background tasks
+
+- Long-running plans
+
+---
+
+Phase 7
+
+Learning and Evolution
+
+- User adaptation
+
+- Skill acquisition
+
+- Workflow optimization
+
+---
+
+# Permanent Rule
+
+This document is the source of truth.
+
+When architecture changes,
+
+update this document first.
+
+Then update the code.
+
+Never the other way around.

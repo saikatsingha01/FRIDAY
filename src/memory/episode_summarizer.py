@@ -3,77 +3,93 @@ from src.memory.episode_manager import add_episode
 
 MIN_MESSAGES = 8
 
+STOP_WORDS = {
+    "the", "a", "an",
+    "and", "or", "but",
+    "that", "this", "with",
+    "have", "has", "had",
+    "what", "when", "where",
+    "which", "would", "could",
+    "should", "there", "their",
+    "about", "because", "from",
+    "into", "your", "you're",
+    "my", "our", "you",
+    "was", "were", "been",
+    "just", "very", "really"
+}
+
 
 def summarize_conversation(conversation):
-
     """
-    Converts a conversation into
-    one episodic memory.
+    Converts a finished conversation
+    into one episodic memory.
     """
 
     if len(conversation) < MIN_MESSAGES:
         return None
 
     user_messages = []
-
     keywords = set()
 
     for item in conversation:
 
         user = item.get("user", "").strip()
 
-        if user:
+        if not user:
+            continue
 
-            user_messages.append(user)
+        user_messages.append(user)
 
-            for word in user.lower().split():
+        for word in user.lower().split():
 
-                word = word.strip(".,?!")
+            word = word.strip(".,?!()[]{}\"'")
 
-                if len(word) < 4:
-                    continue
+            if len(word) < 4:
+                continue
 
-                keywords.add(word)
+            if word in STOP_WORDS:
+                continue
+
+            keywords.add(word)
 
     if not user_messages:
         return None
 
+    preview = user_messages[:3]
+
     summary = "Conversation about "
 
-    summary += ", ".join(user_messages[:3])
+    summary += ", ".join(preview)
 
     if len(user_messages) > 3:
-
         summary += "..."
-
-    important_words = sorted(
-        list(keywords)
-    )[:10]
 
     importance = 5
 
-    if len(conversation) >= 20:
-
-        importance = 8
-
-    if any(word in keywords for word in [
-
+    important_topics = {
         "friday",
-        "project",
         "memory",
         "brain",
+        "assistant",
         "architecture",
-        "assistant"
+        "project",
+        "coding",
+        "python",
+        "ollama",
+        "voice"
+    }
 
-    ]):
+    if keywords & important_topics:
+        importance = 8
 
+    if len(conversation) >= 20:
         importance = 10
 
     return add_episode(
 
         summary=summary,
 
-        keywords=important_words,
+        keywords=sorted(keywords),
 
         importance=importance
 

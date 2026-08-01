@@ -1,84 +1,111 @@
 def sentence_case(text):
 
     if not text:
-        return text
+        return ""
 
     text = text.strip()
 
     return text[0].upper() + text[1:]
 
 
-def generate_memory_response(memory):
+# ==========================================================
+# MEMORY FORMATTING
+# ==========================================================
 
-    text = memory["text"]
-    category = memory.get("category", "general")
+def format_memory(memory):
+
+    text = sentence_case(
+        memory["text"]
+    )
+
+    category = memory.get(
+        "category",
+        "general"
+    )
+
+    if category == "identity":
+
+        return text + "."
+
+    if category == "device":
+
+        return text + "."
+
+    if category == "project":
+
+        return text + "."
 
     if category == "preference":
 
-        if text.startswith("my favorite"):
-            return sentence_case(text).replace("my ", "Your ", 1) + "."
+        return text + "."
 
-        if text.startswith("i like"):
-            return "You told me that you like " + text[7:] + "."
+    if category == "emotional":
 
-        if text.startswith("i love"):
-            return "You once told me that you love " + text[7:] + "."
+        return text + "."
 
-        return "You told me: " + sentence_case(text) + "."
+    return text + "."
 
 
-    elif category == "device":
-
-        return sentence_case(text).replace("my ", "Your ", 1) + "."
-
-
-    elif category == "identity":
-
-        return "I remember that " + text + "."
-
-
-    elif category == "project":
-
-        return "You're currently working on " + text + "."
-
-
-    elif category == "emotional":
-
-        return "I remember you telling me that " + text + "."
-
-
-    return "I remember: " + sentence_case(text) + "."
-
+# ==========================================================
+# MAIN
+# ==========================================================
 
 def generate_response(data):
 
-    # Already a sentence
+    # --------------------------------------
+    # None
+    # --------------------------------------
+
+    if data is None:
+
+        return None
+
+    # --------------------------------------
+    # Already a response
+    # --------------------------------------
+
     if isinstance(data, str):
+
         return data
 
+    # --------------------------------------
+    # Single Memory
+    # --------------------------------------
 
-    # Memory list
-    if isinstance(data, list):
-
-        if len(data) == 0:
-            return "I couldn't find anything about that."
-
-        if len(data) == 1:
-            return generate_memory_response(data[0])
-
-        responses = []
-
-        for memory in data:
-            responses.append(generate_memory_response(memory))
-
-        return " ".join(responses)
-
-
-    # Single memory object
     if isinstance(data, dict):
 
         if "text" in data:
-            return generate_memory_response(data)
 
+            return format_memory(data)
+
+        return str(data)
+
+    # --------------------------------------
+    # Memory List
+    # --------------------------------------
+
+    if isinstance(data, list):
+
+        if len(data) == 0:
+
+            return "I couldn't find anything relevant."
+
+        if len(data) == 1:
+
+            return format_memory(data[0])
+
+        response = []
+
+        for memory in data:
+
+            response.append(
+                format_memory(memory)
+            )
+
+        return "\n".join(response)
+
+    # --------------------------------------
+    # Fallback
+    # --------------------------------------
 
     return str(data)

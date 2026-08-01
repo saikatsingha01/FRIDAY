@@ -1,3 +1,43 @@
 {
-    "episodes": []
+    "episodes": [
+        {
+            "id": 1,
+            "summary": "Previously: My favorite food is rice. This was updated to: My favorite food is chicken curry.",
+            "keywords": [
+                "chicken",
+                "curry",
+                "food",
+                "rice"
+            ],
+            "importance": 7,
+            "timestamp": "2026-08-01T15:21:20.056632"
+        },
+        {
+            "id": 2,
+            "summary": "Previously: My favorite game is Sekiro. This was updated to: My favorite game is Post of Sushiva now.",
+            "keywords": [
+                "game",
+                "now",
+                "post",
+                "sekiro",
+                "sushiva"
+            ],
+            "importance": 7,
+            "timestamp": "2026-08-01T15:21:44.228553"
+        },
+        {
+            "id": 3,
+            "summary": "Previously: My favorite game is Post of Sushiva now. This was updated to: My favorite game is Ghost of Tsushima.",
+            "keywords": [
+                "game",
+                "ghost",
+                "now",
+                "post",
+                "sushiva",
+                "tsushima"
+            ],
+            "importance": 7,
+            "timestamp": "2026-08-01T15:22:35.394652"
+        }
+    ]
 }

@@ -8,159 +8,214 @@ from src.core.conversation_manager import process_conversation
 from src.core.context_manager import add_context
 
 
+class VoiceAssistant:
 
-def should_shutdown(text):
+    """
+    Main runtime for FRIDAY.
 
-    shutdown_words = [
+    Responsibilities:
+    - Listen
+    - Transcribe
+    - Validate
+    - Process conversation
+    - Speak response
+
+    Future:
+    - Wake word
+    - Interrupt handling
+    - Multi-modal input
+    - Emotion detection
+    - Streaming responses
+    """
+
+
+    SHUTDOWN_WORDS = [
+
         "exit",
         "shutdown",
         "shut down",
-        "stop",
         "quit",
+        "stop",
         "bye",
         "goodbye",
         "turn off"
+
     ]
 
-    for word in shutdown_words:
 
-        if word in text:
-            return True
+    def should_shutdown(
+        self,
+        text
+    ):
 
-    return False
+        text = text.lower()
 
+        return any(
 
+            word in text
 
-def main():
+            for word in self.SHUTDOWN_WORDS
 
-    print("Friday voice mode activated.")
-
-    speak("Friday voice mode activated.")
-
-
-
-    while True:
-
-
-        # Voice activity detection
-        audio_file = listen()
-
-
-
-        # Speech to text
-        raw_text = transcribe(audio_file)
-
-
-
-        print(
-            "RAW WHISPER:",
-            repr(raw_text)
         )
 
 
-
-        # Cleanup
-        text = clean_text(raw_text)
-
-
-
-        # Validation
-        if not validate_input(text):
-
-            print(
-                "Input unclear, ignoring."
-            )
-
-            continue
-
-
+    def run(self):
 
         print(
-            "\nYou said:",
-            text
+            "Friday voice mode activated."
+        )
+
+        speak(
+            "Friday voice mode activated."
         )
 
 
-
-        # Shutdown
-        if should_shutdown(text):
-
-            response = "Shutting down."
+        while True:
 
 
-            print(
-                "Friday:",
-                response
+            # ===================================
+            # LISTEN
+            # ===================================
+
+            audio = listen()
+
+
+            # ===================================
+            # SPEECH TO TEXT
+            # ===================================
+
+            raw_text = transcribe(
+                audio
             )
 
 
-            speak(response)
-
-
-
-            add_context(
-                text,
-                response
+            print(
+                "\nRAW:",
+                repr(raw_text)
             )
 
 
-            break
+            # ===================================
+            # CLEAN INPUT
+            # ===================================
+
+            text = clean_text(
+                raw_text
+            )
 
 
+            if not validate_input(
+                text
+            ):
 
-
-        # Conversation layer
-        conversation_result = process_conversation(text)
-
-
-
-        # Debug context reasoning
-        print(
-            "DEBUG CONTEXT:",
-            conversation_result["context"]
-        )
-
-
-
-        response = conversation_result["response"]
-
-
-
-        print(
-            "DEBUG RESPONSE:",
-            repr(response)
-        )
-
-
-
-        if response:
+                continue
 
 
             print(
-                "Friday:",
+                "\nUSER:",
+                text
+            )
+
+
+            # ===================================
+            # SHUTDOWN
+            # ===================================
+
+            if self.should_shutdown(
+                text
+            ):
+
+                response = "Shutting down."
+
+
+                print(
+                    "\nFRIDAY:",
+                    response
+                )
+
+
+                speak(
+                    response
+                )
+
+
+                add_context(
+
+                    text,
+
+                    response
+
+                )
+
+
+                break
+
+
+
+            # ===================================
+            # COGNITIVE PIPELINE
+            # ===================================
+
+            result = process_conversation(
+                text
+            )
+
+
+            # ===================================
+            # RESPONSE EXTRACTION
+            # ===================================
+
+            if isinstance(
+                result,
+                dict
+            ):
+
+                response = result.get(
+
+                    "response",
+
+                    "I'm not sure how to respond."
+
+                )
+
+            else:
+
+                response = (
+                    "I'm not sure how to respond."
+                )
+
+
+
+            print(
+                "\nFRIDAY:",
                 response
             )
 
 
             speak(
-                str(response)
-            )
-
-
-
-            # Save short-term context
-            add_context(
-                text,
                 response
             )
 
 
-        else:
+            # ===================================
+            # SHORT TERM CONTEXT
+            # ===================================
 
-            print(
-                "Friday did not generate a response."
+            add_context(
+
+                text,
+
+                response
+
             )
 
+
+
+def main():
+
+    assistant = VoiceAssistant()
+
+    assistant.run()
 
 
 

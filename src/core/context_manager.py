@@ -1,39 +1,70 @@
-conversation_context = []
+from collections import deque
 
 
-# Maximum number of recent conversations to keep
-MAX_CONTEXT = 5
+# ==========================================================
+# CONFIG
+# ==========================================================
+
+MAX_CONTEXT = 10
 
 
+# ==========================================================
+# STORAGE
+# ==========================================================
+
+conversation_context = deque(maxlen=MAX_CONTEXT)
+
+
+# ==========================================================
+# ADD
+# ==========================================================
 
 def add_context(user_message, friday_response):
 
-    conversation_context.append(
-        {
-            "user": user_message,
-            "friday": friday_response
-        }
-    )
+    conversation_context.append({
+
+        "user": user_message,
+
+        "friday": friday_response
+
+    })
 
 
-    # Remove oldest context when limit exceeds
-    if len(conversation_context) > MAX_CONTEXT:
-
-        conversation_context.pop(0)
-
-
+# ==========================================================
+# READ
+# ==========================================================
 
 def get_context():
 
-    return conversation_context
+    return list(conversation_context)
 
 
+def get_recent_context(limit=5):
 
-def get_recent_context(limit=3):
+    if limit <= 0:
 
-    return conversation_context[-limit:]
+        return []
+
+    return list(conversation_context)[-limit:]
 
 
+def last_exchange():
+
+    if not conversation_context:
+
+        return None
+
+    return conversation_context[-1]
+
+
+def context_size():
+
+    return len(conversation_context)
+
+
+# ==========================================================
+# MANAGEMENT
+# ==========================================================
 
 def clear_context():
 

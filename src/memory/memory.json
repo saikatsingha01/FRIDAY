@@ -2,104 +2,31 @@
     "memories": [
         {
             "id": 3,
-            "text": "i love her",
-            "category": "emotional",
-            "importance": 10
-        },
-        {
-            "id": 3,
-            "text": "my name is chui got shin ho",
-            "category": "identity",
-            "importance": 10
-        },
-        {
-            "id": 4,
-            "text": "i ate rice",
-            "category": "general",
-            "importance": 3
-        },
-        {
-            "id": 5,
-            "text": "my laptop has rtx 4050",
-            "category": "device",
-            "importance": 8
-        },
-        {
-            "id": 5,
-            "text": "my favorite game is sekiro",
+            "text": "My favorite food is chicken curry",
             "category": "preference",
-            "importance": 6,
-            "confidence": 75
+            "importance": 7,
+            "confidence": 35
+        },
+        {
+            "id": 5,
+            "text": "My favorite game is Ghost of Tsushima",
+            "category": "preference",
+            "importance": 7,
+            "confidence": 35
         },
         {
             "id": 6,
-            "text": "by memory i mean my name from chuigotchi no to suigotchi no",
-            "category": "identity",
-            "importance": 10,
-            "confidence": 80
+            "text": "I like Darjeeling",
+            "category": "preference",
+            "importance": 7,
+            "confidence": 35
         },
         {
             "id": 7,
-            "text": "then whats my name",
-            "category": "identity",
-            "importance": 10,
-            "confidence": 80
-        },
-        {
-            "id": 8,
-            "text": "yes very like shwikar singh ho s-a-i-k-a-t s-i-n-g-h-a",
-            "category": "preference",
-            "importance": 6,
-            "confidence": 75
-        },
-        {
-            "id": 9,
-            "text": "tell me again whats my name",
-            "category": "identity",
-            "importance": 10,
-            "confidence": 80
-        },
-        {
-            "id": 10,
-            "text": "its okay you dont have to remember my name",
-            "category": "identity",
-            "importance": 10,
-            "confidence": 80
-        },
-        {
-            "id": 11,
-            "text": "now my favorite game is ghost of tsushima",
+            "text": "I love to study",
             "category": "preference",
             "importance": 7,
-            "confidence": 75
-        },
-        {
-            "id": 12,
-            "text": "tell me again whats my favorite game",
-            "category": "preference",
-            "importance": 7,
-            "confidence": 75
-        },
-        {
-            "id": 13,
-            "text": "tell me whats my favorite game",
-            "category": "preference",
-            "importance": 7,
-            "confidence": 75
-        },
-        {
-            "id": 14,
-            "text": "my favorite movie is avengers endgame",
-            "category": "preference",
-            "importance": 7,
-            "confidence": 75
-        },
-        {
-            "id": 15,
-            "text": "so sekiro was my favorite game before but now its ghost of tsushima",
-            "category": "preference",
-            "importance": 7,
-            "confidence": 75
+            "confidence": 35
         }
     ]
 }

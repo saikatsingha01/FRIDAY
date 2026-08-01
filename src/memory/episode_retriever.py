@@ -3,35 +3,62 @@ from src.memory.episode_manager import get_all_episodes
 
 STOP_WORDS = {
 
-    "the", "a", "an",
+    "the",
+    "a",
+    "an",
 
-    "is", "are", "was", "were",
+    "is",
+    "are",
+    "was",
+    "were",
 
-    "i", "me", "my",
+    "i",
+    "me",
+    "my",
+    "you",
+    "your",
 
-    "you", "your",
+    "what",
+    "who",
+    "where",
+    "when",
+    "why",
+    "how",
 
-    "tell", "about",
-
-    "what", "who", "where",
-
-    "when", "why", "how",
-
-    "did", "do", "does",
+    "do",
+    "does",
+    "did",
 
     "remember",
+    "recall",
 
     "conversation",
-
-    "conversations",
-
     "chat",
-
     "previous",
+    "last",
 
-    "context"
+    "please"
 
 }
+
+
+def extract_keywords(text):
+
+    words = []
+
+    for word in text.lower().split():
+
+        word = word.strip(".,?!")
+
+        if len(word) < 3:
+            continue
+
+        if word in STOP_WORDS:
+            continue
+
+        words.append(word)
+
+    return words
 
 
 def retrieve_relevant_episodes(
@@ -42,69 +69,73 @@ def retrieve_relevant_episodes(
 
 ):
 
-    message = message.lower().strip()
-
-    query_words = []
-
-    for word in message.split():
-
-        word = word.strip(".,?!")
-
-        if len(word) < 3:
-
-            continue
-
-        if word in STOP_WORDS:
-
-            continue
-
-        query_words.append(word)
-
-    scored = []
+    query = extract_keywords(message)
 
     episodes = get_all_episodes()
+
+    scored = []
 
     for episode in episodes:
 
         score = 0
 
-        summary = episode["summary"].lower()
+        summary = episode.get(
+
+            "summary",
+
+            ""
+
+        ).lower()
 
         keywords = [
 
             k.lower()
 
-            for k in episode["keywords"]
+            for k in episode.get(
+
+                "keywords",
+
+                []
+
+            )
 
         ]
 
-        # ------------------------
+        # ==========================================
         # Keyword overlap
-        # ------------------------
+        # ==========================================
 
-        for word in query_words:
+        overlap = 0
+
+        for word in query:
 
             if word in summary:
 
-                score += 20
+                overlap += 1
 
             if word in keywords:
 
-                score += 25
+                overlap += 1
 
-        # ------------------------
+        score += overlap * 20
+
+        # ==========================================
         # Previous conversation boost
-        # ------------------------
+        # ==========================================
 
         if any(
 
-            phrase in message
+            phrase in message.lower()
 
             for phrase in [
 
                 "previous chat",
 
                 "previous conversation",
+
+                "last conversation",
+
+                "last chat",
 
                 "remember yesterday",
 
@@ -114,21 +145,25 @@ def retrieve_relevant_episodes(
 
                 "what did we discuss",
 
-                "our conversation",
-
-                "last conversation"
+                "our conversation"
 
             ]
 
         ):
 
-            score += 40
+            score += 25
 
-        # ------------------------
+        # ==========================================
         # Importance bonus
-        # ------------------------
+        # ==========================================
 
-        score += episode["importance"]
+        score += episode.get(
+
+            "importance",
+
+            0
+
+        )
 
         if score >= 30:
 
@@ -152,20 +187,10 @@ def retrieve_relevant_episodes(
 
     )
 
-    results = [
+    return [
 
-        item[1]
+        episode
 
-        for item in scored[:max_results]
+        for _, episode in scored[:max_results]
 
     ]
-
-    print(
-
-        "EPISODE RETRIEVER:",
-
-        results
-
-    )
-
-    return results

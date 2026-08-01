@@ -1,33 +1,116 @@
-from src.memory.memory_manager import get_memory
+from src.memory.memory_manager import get_all_memories
+from src.memory.knowledge_normalizer import normalize_fact
 
 
 STOP_WORDS = {
-    "the", "a", "an", "is", "are", "was", "were",
-    "i", "me", "my", "you", "your",
-    "do", "does", "did",
-    "can", "could", "would",
-    "tell", "about",
-    "what", "who", "where", "when", "why", "how",
-    "please",
+
+    "the",
+    "a",
+    "an",
+
+    "is",
+    "are",
+    "was",
+    "were",
+
+    "i",
+    "me",
+    "my",
+    "you",
+    "your",
+
+    "do",
+    "does",
+    "did",
+
+    "can",
+    "could",
+    "would",
+    "should",
+
+    "what",
+    "who",
+    "where",
+    "when",
+    "why",
+    "how",
+
+    "tell",
+    "about",
+
     "remember",
+    "recall",
+
+    "please",
+
+    "our",
+    "we",
+
+    "conversation",
+    "chat",
     "previous",
-    "context"
+    "last"
 }
 
 
-def retrieve_relevant_memories(message, max_results=5):
+CATEGORY_HINTS = {
 
-    message = message.lower().strip()
+    "device": [
+        "laptop",
+        "computer",
+        "pc",
+        "phone",
+        "gpu",
+        "cpu",
+        "ram",
+        "ssd",
+        "monitor"
+    ],
 
-    memories = get_memory()["memories"]
+    "preference": [
+        "favorite",
+        "favourite",
+        "like",
+        "love",
+        "hate",
+        "prefer",
+        "movie",
+        "game",
+        "music"
+    ],
 
-    scored = []
+    "project": [
+        "project",
+        "building",
+        "developing",
+        "creating",
+        "working"
+    ],
 
-    query_words = []
+    "identity": [
+        "name",
+        "age",
+        "birthday",
+        "who am i"
+    ],
 
-    for word in message.split():
+    "emotional": [
+        "girlfriend",
+        "friend",
+        "family",
+        "relationship"
+    ]
 
-        word = word.strip(".,?!")
+}
+
+
+def extract_keywords(text):
+
+    words = []
+
+    text = normalize_fact(text)
+
+    for word in text.split():
 
         if len(word) < 3:
             continue
@@ -35,101 +118,103 @@ def retrieve_relevant_memories(message, max_results=5):
         if word in STOP_WORDS:
             continue
 
-        query_words.append(word)
+        words.append(word)
+
+    return words
+
+
+def retrieve_relevant_memories(message, max_results=5):
+
+    query = normalize_fact(message)
+
+    keywords = extract_keywords(query)
+
+    memories = get_all_memories()
+
+    scored = []
+
+    seen = set()
 
     for memory in memories:
 
+        memory_text = normalize_fact(memory["text"])
+
+        if memory_text in seen:
+            continue
+
+        seen.add(memory_text)
+
         score = 0
 
-        text = memory["text"].lower()
-
-        # -------------------------
+        # =====================================
         # Exact match
-        # -------------------------
+        # =====================================
 
-        if message == text:
+        if query == memory_text:
+            score += 120
 
-            score += 100
-
-        # -------------------------
+        # =====================================
         # Phrase match
-        # -------------------------
+        # =====================================
 
-        if message in text or text in message:
+        elif query in memory_text:
 
-            score += 50
+            score += 70
 
-        # -------------------------
+        elif memory_text in query:
+
+            score += 60
+
+        # =====================================
         # Keyword overlap
-        # -------------------------
+        # =====================================
 
-        for word in query_words:
+        overlap = 0
 
-            if word in text:
+        for word in keywords:
 
-                score += 20
+            if word in memory_text:
+                overlap += 1
 
-        # -------------------------
-        # Category boosts
-        # -------------------------
+        score += overlap * 20
 
-        if any(w in message for w in [
-            "game",
-            "favorite",
-            "prefer",
-            "like",
-            "hate"
-        ]):
+        # =====================================
+        # Category boost
+        # =====================================
 
-            if memory["category"] == "preference":
+        for category, hints in CATEGORY_HINTS.items():
 
-                score += 30
+            if any(hint in query for hint in hints):
 
-        if any(w in message for w in [
-            "laptop",
-            "gpu",
-            "ram",
-            "pc",
-            "phone"
-        ]):
+                if memory["category"] == category:
 
-            if memory["category"] == "device":
+                    score += 25
 
-                score += 30
+        # =====================================
+        # Importance bonus
+        # =====================================
 
-        if any(w in message for w in [
-            "project",
-            "building",
-            "working"
-        ]):
+        score += memory.get("importance", 0)
 
-            if memory["category"] == "project":
+        # =====================================
+        # Confidence bonus
+        # =====================================
 
-                score += 30
+        score += memory.get("confidence", 0) // 10
 
-        if any(w in message for w in [
-            "name",
-            "identity"
-        ]):
-
-            if memory["category"] == "identity":
-
-                score += 30
-
-        # -------------------------
-        # Small importance bonus
-        # -------------------------
-
-        score += memory["importance"]
-
-        if score >= 25:
+        if score > 25:
 
             scored.append((score, memory))
 
-    scored.sort(key=lambda x: x[0], reverse=True)
+    scored.sort(
+        key=lambda x: x[0],
+        reverse=True
+    )
 
-    results = [item[1] for item in scored[:max_results]]
+    return [
 
-    print("MEMORY RETRIEVER:", results)
+        memory
 
-    return results
+        for _, memory in scored[:max_results]
+
+    ]

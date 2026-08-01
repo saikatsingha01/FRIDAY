@@ -1,0 +1,55 @@
+{
+    "history": [
+        {
+            "old_memory": {
+                "id": 1,
+                "text": "My favorite food is rice",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 3,
+                "text": "My favorite food is chicken curry",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "changed_at": "2026-08-01T15:21:20.055011"
+        },
+        {
+            "old_memory": {
+                "id": 2,
+                "text": "My favorite game is Sekiro",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 4,
+                "text": "My favorite game is Post of Sushiva now",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "changed_at": "2026-08-01T15:21:44.227458"
+        },
+        {
+            "old_memory": {
+                "id": 4,
+                "text": "My favorite game is Post of Sushiva now",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 5,
+                "text": "My favorite game is Ghost of Tsushima",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "changed_at": "2026-08-01T15:22:35.393553"
+        }
+    ]
+}

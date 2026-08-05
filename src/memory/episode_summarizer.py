@@ -1,31 +1,22 @@
+from datetime import datetime
+
 from src.memory.episode_manager import add_episode
 
 
 MIN_MESSAGES = 8
 
-STOP_WORDS = {
-    "the", "a", "an",
-    "and", "or", "but",
-    "that", "this", "with",
-    "have", "has", "had",
-    "what", "when", "where",
-    "which", "would", "could",
-    "should", "there", "their",
-    "about", "because", "from",
-    "into", "your", "you're",
-    "my", "our", "you",
-    "was", "were", "been",
-    "just", "very", "really"
-}
 
-
-def summarize_conversation(conversation):
+def summarize_conversation(conversation, force=False):
     """
-    Converts a finished conversation
-    into one episodic memory.
+    Converts a finished session (the working context buffer) into one
+    episodic memory (Issue 6/7).
+
+    Importance is derived from session length only — no keyword-based
+    topic scoring. Keywords are a retrieval index over the session
+    text, never a behavior driver.
     """
 
-    if len(conversation) < MIN_MESSAGES:
+    if len(conversation) < MIN_MESSAGES and not force:
         return None
 
     user_messages = []
@@ -47,9 +38,6 @@ def summarize_conversation(conversation):
             if len(word) < 4:
                 continue
 
-            if word in STOP_WORDS:
-                continue
-
             keywords.add(word)
 
     if not user_messages:
@@ -64,33 +52,20 @@ def summarize_conversation(conversation):
     if len(user_messages) > 3:
         summary += "..."
 
-    importance = 5
-
-    important_topics = {
-        "friday",
-        "memory",
-        "brain",
-        "assistant",
-        "architecture",
-        "project",
-        "coding",
-        "python",
-        "ollama",
-        "voice"
-    }
-
-    if keywords & important_topics:
-        importance = 8
-
     if len(conversation) >= 20:
         importance = 10
+    elif len(conversation) >= 12:
+        importance = 8
+    else:
+        importance = 5
+
+    now = datetime.now().isoformat()
 
     return add_episode(
-
         summary=summary,
-
         keywords=sorted(keywords),
-
-        importance=importance
-
+        importance=importance,
+        session_id="session-" + now[:19].replace(":", "").replace(" ", "T"),
+        start_time=conversation[0].get("_ts"),
+        end_time=now,
     )

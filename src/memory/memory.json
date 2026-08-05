@@ -1,32 +1,711 @@
 {
     "memories": [
         {
-            "id": 3,
-            "text": "My favorite food is chicken curry",
-            "category": "preference",
+            "id": 98,
+            "text": "My best friend is Priya",
+            "category": "social",
             "importance": 7,
-            "confidence": 35
+            "confidence": 99,
+            "persistence": "permanent",
+            "tags": [
+                "friend",
+                "priya"
+            ],
+            "source_text": "My best friend is Priya",
+            "created_at": "2026-07-08T19:18:16.571494",
+            "updated_at": "2026-07-08T19:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.86,
+                "understanding": 0.97,
+                "canonicalization": 0.94,
+                "memory": 0.82,
+                "retrieval": 0.82
+            },
+            "retrieval_confidence": 0.39
         },
         {
-            "id": 5,
-            "text": "My favorite game is Ghost of Tsushima",
-            "category": "preference",
-            "importance": 7,
-            "confidence": 35
+            "id": 101,
+            "text": "My current project is a chess bot",
+            "category": "project",
+            "importance": 8,
+            "confidence": 72,
+            "persistence": "transient",
+            "tags": [
+                "current",
+                "project",
+                "chess"
+            ],
+            "source_text": "My current project is a chess bot",
+            "created_at": "2026-07-23T11:18:16.571494",
+            "updated_at": "2026-07-23T11:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.96,
+                "understanding": 0.91,
+                "canonicalization": 0.92,
+                "memory": 0.84,
+                "retrieval": 0.89
+            },
+            "retrieval_confidence": 0.55
         },
         {
-            "id": 6,
-            "text": "I like Darjeeling",
-            "category": "preference",
-            "importance": 7,
-            "confidence": 35
+            "id": 102,
+            "text": "I usually hang out with Vikram",
+            "category": "social",
+            "importance": 4,
+            "confidence": 68,
+            "persistence": "unknown",
+            "tags": [
+                "usually",
+                "vikram"
+            ],
+            "source_text": "I usually hang out with Vikram",
+            "created_at": "2026-07-16T10:18:16.571494",
+            "updated_at": "2026-07-16T10:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.81,
+                "understanding": 0.97,
+                "canonicalization": 0.88,
+                "memory": 0.93,
+                "retrieval": 0.82
+            },
+            "retrieval_confidence": 0.34
         },
         {
-            "id": 7,
-            "text": "I love to study",
-            "category": "preference",
+            "id": 105,
+            "text": "Remember that I study Biotech",
+            "category": "memory",
+            "importance": 8,
+            "confidence": 84,
+            "persistence": "permanent",
+            "tags": [
+                "remember",
+                "study",
+                "biotech"
+            ],
+            "source_text": "Remember that I study Biotech",
+            "created_at": "2026-08-02T02:18:16.571494",
+            "updated_at": "2026-08-02T02:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.96,
+                "understanding": 1.0,
+                "canonicalization": 0.99,
+                "memory": 0.97,
+                "retrieval": 0.82
+            },
+            "retrieval_confidence": 0.68
+        },
+        {
+            "id": 106,
+            "text": "I go for a walk every morning",
+            "category": "general",
+            "importance": 6,
+            "confidence": 78,
+            "persistence": "transient",
+            "tags": [
+                "every",
+                "morning"
+            ],
+            "source_text": "I go for a walk every morning",
+            "created_at": "2026-06-07T12:18:16.571494",
+            "updated_at": "2026-06-07T12:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.98,
+                "understanding": 0.95,
+                "canonicalization": 0.99,
+                "memory": 0.86,
+                "retrieval": 1.0
+            },
+            "retrieval_confidence": 0.85
+        },
+        {
+            "id": 107,
+            "text": "I am from Delhi",
+            "category": "identity",
+            "importance": 5,
+            "confidence": 94,
+            "persistence": "transient",
+            "tags": [
+                "delhi"
+            ],
+            "source_text": "I am from Delhi",
+            "created_at": "2026-06-23T05:18:16.571494",
+            "updated_at": "2026-06-23T05:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.92,
+                "understanding": 0.98,
+                "canonicalization": 0.94,
+                "memory": 0.81,
+                "retrieval": 0.99
+            },
+            "retrieval_confidence": 0.78
+        },
+        {
+            "id": 108,
+            "text": "I want to finish a marathon next month",
+            "category": "planning",
+            "importance": 10,
+            "confidence": 70,
+            "persistence": "permanent",
+            "tags": [
+                "finish",
+                "marathon",
+                "month"
+            ],
+            "source_text": "I want to finish a marathon next month",
+            "created_at": "2026-06-11T08:18:16.571494",
+            "updated_at": "2026-06-11T08:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.9,
+                "understanding": 0.93,
+                "canonicalization": 0.95,
+                "memory": 0.92,
+                "retrieval": 0.8
+            },
+            "retrieval_confidence": 0.57
+        },
+        {
+            "id": 109,
+            "text": "I read before bed",
+            "category": "general",
+            "importance": 8,
+            "confidence": 93,
+            "persistence": "unknown",
+            "tags": [
+                "before"
+            ],
+            "source_text": "I read before bed",
+            "created_at": "2026-07-30T23:18:16.571494",
+            "updated_at": "2026-07-30T23:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.93,
+                "understanding": 0.92,
+                "canonicalization": 0.86,
+                "memory": 0.86,
+                "retrieval": 0.8
+            },
+            "retrieval_confidence": 0.31
+        },
+        {
+            "id": 110,
+            "text": "I was born in Pune",
+            "category": "identity",
+            "importance": 10,
+            "confidence": 37,
+            "persistence": "permanent",
+            "tags": [],
+            "source_text": "I was born in Pune",
+            "created_at": "2026-06-06T17:18:16.571494",
+            "updated_at": "2026-06-06T17:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.94,
+                "understanding": 0.98,
+                "canonicalization": 0.94,
+                "memory": 0.98,
+                "retrieval": 0.8
+            },
+            "retrieval_confidence": 0.76
+        },
+        {
+            "id": 111,
+            "text": "I am from Bangalore",
+            "category": "identity",
+            "importance": 8,
+            "confidence": 84,
+            "persistence": "permanent",
+            "tags": [
+                "bangalore"
+            ],
+            "source_text": "I am from Bangalore",
+            "created_at": "2026-06-09T02:18:16.571494",
+            "updated_at": "2026-06-09T02:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.8,
+                "understanding": 1.0,
+                "canonicalization": 0.86,
+                "memory": 0.83,
+                "retrieval": 0.81
+            },
+            "retrieval_confidence": 0.89
+        },
+        {
+            "id": 112,
+            "text": "My name is Aarav",
+            "category": "identity",
+            "importance": 6,
+            "confidence": 94,
+            "persistence": "permanent",
+            "tags": [
+                "aarav"
+            ],
+            "source_text": "My name is Aarav",
+            "created_at": "2026-06-08T16:18:16.571494",
+            "updated_at": "2026-06-08T16:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.88,
+                "understanding": 0.94,
+                "canonicalization": 0.9,
+                "memory": 0.97,
+                "retrieval": 0.94
+            },
+            "retrieval_confidence": 0.51
+        },
+        {
+            "id": 113,
+            "text": "I am building a chess bot",
+            "category": "project",
+            "importance": 10,
+            "confidence": 76,
+            "persistence": "permanent",
+            "tags": [
+                "building",
+                "chess"
+            ],
+            "source_text": "I am building a chess bot",
+            "created_at": "2026-07-08T05:18:16.571494",
+            "updated_at": "2026-07-08T05:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.87,
+                "understanding": 0.86,
+                "canonicalization": 0.89,
+                "memory": 0.96,
+                "retrieval": 0.92
+            },
+            "retrieval_confidence": 0.49
+        },
+        {
+            "id": 115,
+            "text": "I want to create a portfolio site",
+            "category": "project",
+            "importance": 8,
+            "confidence": 38,
+            "persistence": "permanent",
+            "tags": [
+                "create",
+                "portfolio"
+            ],
+            "source_text": "I want to create a portfolio site",
+            "created_at": "2026-07-13T17:18:16.571494",
+            "updated_at": "2026-07-13T17:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.88,
+                "understanding": 0.99,
+                "canonicalization": 0.97,
+                "memory": 0.98,
+                "retrieval": 0.85
+            },
+            "retrieval_confidence": 1.0
+        },
+        {
+            "id": 116,
+            "text": "I told you before that I play Rimworld",
+            "category": "memory",
             "importance": 7,
-            "confidence": 35
+            "confidence": 72,
+            "persistence": "transient",
+            "tags": [
+                "before",
+                "rimworld"
+            ],
+            "source_text": "I told you before that I play Rimworld",
+            "created_at": "2026-07-23T06:18:16.571494",
+            "updated_at": "2026-07-23T06:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.98,
+                "understanding": 0.85,
+                "canonicalization": 0.92,
+                "memory": 0.82,
+                "retrieval": 0.8
+            },
+            "retrieval_confidence": 0.71
+        },
+        {
+            "id": 118,
+            "text": "I am curious about genome editing",
+            "category": "science",
+            "importance": 5,
+            "confidence": 43,
+            "persistence": "permanent",
+            "tags": [
+                "curious",
+                "about",
+                "genome",
+                "editing"
+            ],
+            "source_text": "I am curious about genome editing",
+            "created_at": "2026-07-29T02:18:16.571494",
+            "updated_at": "2026-07-29T02:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.93,
+                "understanding": 0.91,
+                "canonicalization": 0.87,
+                "memory": 0.89,
+                "retrieval": 0.85
+            },
+            "retrieval_confidence": 0.66
+        },
+        {
+            "id": 119,
+            "text": "I usually hang out with Sam",
+            "category": "social",
+            "importance": 2,
+            "confidence": 82,
+            "persistence": "transient",
+            "tags": [
+                "usually"
+            ],
+            "source_text": "I usually hang out with Sam",
+            "created_at": "2026-06-19T14:18:16.571494",
+            "updated_at": "2026-06-19T14:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.9,
+                "understanding": 0.96,
+                "canonicalization": 0.83,
+                "memory": 0.96,
+                "retrieval": 0.82
+            },
+            "retrieval_confidence": 0.51
+        },
+        {
+            "id": 120,
+            "text": "I wake up at 5:30",
+            "category": "general",
+            "importance": 3,
+            "confidence": 60,
+            "persistence": "permanent",
+            "tags": [],
+            "source_text": "I wake up at 5:30",
+            "created_at": "2026-06-16T09:18:16.571494",
+            "updated_at": "2026-06-16T09:18:16.571494",
+            "confidence_breakdown": {
+                "stt": 0.82,
+                "understanding": 0.98,
+                "canonicalization": 0.92,
+                "memory": 0.9,
+                "retrieval": 0.83
+            },
+            "retrieval_confidence": 0.87
+        },
+        {
+            "id": 122,
+            "text": "I am curious about black holes",
+            "category": "science",
+            "importance": 7,
+            "confidence": 80,
+            "persistence": "transient",
+            "tags": [
+                "curious",
+                "about",
+                "black",
+                "holes"
+            ],
+            "source_text": "I am curious about black holes",
+            "created_at": "2026-06-12T04:18:16.573504",
+            "updated_at": "2026-06-12T04:18:16.573504",
+            "confidence_breakdown": {
+                "stt": 0.92,
+                "understanding": 0.8,
+                "canonicalization": 1.0,
+                "memory": 0.86,
+                "retrieval": 0.97
+            },
+            "retrieval_confidence": 0.84
+        },
+        {
+            "id": 123,
+            "text": "I wake up at 8:00",
+            "category": "general",
+            "importance": 9,
+            "confidence": 71,
+            "persistence": "unknown",
+            "tags": [],
+            "source_text": "I wake up at 8:00",
+            "created_at": "2026-07-17T15:18:16.573504",
+            "updated_at": "2026-07-17T15:18:16.573504",
+            "confidence_breakdown": {
+                "stt": 0.89,
+                "understanding": 0.96,
+                "canonicalization": 0.91,
+                "memory": 0.86,
+                "retrieval": 0.88
+            },
+            "retrieval_confidence": 0.95
+        },
+        {
+            "id": 124,
+            "text": "I usually play chess on weekends",
+            "category": "general",
+            "importance": 3,
+            "confidence": 59,
+            "persistence": "transient",
+            "tags": [
+                "usually",
+                "chess",
+                "weekends"
+            ],
+            "source_text": "I usually play chess on weekends",
+            "created_at": "2026-06-10T23:18:16.573504",
+            "updated_at": "2026-06-10T23:18:16.573504",
+            "confidence_breakdown": {
+                "stt": 0.94,
+                "understanding": 0.85,
+                "canonicalization": 0.8,
+                "memory": 0.82,
+                "retrieval": 0.88
+            },
+            "retrieval_confidence": 0.95
+        },
+        {
+            "id": 125,
+            "text": "I usually read on weekends",
+            "category": "general",
+            "importance": 7,
+            "confidence": 69,
+            "persistence": "unknown",
+            "tags": [
+                "usually",
+                "weekends"
+            ],
+            "source_text": "I usually read on weekends",
+            "created_at": "2026-07-14T09:18:16.573504",
+            "updated_at": "2026-07-14T09:18:16.573504",
+            "confidence_breakdown": {
+                "stt": 0.9,
+                "understanding": 0.82,
+                "canonicalization": 0.92,
+                "memory": 0.92,
+                "retrieval": 0.98
+            },
+            "retrieval_confidence": 0.52
+        },
+        {
+            "id": 126,
+            "text": "My go-to language is Julia",
+            "category": "programming",
+            "importance": 5,
+            "confidence": 53,
+            "persistence": "transient",
+            "tags": [
+                "go-to",
+                "language",
+                "julia"
+            ],
+            "source_text": "My go-to language is Julia",
+            "created_at": "2026-06-30T14:18:16.573504",
+            "updated_at": "2026-06-30T14:18:16.573504",
+            "confidence_breakdown": {
+                "stt": 0.89,
+                "understanding": 0.97,
+                "canonicalization": 0.84,
+                "memory": 1.0,
+                "retrieval": 0.96
+            },
+            "retrieval_confidence": 0.46
+        },
+        {
+            "id": 128,
+            "text": "I use VS Code",
+            "category": "general",
+            "importance": 3,
+            "confidence": 100,
+            "persistence": "unknown",
+            "tags": [],
+            "source_text": "anything from my last session",
+            "created_at": "2026-08-04T00:06:57.027606",
+            "updated_at": "2026-08-04T00:06:57.027606",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 134,
+            "text": "I study B.Tech Computer Science Engineering",
+            "category": "education",
+            "importance": 9,
+            "confidence": 100,
+            "persistence": "permanent",
+            "tags": [
+                "degree",
+                "btech"
+            ],
+            "source_text": "this means this topic",
+            "created_at": "2026-08-04T04:55:20.641883",
+            "updated_at": "2026-08-04T05:05:01.518731",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 135,
+            "text": "My favorite food is lasagna",
+            "category": "general",
+            "importance": 3,
+            "confidence": 100,
+            "persistence": "unknown",
+            "tags": [],
+            "source_text": "my favorite food is lasagna",
+            "created_at": "2026-07-27T10:18:16.573504",
+            "updated_at": "2026-08-04T05:47:29.335953",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 136,
+            "text": "My favorite movie is interstellar",
+            "category": "general",
+            "importance": 1,
+            "confidence": 100,
+            "persistence": "temporal",
+            "tags": [],
+            "source_text": "my favorite movie is interstellar",
+            "created_at": "2026-08-05T19:47:35.509795",
+            "updated_at": "2026-08-05T19:47:35.509795",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 137,
+            "text": "My birthday is in April",
+            "category": "general",
+            "importance": 3,
+            "confidence": 100,
+            "persistence": "permanent",
+            "tags": [
+                "birthday",
+                "april"
+            ],
+            "source_text": "okay so my birthday is in april",
+            "created_at": "2026-08-05T19:51:45.727841",
+            "updated_at": "2026-08-05T19:51:45.728392",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 138,
+            "text": "I study btag",
+            "category": "general",
+            "importance": 1,
+            "confidence": 100,
+            "persistence": "temporal",
+            "tags": [],
+            "source_text": "previously i said that my favorite movie is interstellar but wait i have changed my taste and now my favorite movie is inception",
+            "created_at": "2026-08-05T19:52:57.025852",
+            "updated_at": "2026-08-05T19:52:57.025852",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 139,
+            "text": "I remember that I just told you to update your memory and forget about Interstellar, but now I think Inception is my current favorite movie.",
+            "category": "general",
+            "importance": 1,
+            "confidence": 50,
+            "persistence": "temporal",
+            "tags": [],
+            "source_text": "i just like inception more than interstellar right now so i told you to update your memory and forget about interstellar and being my current favorite movie",
+            "created_at": "2026-07-05T09:18:16.571494",
+            "updated_at": "2026-08-05T19:56:22.245443",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 0.5,
+                "canonicalization": 1.0,
+                "memory": 0.5,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 140,
+            "text": "I am planning to take admission in a B.Tech Computer Science Engineering course",
+            "category": "education",
+            "importance": 9,
+            "confidence": 100,
+            "persistence": "permanent",
+            "tags": [
+                "admission",
+                "btech",
+                "computer science engineering"
+            ],
+            "source_text": "i am planning to take admission in a btec computer science engineering course do you have anything to say",
+            "created_at": "2026-06-07T13:18:16.571494",
+            "updated_at": "2026-08-05T19:57:07.758453",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 141,
+            "text": "I like preppy",
+            "category": "general",
+            "importance": 3,
+            "confidence": 50,
+            "persistence": "permanent",
+            "tags": [
+                "fashion",
+                "style"
+            ],
+            "source_text": "i like preppy",
+            "created_at": "2026-08-05T19:57:42.405265",
+            "updated_at": "2026-08-05T19:57:42.405265",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 0.5,
+                "canonicalization": 1.0,
+                "memory": 0.5,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 142,
+            "text": "I like Frappe more than Inception as my current favorite movie",
+            "category": "general",
+            "importance": 3,
+            "confidence": 100,
+            "persistence": "permanent",
+            "tags": [
+                "favorite",
+                "movie"
+            ],
+            "source_text": "i meant frappe",
+            "created_at": "2026-06-24T08:18:16.571494",
+            "updated_at": "2026-08-05T19:58:14.912919",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
         }
     ]
 }

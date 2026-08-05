@@ -55,10 +55,20 @@ def save_episodes(data):
 def add_episode(
     summary,
     keywords,
-    importance=5
+    importance=5,
+    session_id=None,
+    semantic_ids=None,
+    entities=None,
+    topic_clusters=None,
+    start_time=None,
+    end_time=None,
 ):
     """
     Creates a new episode.
+
+    Extended schema (Issue 6): an episode represents one session of
+    conversation. Topic/entity fields are retrieval keys; semantic_ids
+    reference the semantic memories this session touched.
     """
 
     data = load_episodes()
@@ -93,6 +103,24 @@ def add_episode(
 
         "timestamp": datetime.now().isoformat()
     }
+
+    if session_id:
+        episode["session_id"] = session_id
+
+    if semantic_ids:
+        episode["semantic_ids"] = list(semantic_ids)
+
+    if entities:
+        episode["entities"] = list(entities)
+
+    if topic_clusters:
+        episode["topic_clusters"] = list(topic_clusters)
+
+    if start_time:
+        episode["start_time"] = start_time
+
+    if end_time:
+        episode["end_time"] = end_time
 
     episodes.append(episode)
 

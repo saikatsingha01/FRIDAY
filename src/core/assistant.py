@@ -5,7 +5,7 @@ from src.speech.voice_detector import listen
 from src.core.process import clean_text
 from src.core.input_validator import validate_input
 from src.core.conversation_manager import process_conversation
-from src.core.context_manager import add_context
+from src.core.context_manager import add_context, rollover
 
 from src.utils.logger import logger
 
@@ -65,6 +65,10 @@ def main():
                 response
             )
 
+            # Issue 10: roll the session's working buffer into an
+            # episode on shutdown so nothing is lost on exit.
+            rollover(force=True)
+
             break
 
         result = process_conversation(text)
@@ -85,6 +89,22 @@ def main():
             text,
             response
         )
+
+        # END_SESSION — the Understanding Layer classified a
+        # natural-language session end ("you can sleep now", "go
+        # to sleep", "shut down", ...) and the ExecutionManager
+        # mapped it to a runtime signal. Roll the working buffer
+        # into an episode and stop listening. No keyword lists.
+        execution = result.get("execution")
+
+        if (
+            execution is not None
+            and getattr(execution, "end_session", False)
+        ):
+
+            rollover(force=True)
+
+            break
 
     logger.info("FRIDAY stopped")
 

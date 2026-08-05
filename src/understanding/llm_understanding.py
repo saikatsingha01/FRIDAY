@@ -29,10 +29,11 @@ class LLMUnderstanding:
     - Build contracts
     """
 
-    def understand(self, user_message: str):
+    def understand(self, user_message: str, recent_context=None):
 
         prompt = build_understanding_prompt(
-            user_message
+            user_message,
+            recent_context=recent_context,
         )
 
         response = llm.generate(
@@ -47,8 +48,9 @@ class LLMUnderstanding:
 llm_understanding = LLMUnderstanding()
 
 
-def understand(user_message: str):
+def understand(user_message: str, recent_context=None):
 
     return llm_understanding.understand(
-        user_message
+        user_message,
+        recent_context=recent_context,
     )

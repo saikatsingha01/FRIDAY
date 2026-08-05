@@ -1,43 +1,428 @@
 {
     "episodes": [
         {
-            "id": 1,
-            "summary": "Previously: My favorite food is rice. This was updated to: My favorite food is chicken curry.",
+            "id": 28,
+            "summary": "Conversation: brainstormed ideas for a home server",
             "keywords": [
-                "chicken",
-                "curry",
+                "excited",
+                "about"
+            ],
+            "entities": [],
+            "importance": 6,
+            "timestamp": "2026-08-02T09:18:16.575435",
+            "session_id": "session-random-28",
+            "start_time": "2026-08-02T09:11:16.575435",
+            "end_time": "2026-08-02T09:18:16.575435"
+        },
+        {
+            "id": 29,
+            "summary": "Conversation: walked through a Rust problem together",
+            "keywords": [
+                "currently",
+                "hooked",
+                "sekiro"
+            ],
+            "entities": [],
+            "importance": 3,
+            "timestamp": "2026-07-30T00:18:16.575435",
+            "session_id": "session-random-29",
+            "start_time": "2026-07-30T00:03:16.575435",
+            "end_time": "2026-07-30T00:18:16.575435"
+        },
+        {
+            "id": 30,
+            "summary": "Conversation: went over quantum computing and what I learned about it",
+            "keywords": [
+                "preparing"
+            ],
+            "entities": [],
+            "importance": 8,
+            "timestamp": "2026-07-28T01:18:16.575435",
+            "session_id": "session-random-30",
+            "start_time": "2026-07-28T00:52:16.575435",
+            "end_time": "2026-07-28T01:18:16.575435"
+        },
+        {
+            "id": 31,
+            "summary": "Conversation: planned out my learn guitar",
+            "keywords": [
+                "friend",
+                "priya",
+                "lives",
+                "kolkata"
+            ],
+            "entities": [],
+            "importance": 4,
+            "timestamp": "2026-07-27T08:18:16.575435",
+            "session_id": "session-random-31",
+            "start_time": "2026-07-27T08:13:16.575435",
+            "end_time": "2026-07-27T08:18:16.575435"
+        },
+        {
+            "id": 32,
+            "summary": "Conversation: reviewed Baldur's Gate 3 strategy",
+            "keywords": [
+                "favorite",
+                "classical",
+                "genre"
+            ],
+            "entities": [],
+            "importance": 7,
+            "timestamp": "2026-07-21T09:18:16.575435",
+            "session_id": "session-random-32",
+            "start_time": "2026-07-21T08:59:16.575435",
+            "end_time": "2026-07-21T09:18:16.575435"
+        },
+        {
+            "id": 33,
+            "summary": "Conversation: brainstormed ideas for a habit tracker app",
+            "keywords": [
+                "every",
+                "morning"
+            ],
+            "entities": [],
+            "importance": 3,
+            "timestamp": "2026-08-01T16:18:16.575435",
+            "session_id": "session-random-33",
+            "start_time": "2026-08-01T15:58:16.575435",
+            "end_time": "2026-08-01T16:18:16.575435"
+        },
+        {
+            "id": 34,
+            "summary": "Conversation: chatted about my favorite history",
+            "keywords": [
+                "chat"
+            ],
+            "entities": [],
+            "importance": 6,
+            "timestamp": "2026-07-24T19:18:16.575435",
+            "session_id": "session-random-34",
+            "start_time": "2026-07-24T19:05:16.575435",
+            "end_time": "2026-07-24T19:18:16.575435"
+        },
+        {
+            "id": 35,
+            "summary": "Conversation: we compared notes on hip-hop music",
+            "keywords": [
+                "favorite",
+                "classical",
+                "genre"
+            ],
+            "entities": [],
+            "importance": 6,
+            "timestamp": "2026-08-01T10:18:16.575435",
+            "session_id": "session-random-35",
+            "start_time": "2026-08-01T09:57:16.575435",
+            "end_time": "2026-08-01T10:18:16.575435"
+        },
+        {
+            "id": 36,
+            "summary": "Conversation: reviewed Sekiro strategy",
+            "keywords": [
+                "preparing"
+            ],
+            "entities": [],
+            "importance": 7,
+            "timestamp": "2026-08-01T13:18:16.575435",
+            "session_id": "session-random-36",
+            "start_time": "2026-08-01T12:50:16.575435",
+            "end_time": "2026-08-01T13:18:16.575435"
+        },
+        {
+            "id": 37,
+            "summary": "Conversation: reviewed Zelda strategy",
+            "keywords": [
+                "building",
+                "recipe",
+                "website"
+            ],
+            "entities": [],
+            "importance": 7,
+            "timestamp": "2026-07-22T07:18:16.575435",
+            "session_id": "session-random-37",
+            "start_time": "2026-07-22T07:01:16.575435",
+            "end_time": "2026-07-22T07:18:16.575435"
+        },
+        {
+            "id": 38,
+            "summary": "Conversation: shared my progress on build a portfolio site",
+            "keywords": [
+                "quantum",
+                "computing",
+                "fascinating"
+            ],
+            "entities": [],
+            "importance": 7,
+            "timestamp": "2026-07-25T08:18:16.575435",
+            "session_id": "session-random-38",
+            "start_time": "2026-07-25T08:05:16.575435",
+            "end_time": "2026-07-25T08:18:16.575435"
+        },
+        {
+            "id": 39,
+            "summary": "Conversation: shared my progress on learn guitar",
+            "keywords": [
+                "about",
+                "black",
+                "holes",
+                "often"
+            ],
+            "entities": [],
+            "importance": 3,
+            "timestamp": "2026-07-30T20:18:16.575435",
+            "session_id": "session-random-39",
+            "start_time": "2026-07-30T19:50:16.575435",
+            "end_time": "2026-07-30T20:18:16.575435"
+        },
+        {
+            "id": 40,
+            "summary": "Previously: I remember that my favorite food is lasagna. This was updated to: My favorite food is sushi.",
+            "keywords": [
+                "favorite",
                 "food",
-                "rice"
+                "lasagna",
+                "remember",
+                "sushi",
+                "that"
             ],
-            "importance": 7,
-            "timestamp": "2026-08-01T15:21:20.056632"
+            "importance": 5,
+            "timestamp": "2026-08-04T03:06:53.788989",
+            "semantic_ids": [
+                103
+            ]
         },
         {
-            "id": 2,
-            "summary": "Previously: My favorite game is Sekiro. This was updated to: My favorite game is Post of Sushiva now.",
+            "id": 41,
+            "summary": "Previously: I study B.Tech Computer Science Engineering. This was updated to: I study B.Tech.",
             "keywords": [
-                "game",
-                "now",
-                "post",
-                "sekiro",
-                "sushiva"
+                "b.tech",
+                "computer",
+                "engineering",
+                "science",
+                "study"
             ],
-            "importance": 7,
-            "timestamp": "2026-08-01T15:21:44.228553"
+            "importance": 9,
+            "timestamp": "2026-08-04T04:59:59.158233",
+            "semantic_ids": [
+                132
+            ]
         },
         {
-            "id": 3,
-            "summary": "Previously: My favorite game is Post of Sushiva now. This was updated to: My favorite game is Ghost of Tsushima.",
+            "id": 42,
+            "summary": "Previously: I study B.Tech. This was updated to: I study B.Tech Computer Science Engineering.",
             "keywords": [
-                "game",
-                "ghost",
-                "now",
-                "post",
-                "sushiva",
-                "tsushima"
+                "b.tech",
+                "computer",
+                "engineering",
+                "science",
+                "study"
             ],
-            "importance": 7,
-            "timestamp": "2026-08-01T15:22:35.394652"
+            "importance": 9,
+            "timestamp": "2026-08-04T05:05:01.526438",
+            "semantic_ids": [
+                133
+            ]
+        },
+        {
+            "id": 43,
+            "summary": "Previously: Remember that I study Computer Engineering. This was updated to: I missed the previous topic about studying B.Tech Computer Science Engineering and a simple C program to print Hello World..",
+            "keywords": [
+                "about",
+                "and",
+                "b.tech",
+                "computer",
+                "engineering",
+                "hello",
+                "missed",
+                "previous",
+                "print",
+                "program",
+                "remember",
+                "science",
+                "simple",
+                "study",
+                "studying",
+                "that",
+                "the",
+                "topic",
+                "world."
+            ],
+            "importance": 5,
+            "timestamp": "2026-08-04T05:05:19.501069",
+            "semantic_ids": [
+                114
+            ]
+        },
+        {
+            "id": 44,
+            "summary": "Conversation about tell me what we have discussed about previously, dont you recall that we were working on a simple c program to print hello world or a rust problem, this means this topic...",
+            "keywords": [
+                "about",
+                "discussed",
+                "dont",
+                "have",
+                "hello",
+                "joke",
+                "lame",
+                "means",
+                "miss",
+                "previously",
+                "print",
+                "problem",
+                "program",
+                "recall",
+                "rust",
+                "simple",
+                "tell",
+                "that",
+                "thats",
+                "this",
+                "time",
+                "topic",
+                "were",
+                "what",
+                "working",
+                "world"
+            ],
+            "importance": 5,
+            "timestamp": "2026-08-04T05:06:42.787794",
+            "session_id": "session-2026-08-04T050642",
+            "start_time": "2026-08-04T05:03:50.103639",
+            "end_time": "2026-08-04T05:06:42.787794"
+        },
+        {
+            "id": 45,
+            "summary": "Previously: My go-to comfort food is lasagna. This was updated to: My favorite food is lasagna.",
+            "keywords": [
+                "comfort",
+                "favorite",
+                "food",
+                "go-to",
+                "lasagna"
+            ],
+            "importance": 5,
+            "timestamp": "2026-08-04T05:47:29.347728",
+            "semantic_ids": [
+                127
+            ]
+        },
+        {
+            "id": 46,
+            "summary": "Previously: My favorite drink is buttermilk. This was updated to: My favorite drink is coffee.",
+            "keywords": [
+                "buttermilk",
+                "coffee",
+                "drink",
+                "favorite"
+            ],
+            "importance": 3,
+            "timestamp": "2026-08-05T17:06:14.743873",
+            "semantic_ids": [
+                136
+            ]
+        },
+        {
+            "id": 47,
+            "summary": "My hometown is Mumbai — this memory was forgotten.",
+            "keywords": [
+                "hometown",
+                "mumbai"
+            ],
+            "importance": 2,
+            "timestamp": "2026-08-05T19:50:15.651423",
+            "semantic_ids": [
+                117
+            ]
+        },
+        {
+            "id": 48,
+            "summary": "I am from Tokyo — this memory was forgotten.",
+            "keywords": [
+                "from",
+                "tokyo"
+            ],
+            "importance": 3,
+            "timestamp": "2026-08-05T19:50:15.680812",
+            "semantic_ids": [
+                137
+            ]
+        },
+        {
+            "id": 49,
+            "summary": "Previously: I told you before that I play Zelda. This was updated to: I remember that I just told you to update your memory and forget about Interstellar, but now I think Inception is my current favorite movie..",
+            "keywords": [
+                "about",
+                "and",
+                "before",
+                "but",
+                "current",
+                "favorite",
+                "forget",
+                "inception",
+                "interstellar,",
+                "just",
+                "memory",
+                "movie.",
+                "now",
+                "play",
+                "remember",
+                "that",
+                "think",
+                "told",
+                "update",
+                "you",
+                "your",
+                "zelda"
+            ],
+            "importance": 9,
+            "timestamp": "2026-08-05T19:56:22.255601",
+            "semantic_ids": [
+                104
+            ]
+        },
+        {
+            "id": 50,
+            "summary": "Previously: Remember that I study Computer Engineering. This was updated to: I am planning to take admission in a B.Tech Computer Science Engineering course.",
+            "keywords": [
+                "admission",
+                "b.tech",
+                "computer",
+                "course",
+                "engineering",
+                "planning",
+                "remember",
+                "science",
+                "study",
+                "take",
+                "that"
+            ],
+            "importance": 5,
+            "timestamp": "2026-08-05T19:57:07.762899",
+            "semantic_ids": [
+                114
+            ]
+        },
+        {
+            "id": 51,
+            "summary": "Previously: My favorite topic is quantum computing. This was updated to: I like Frappe more than Inception as my current favorite movie.",
+            "keywords": [
+                "computing",
+                "current",
+                "favorite",
+                "frappe",
+                "inception",
+                "like",
+                "more",
+                "movie",
+                "quantum",
+                "than",
+                "topic"
+            ],
+            "importance": 4,
+            "timestamp": "2026-08-05T19:58:14.921996",
+            "semantic_ids": [
+                99
+            ]
         }
     ]
 }

@@ -109,6 +109,27 @@ class MemoryUnderstanding:
     memory_payload: Optional[str] = None
     # The clean extracted fact. Null if no write operation.
 
+    # ----------------------------------------------------------
+    # Persistence / classification proposed by the LLM and
+    # validated deterministically by the Memory layer.
+    # ----------------------------------------------------------
+
+    persistence_class: Optional[str] = None
+    # "permanent" | "temporal" | "transient" | "unknown"
+
+    memory_category: Optional[str] = None
+    # Primary category the LLM proposes for the fact.
+
+    memory_tags: List[str] = field(default_factory=list)
+    # Retrieval tags the LLM proposes for the fact.
+
+    missing_information: List[str] = field(default_factory=list)
+    # Fields the user did not provide (used by planner too).
+
+    confidence_breakdown: Dict[str, float] = field(default_factory=dict)
+    # Independent per-stage confidences (Issue 12):
+    # stt / understanding / canonicalization / memory / retrieval.
+
 
 # ==========================================================
 # CONTEXT UNDERSTANDING

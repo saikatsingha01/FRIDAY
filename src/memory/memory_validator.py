@@ -10,6 +10,10 @@ class MemoryValidator:
     - Reject questions
     - Reject instruction phrases that leaked through
 
+    These are fail-safe structural backstops only. They never score
+    meaning and never decide what a fact means — the Understanding LLM
+    is the sole authority on meaning.
+
     Does NOT:
     - Score importance
     - Evaluate relevance
@@ -82,34 +86,9 @@ class MemoryValidator:
                 result["reason"] = "instruction_leak"
                 return result
 
-        # -----------------------------
-        # Important personal indicators
-        # boost confidence
-        # -----------------------------
-
-        important_patterns = [
-            "my name",
-            "i am",
-            "i'm",
-            "my laptop",
-            "my phone",
-            "my favorite",
-            "my favourite",
-            "i like",
-            "i love",
-            "i hate",
-            "i prefer",
-            "my project",
-            "i use",
-            "my food",
-            "my gpu",
-            "my ram"
-        ]
-
-        for pattern in important_patterns:
-            if pattern in text:
-                result["confidence"] += 30
-                break
+        # Confidence is structural validity only. No keyword-based
+        # boosting — the Understanding LLM owns meaning confidence.
+        result["confidence"] = 50 if result["valid"] else 0
 
         return result
 

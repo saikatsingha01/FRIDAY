@@ -5,28 +5,22 @@ class OllamaProvider:
     """
     Ollama provider for FRIDAY.
 
-    Future capabilities:
-    - Multiple local models
+    Capabilities:
+    - Text generation (chat)
+    - Embeddings (nomic-embed-text)
     - Temperature control
-    - Streaming
-    - Vision models
-    - Embedding models
-    - Automatic retries
     - Health checks
-    - Structured JSON mode
+    - Model switching
     """
 
     def __init__(self):
 
-        self.model = "llama3.2:3b"
+        self.model       = "llama3.2:3b"
+        self.embed_model = "nomic-embed-text"
 
-        # Deterministic output by default
-        # Better for understanding JSON.
+        # Deterministic output for understanding JSON.
         self.temperature = 0.0
-
-        self.top_p = 0.9
-
-        # Increased to avoid truncated JSON
+        self.top_p       = 0.9
         self.num_predict = 2048
 
     # ==========================================
@@ -34,11 +28,9 @@ class OllamaProvider:
     # ==========================================
 
     def set_model(self, model):
-
         self.model = model
 
     def get_model(self):
-
         return self.model
 
     # ==========================================
@@ -46,67 +38,80 @@ class OllamaProvider:
     # ==========================================
 
     def set_temperature(self, value):
-
         self.temperature = value
 
     def set_top_p(self, value):
-
         self.top_p = value
 
     def set_max_tokens(self, value):
-
-        # Prevent accidental tiny limits
         self.num_predict = max(512, value)
 
     # ==========================================
     # GENERATION
     # ==========================================
 
-    def generate(self, prompt):
+    def generate(self, prompt, format_json=False):
 
         try:
 
-            response = ollama.chat(
-
+            request = dict(
                 model=self.model,
 
                 messages=[
-
                     {
-
-                        "role": "user",
-
+                        "role":    "user",
                         "content": prompt
-
                     }
-
                 ],
 
                 options={
-
-                    "temperature": self.temperature,
-
-                    "top_p": self.top_p,
-
-                    "num_predict": self.num_predict,
-
+                    "temperature":    self.temperature,
+                    "top_p":          self.top_p,
+                    "num_predict":    self.num_predict,
                     "repeat_penalty": 1.1,
-
                 }
-
             )
+
+            # Grammar-constrained JSON output. Used by the planner,
+            # whose long JSON responses llama3.2:3b otherwise stops
+            # mid-document (truncated "steps": [ ...). The grammar
+            # forces the decoder to complete a valid JSON document.
+            if format_json:
+                request["format"] = "json"
+
+            response = ollama.chat(**request)
 
             return response["message"]["content"].strip()
 
         except Exception as error:
 
-            print(
+            print("OLLAMA ERROR:", error)
 
-                "OLLAMA ERROR:",
+            return None
 
-                error
+    # ==========================================
+    # EMBEDDINGS
+    # ==========================================
 
+    def embed(self, text: str):
+        """
+        Returns a float vector for the given text.
+        Uses nomic-embed-text — fast, single forward pass.
+        Not generative. Does not call the chat model.
+        """
+
+        try:
+
+            response = ollama.embeddings(
+                model=self.embed_model,
+                prompt=text,
             )
+
+            return response["embedding"]
+
+        except Exception as error:
+
+            print("OLLAMA EMBED ERROR:", error)
 
             return None
 
@@ -117,13 +122,9 @@ class OllamaProvider:
     def is_available(self):
 
         try:
-
             ollama.list()
-
             return True
-
         except Exception:
-
             return False
 
     # ==========================================
@@ -133,15 +134,10 @@ class OllamaProvider:
     def info(self):
 
         return {
-
-            "provider": "ollama",
-
-            "model": self.model,
-
+            "provider":    "ollama",
+            "model":       self.model,
+            "embed_model": self.embed_model,
             "temperature": self.temperature,
-
-            "top_p": self.top_p,
-
-            "max_tokens": self.num_predict
-
+            "top_p":       self.top_p,
+            "max_tokens":  self.num_predict,
         }

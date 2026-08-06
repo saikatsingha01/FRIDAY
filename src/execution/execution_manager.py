@@ -1,4 +1,8 @@
 from src.contracts.execution import ExecutionResult
+from src.contracts.planner import (
+    PlannerInput,
+    PlanStatus,
+)
 from src.core.memory_router import memory_router
 
 
@@ -109,13 +113,30 @@ class ExecutionManager:
         if reasoning.use_planning:
 
             from src.core.planner import planner
+            from src.core.context_manager import get_active_plan
+
+            active_plan = get_active_plan()
 
             result.planner_result = planner.plan(
-                reasoning.understanding,
-                recent_context=result.context,
-                memories=result.memories,
-                episodes=result.episodes,
+                PlannerInput(
+                    understanding=reasoning.understanding,
+                    reasoning=reasoning,
+                    recent_context=result.context,
+                    memories=result.memories,
+                    episodes=result.episodes,
+                    history=result.history,
+                    active_plan=active_plan,
+                )
             )
+
+            # With no active plan there is nothing to continue — the
+            # planner's continues_active_plan judgment is meaningless
+            # (the small model sometimes sets it TRUE anyway). Force it
+            # False so a first-turn goal is never treated as a
+            # continuation. This only guards the no-active-plan case;
+            # once a plan exists the planner is the arbiter.
+            if active_plan is None and result.planner_result:
+                result.planner_result.continues_active_plan = False
 
         # ==========================================
         # TOOLS — Phase 5
@@ -168,6 +189,253 @@ class ExecutionManager:
         print("===============================\n")
 
         return result
+
+    # ==========================================
+    # PLAN EXECUTION
+    # The Planner creates structured plans;
+    # the ExecutionManager executes them.
+    #
+    # Steps run in dependency order. Each step
+    # is dispatched to the subsystem Reasoning
+    # granted for it. Steps whose executor does
+    # not exist yet (web/tools — Phase 5) are
+    # recorded and skipped, never fatal.
+    # ==========================================
+
+    def execute_plan(
+        self,
+        plan,
+        understanding,
+        reasoning,
+        execution,
+        model=None,
+    ):
+
+        # A plan that cannot make progress asks before doing anything
+        # else. This is a request for the missing input, not a promise
+        # to act on half a goal.
+        if plan.requires_clarification and plan.missing_information:
+            plan.status = PlanStatus.WAITING_FOR_INPUT
+            self._record_active_plan(plan, understanding)
+            return (
+                f"To help you with this I need a bit more detail. "
+                f"Could you tell me: "
+                f"{', '.join(plan.missing_information)}?"
+            )
+
+        plan.status = PlanStatus.RUNNING
+        self._record_active_plan(plan, understanding)
+
+        completed = set()
+        pending = list(plan.steps)
+
+        # Dependency-ordered walk. A step whose dependencies are not
+        # complete yet is deferred to the next pass. Bounded by the
+        # number of steps so a cyclic or broken plan can never loop.
+        for _ in range(len(plan.steps) + 1):
+
+            if not pending:
+                break
+
+            deferred = []
+
+            for step in pending:
+
+                if (
+                    step.depends_on
+                    and not set(step.depends_on).issubset(completed)
+                ):
+                    deferred.append(step)
+                    continue
+
+                step.completed = True
+
+                outcome = self._dispatch_step(
+                    step,
+                    plan,
+                    understanding,
+                    reasoning,
+                    execution,
+                    model,
+                )
+
+                if outcome is not None:
+                    # A step produced the turn's final answer.
+                    plan.status = PlanStatus.COMPLETED
+                    return outcome
+
+                completed.add(step.step_id)
+
+            pending = deferred
+
+        plan.status = PlanStatus.COMPLETED
+
+        return self._final_response(
+            plan,
+            understanding,
+            execution,
+            model,
+        )
+
+    def _record_active_plan(self, plan, understanding):
+        """
+        Persists the running plan as the session's active goal so a
+        follow-up on the next turn continues it (Phase 3 planning
+        continuity). Session state only — never the memory store.
+        A continuation plan updates the existing goal; a fresh plan
+        replaces it.
+        """
+        try:
+            from src.core.context_manager import set_active_plan
+            set_active_plan(
+                plan,
+                goal_text=(understanding.raw_text or ""),
+            )
+        except Exception:
+            pass
+
+    def _dispatch_step(
+        self,
+        step,
+        plan,
+        understanding,
+        reasoning,
+        execution,
+        model=None,
+    ):
+
+        action = step.action
+
+        if action == "generate_response":
+            response = self._final_response(
+                plan,
+                understanding,
+                execution,
+                model,
+            )
+            if response:
+                step.result  = response
+                step.success = True
+                return response
+            return None
+
+        if action == "ask_clarification":
+            if plan.missing_information:
+                return (
+                    f"To help you with this I need: "
+                    f"{', '.join(plan.missing_information)}."
+                )
+            return "Could you give me a bit more detail about what you need?"
+
+        if action == "retrieve_memory":
+            self._retrieve_for_plan(
+                step,
+                understanding,
+                reasoning,
+                execution,
+            )
+            return None
+
+        if action == "analyze":
+            # Internal reasoning step — produces no user-facing
+            # output. It exists so plans can structure their thinking;
+            # the final generate_response step carries the answer.
+            step.success = True
+            step.result  = "analyzed"
+            return None
+
+        # search_web / use_tool — their executors arrive in Phase 5.
+        # A plan never fails because an executor does not exist yet;
+        # the step is recorded and the plan continues to its response
+        # step, which answers honestly with what is available.
+        step.success = False
+        step.error    = f"executor not available yet (Phase 5): {action}"
+        step.result   = None
+        return None
+
+    def _retrieve_for_plan(
+        self,
+        step,
+        understanding,
+        reasoning,
+        execution,
+    ):
+
+        try:
+            bundle = memory_router.retrieve(
+                understanding.raw_text,
+                reasoning,
+            )
+        except Exception as exc:
+            step.success = False
+            step.error   = str(exc)
+            return
+
+        known = {
+            m.get("text")
+            for m in execution.memories
+            if isinstance(m, dict)
+        }
+
+        for memory in bundle.get("memory", []):
+            if (
+                isinstance(memory, dict)
+                and memory.get("text")
+                and memory["text"] not in known
+            ):
+                execution.memories.append(memory)
+
+        for episode in bundle.get("episodes", []):
+            if episode not in execution.episodes:
+                execution.episodes.append(episode)
+
+        step.success = True
+        step.result  = (
+            f"retrieved {len(bundle.get('memory', []))} memory "
+            f"entries and {len(bundle.get('episodes', []))} episodes"
+        )
+
+    def _final_response(
+        self,
+        plan,
+        understanding,
+        execution,
+        model=None,
+    ):
+
+        from src.ai.prompt_builder import build_prompt
+        from src.ai.llm_interface import llm
+        import dataclasses
+
+        # Continuation turns already carry everything needed inside the
+        # plan and the conversation: the goal, the corrected facts, and
+        # the steps. Re-injecting the retrieved memory bundle into the
+        # response risks the model anchoring on unrelated stored facts
+        # (e.g. asking about "B.Tech" mid-Python-plan). Suppress stored
+        # memories for the reply on continuation turns only; fresh-plan
+        # and all non-planning responses keep the full bundle.
+        if plan.continues_active_plan:
+            execution = dataclasses.replace(execution, memories=[])
+
+        prompt = build_prompt(understanding, execution)
+
+        # Planning-only focus instruction. Never touches the memory /
+        # conversation path: this method runs only when a plan executed.
+        # Keeps the reply anchored to the goal and prevents re-asking
+        # for information the plan or conversation already establishes.
+        prompt += (
+            "\n\nThe user is mid-plan on the goal in the EXECUTION PLAN "
+            "above. Keep your reply focused on that goal. Do not ask for "
+            "information that the plan or the recent conversation already "
+            "establishes, and do not ask about unrelated stored facts."
+        )
+
+        response = llm.generate(prompt, model=model)
+
+        if not response:
+            return "I'm not sure how to respond."
+
+        return response
 
 
 execution_manager = ExecutionManager()

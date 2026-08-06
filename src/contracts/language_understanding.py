@@ -57,6 +57,12 @@ class SemanticUnderstanding:
 
     category: Optional[str] = None
 
+    # Capability category — the KIND OF WORK FRIDAY must do
+    # for this request (e.g. "programming", "planning",
+    # "memory"). Consumed by the Model Router. Values come
+    # from the shared CapabilityCategory constants.
+    capability: Optional[str] = None
+
     entities: List[Entity] = field(
         default_factory=list
     )

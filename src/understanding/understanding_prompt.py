@@ -13,6 +13,7 @@ JSON structure:
     "goal": "",
     "intent": "",
     "category": "",
+    "capability": "",
     "memory_scope": "",
     "conversation_state": "",
     "emotion": "",
@@ -115,6 +116,61 @@ memory
 social
 conversation
 general
+
+capability:
+Use EXACTLY one of these values.
+
+social
+general
+knowledge
+reasoning
+planning
+programming
+mathematics
+science
+writing
+creative
+translation
+summarization
+memory
+vision
+audio
+web
+tool_use
+device
+automation
+learning
+security
+system
+
+capability describes the KIND OF WORK FRIDAY must do for this message — not the topic. Choose the capability that best matches the task:
+
+- memory: personal facts stored or recalled about the user (my favorite X, do you know my name, what do you know about me).
+- knowledge: factual questions about the world, concepts, or courses (capital of France, what is B.Tech).
+- science: explaining natural phenomena and how things work (photosynthesis, gravity, how a capacitor works).
+- mathematics: solving calculations, equations, or quantitative problems.
+- programming: writing, debugging, or explaining code.
+- planning: multi-step goals, schedules, study plans, roadmaps, "learn X", "build X".
+- learning: teaching or structured learning of a subject.
+- writing: prose, emails, essays, notes, letters.
+- creative: poems, stories, ideas, imaginative content.
+- translation: converting text between languages.
+- summarization: condensing text or a past conversation.
+- social: greetings, farewells, thanks, small talk, acknowledgment.
+- device: controlling or acknowledging hardware and device actions.
+- web: real-time external information (news, weather, current prices).
+- tool_use: using a specific tool (calculator, files, terminal).
+- vision: images or visual content.
+- audio: sound or speech content.
+- automation: repeated or scheduled actions.
+- security: safety or privacy related requests.
+- system: questions about FRIDAY herself or the system.
+- reasoning: complex analysis and strategic thinking.
+- general: anything that fits no other capability.
+
+When in doubt between two capabilities, choose the more specific one that best matches the task (mathematics over general, programming over general, planning over general).
+
+capability must ALWAYS be one of the exact values above — never a variant or paraphrase such as "explaining", "information", "facts", "translate", "coding", "problem-solving", "debugging", "workout", "language". If no category fits, use general.
 
 memory_scope:
 Use EXACTLY one of these values.
@@ -365,21 +421,28 @@ web:
 Set true only when real-time external information is needed such as news, weather, or current prices.
 
 planning:
-Set planning to TRUE only when the user explicitly wants:
-- A multi-step schedule or timetable
-- A project plan or roadmap
-- An organized outline of tasks with time allocations
-- A step-by-step guide they asked you to create
+Set planning to TRUE when the user states a GOAL that needs multiple
+coordinated steps to accomplish — not a single question or single task.
+This includes:
+- Learning something new: "learn python", "study for exams", "teach me react"
+- Building or creating something: "build a game", "make an app", "create a portfolio"
+- A schedule, timetable, roadmap, or organized outline of tasks
+- Completing or finishing existing work: "help me finish my project"
+- Any request to organize their time, work, or study
 
 Set planning to FALSE for:
 - Questions about what something is
-- Requests to explain a concept
+- Requests to explain a concept (just answer it)
 - General knowledge questions
 - Conversational messages
-- Simple single-step tasks
+- Simple single-step tasks that can be answered directly
 
 Examples:
 "make me a study schedule" → planning: true
+"i want to learn python" → planning: true
+"study for exams" → planning: true
+"build a game" → planning: true
+"help me finish my project" → planning: true
 "plan my project" → planning: true
 "what is B.Tech" → planning: false
 "explain electromagnetism" → planning: false
@@ -396,6 +459,7 @@ Output:
   "goal": "retrieve_information",
   "intent": "question",
   "category": "food",
+  "capability": "memory",
   "memory_operation": "query",
   "canonical_fact": null,
   "uncertain_terms": [],
@@ -425,6 +489,7 @@ Output:
   "goal": "retrieve_information",
   "intent": "question",
   "category": "food",
+  "capability": "memory",
   "memory_operation": "query",
   "canonical_fact": null,
   "uncertain_terms": [],
@@ -454,6 +519,7 @@ Output:
   "goal": "retrieve_information",
   "intent": "question",
   "category": "hardware",
+  "capability": "memory",
   "memory_operation": "query",
   "canonical_fact": null,
   "uncertain_terms": [],
@@ -483,6 +549,7 @@ Output:
   "goal": "retrieve_information",
   "intent": "question",
   "category": "programming",
+  "capability": "memory",
   "memory_operation": "query",
   "canonical_fact": null,
   "uncertain_terms": [],
@@ -512,6 +579,7 @@ Output:
   "goal": "retrieve_information",
   "intent": "question",
   "category": "food",
+  "capability": "memory",
   "memory_operation": "query",
   "canonical_fact": null,
   "uncertain_terms": [],
@@ -541,6 +609,7 @@ Output:
   "goal": "retrieve_information",
   "intent": "question",
   "category": "hardware",
+  "capability": "memory",
   "memory_operation": "query",
   "canonical_fact": null,
   "uncertain_terms": [],
@@ -570,6 +639,7 @@ Output:
   "goal": "remember_information",
   "intent": "command",
   "category": "food",
+  "capability": "memory",
   "memory_operation": "store",
   "canonical_fact": "My favorite food is rice",
   "uncertain_terms": [],
@@ -603,6 +673,7 @@ Output:
   "goal": "remember_information",
   "intent": "correction",
   "category": "food",
+  "capability": "memory",
   "memory_operation": "update",
   "canonical_fact": "My favorite coffee is sweet lassi",
   "uncertain_terms": [],
@@ -636,6 +707,7 @@ Output:
   "goal": "remember_information",
   "intent": "command",
   "category": "hardware",
+  "capability": "memory",
   "memory_operation": "store",
   "canonical_fact": "My laptop has an RTX 4050",
   "uncertain_terms": [],
@@ -665,6 +737,7 @@ Output:
   "goal": "update_information",
   "intent": "command",
   "category": "programming",
+  "capability": "memory",
   "memory_operation": "update",
   "canonical_fact": "My favorite editor is PyCharm",
   "uncertain_terms": [],
@@ -698,6 +771,7 @@ Output:
   "goal": "update_information",
   "intent": "command",
   "category": "programming",
+  "capability": "memory",
   "memory_operation": "update",
   "canonical_fact": "I use VS Code",
   "uncertain_terms": [],
@@ -727,6 +801,7 @@ Output:
   "goal": "retrieve_information",
   "intent": "question",
   "category": "general",
+  "capability": "knowledge",
   "memory_operation": null,
   "canonical_fact": null,
   "uncertain_terms": [],
@@ -756,6 +831,7 @@ Output:
   "goal": "explain",
   "intent": "question",
   "category": "science",
+  "capability": "science",
   "memory_operation": null,
   "canonical_fact": null,
   "uncertain_terms": [],
@@ -785,6 +861,7 @@ Output:
   "goal": "remember_information",
   "intent": "command",
   "category": "general",
+  "capability": "memory",
   "memory_operation": "store",
   "canonical_fact": "I study btag",
   "uncertain_terms": ["btag"],
@@ -814,6 +891,7 @@ Output:
   "goal": "explain",
   "intent": "question",
   "category": "education",
+  "capability": "knowledge",
   "memory_operation": null,
   "canonical_fact": null,
   "uncertain_terms": [],
@@ -843,6 +921,7 @@ Output:
   "goal": "remember_information",
   "intent": "command",
   "category": "education",
+  "capability": "memory",
   "memory_operation": "store",
   "canonical_fact": "I study B.Tech",
   "uncertain_terms": [],
@@ -876,6 +955,7 @@ Output:
   "goal": "create",
   "intent": "request",
   "category": "education",
+  "capability": "planning",
   "memory_operation": null,
   "canonical_fact": null,
   "uncertain_terms": [],
@@ -907,6 +987,340 @@ Output:
   "confidence": 1.0
 }
 
+Input: write a python function that reverses a string
+Output:
+{
+  "goal": "create",
+  "intent": "command",
+  "category": "programming",
+  "capability": "programming",
+  "memory_operation": null,
+  "canonical_fact": null,
+  "uncertain_terms": [],
+  "memory_scope": "none",
+  "conversation_state": "new_topic",
+  "emotion": "neutral",
+  "entities": [{"text": "python", "label": "language", "confidence": 0.99}],
+  "time_reference": null,
+  "required_systems": {
+    "memory": false,
+    "episodes": false,
+    "context": false,
+    "tools": false,
+    "web": false,
+    "vision": false,
+    "planning": true,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0
+}
+
+Input: translate good morning to spanish
+Output:
+{
+  "goal": "create",
+  "intent": "command",
+  "category": "general",
+  "capability": "translation",
+  "memory_operation": null,
+  "canonical_fact": null,
+  "uncertain_terms": [],
+  "memory_scope": "none",
+  "conversation_state": "new_topic",
+  "emotion": "neutral",
+  "entities": [{"text": "good morning", "label": "text", "confidence": 0.99}],
+  "time_reference": null,
+  "required_systems": {
+    "memory": false,
+    "episodes": false,
+    "context": false,
+    "tools": false,
+    "web": false,
+    "vision": false,
+    "planning": false,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0
+}
+
+Input: summarize what we talked about today
+Output:
+{
+  "goal": "summarize",
+  "intent": "request",
+  "category": "conversation",
+  "capability": "summarization",
+  "memory_operation": null,
+  "canonical_fact": null,
+  "uncertain_terms": [],
+  "memory_scope": "episodic",
+  "conversation_state": "question",
+  "emotion": "neutral",
+  "entities": [],
+  "time_reference": {"type": "relative", "value": "today"},
+  "required_systems": {
+    "memory": true,
+    "episodes": true,
+    "context": true,
+    "tools": false,
+    "web": false,
+    "vision": false,
+    "planning": false,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0
+}
+
+Input: write a short poem about the rain
+Output:
+{
+  "goal": "create",
+  "intent": "command",
+  "category": "general",
+  "capability": "creative",
+  "memory_operation": null,
+  "canonical_fact": null,
+  "uncertain_terms": [],
+  "memory_scope": "none",
+  "conversation_state": "new_topic",
+  "emotion": "neutral",
+  "entities": [{"text": "rain", "label": "topic", "confidence": 0.99}],
+  "time_reference": null,
+  "required_systems": {
+    "memory": false,
+    "episodes": false,
+    "context": false,
+    "tools": false,
+    "web": false,
+    "vision": false,
+    "planning": false,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0
+}
+
+Input: draft an email to my professor asking for a deadline extension
+Output:
+{
+  "goal": "create",
+  "intent": "request",
+  "category": "project",
+  "capability": "writing",
+  "memory_operation": null,
+  "canonical_fact": null,
+  "uncertain_terms": [],
+  "memory_scope": "none",
+  "conversation_state": "new_topic",
+  "emotion": "neutral",
+  "entities": [],
+  "time_reference": null,
+  "required_systems": {
+    "memory": false,
+    "episodes": false,
+    "context": false,
+    "tools": false,
+    "web": false,
+    "vision": false,
+    "planning": false,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0
+}
+
+Input: turn on the lights in my room
+Output:
+{
+  "goal": "open_application",
+  "intent": "command",
+  "category": "general",
+  "capability": "device",
+  "memory_operation": null,
+  "canonical_fact": null,
+  "uncertain_terms": [],
+  "memory_scope": "none",
+  "conversation_state": "new_topic",
+  "emotion": "neutral",
+  "entities": [],
+  "time_reference": null,
+  "required_systems": {
+    "memory": false,
+    "episodes": false,
+    "context": false,
+    "tools": true,
+    "web": false,
+    "vision": false,
+    "planning": false,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0
+}
+
+Input: teach me the basics of git
+Output:
+{
+  "goal": "create",
+  "intent": "request",
+  "category": "education",
+  "capability": "learning",
+  "memory_operation": null,
+  "canonical_fact": null,
+  "uncertain_terms": [],
+  "memory_scope": "none",
+  "conversation_state": "new_topic",
+  "emotion": "neutral",
+  "entities": [{"text": "git", "label": "tool", "confidence": 0.99}],
+  "time_reference": null,
+  "required_systems": {
+    "memory": false,
+    "episodes": false,
+    "context": false,
+    "tools": false,
+    "web": false,
+    "vision": false,
+    "planning": true,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0
+}
+
+Input: explain how a capacitor works
+Output:
+{
+  "goal": "explain",
+  "intent": "question",
+  "category": "science",
+  "capability": "science",
+  "memory_operation": null,
+  "canonical_fact": null,
+  "uncertain_terms": [],
+  "memory_scope": "none",
+  "conversation_state": "new_topic",
+  "emotion": "neutral",
+  "entities": [{"text": "capacitor", "label": "concept", "confidence": 0.99}],
+  "time_reference": null,
+  "required_systems": {
+    "memory": false,
+    "episodes": false,
+    "context": false,
+    "tools": false,
+    "web": false,
+    "vision": false,
+    "planning": false,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0
+}
+
+Input: give me a 30 day workout schedule
+Output:
+{
+  "goal": "create",
+  "intent": "request",
+  "category": "fitness",
+  "capability": "planning",
+  "memory_operation": null,
+  "canonical_fact": null,
+  "uncertain_terms": [],
+  "persistence_class": "temporal",
+  "memory_category": "fitness",
+  "memory_tags": ["workout schedule", "30 day"],
+  "missing_information": [],
+  "memory_scope": "none",
+  "conversation_state": "new_topic",
+  "emotion": "neutral",
+  "entities": [{"text": "30 day", "label": "duration", "confidence": 0.99}],
+  "time_reference": {"type": "relative", "value": "30 day"},
+  "required_systems": {
+    "memory": false,
+    "episodes": false,
+    "context": false,
+    "tools": false,
+    "web": false,
+    "vision": false,
+    "planning": true,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0
+}
+
+Input: can you help me fix a bug in my python script
+Output:
+{
+  "goal": "create",
+  "intent": "request",
+  "category": "programming",
+  "capability": "programming",
+  "memory_operation": null,
+  "canonical_fact": null,
+  "uncertain_terms": [],
+  "memory_scope": "none",
+  "conversation_state": "new_topic",
+  "emotion": "neutral",
+  "entities": [{"text": "python", "label": "language", "confidence": 0.99}],
+  "time_reference": null,
+  "required_systems": {
+    "memory": false,
+    "episodes": false,
+    "context": false,
+    "tools": false,
+    "web": false,
+    "vision": false,
+    "planning": false,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0
+}
+
+Input: solve for x: x squared plus 5x plus 6 equals 0
+Output:
+{
+  "goal": "calculate",
+  "intent": "question",
+  "category": "science",
+  "capability": "mathematics",
+  "memory_operation": null,
+  "canonical_fact": null,
+  "uncertain_terms": [],
+  "memory_scope": "none",
+  "conversation_state": "question",
+  "emotion": "neutral",
+  "entities": [],
+  "time_reference": null,
+  "required_systems": {
+    "memory": false,
+    "episodes": false,
+    "context": false,
+    "tools": false,
+    "web": false,
+    "vision": false,
+    "planning": false,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0
+}
+
 FINAL RULES
 
 Return ONLY valid JSON.
@@ -921,7 +1335,7 @@ subjects, abbreviations, brand names, or proper nouns.
 Never flag a normal spelling variant of a known concept.
 If genuinely uncertain, list the term and lower confidence.
 Always include every field from the JSON structure above. The fields
-persistence_class, memory_category, memory_tags and
+capability, persistence_class, memory_category, memory_tags and
 missing_information are REQUIRED in every response — output them
 even as "unknown", null or [].
 """

@@ -156,6 +156,10 @@ def analyze_memory(raw_understanding: dict):
     required         = raw_understanding.get("required_systems", {})
     memory_scope     = raw_understanding.get("memory_scope", "none") or "none"
     memory_operation = raw_understanding.get("memory_operation", None)
+    if not isinstance(memory_operation, str):
+        memory_operation = None
+    else:
+        memory_operation = memory_operation.lower().strip() or None
     canonical_fact   = raw_understanding.get("canonical_fact", None)
     uncertain_terms  = raw_understanding.get("uncertain_terms", []) or []
 

@@ -9,8 +9,20 @@ from src.core.response_generator import (
 )
 from src.ai.prompt_builder import build_prompt
 from src.ai.llm_interface import llm
-from src.ai.model_router import select_model
+from src.ai.model_router import route as route_model
 from src.core.context_manager import maybe_rollover
+
+
+# Passive knowledge-lookup goals. When the planner decides such a
+# message does NOT continue the active plan, it is a mid-plan
+# question ("what is the weather in tokyo", "how far is X from Y",
+# "tell me a joke") — never a plan to execute. Deterministic and
+# independent of the flaky Understanding planning flag, so a weather
+# question detours even when Understanding routed it to the planner.
+DETOUR_GOALS = {
+    "retrieve_information",
+    "amusement",
+}
 
 
 def _clean_response(text: str) -> str:
@@ -118,6 +130,24 @@ def think(user_message: str):
         reasoning,
     )
 
+    # A "detour" is a message the planner judged unrelated to the
+    # active plan (not a continuation) AND not something to execute:
+    # either its semantic goal is a passive lookup (weather, distance,
+    # joke) — deterministic, independent of the flaky planning flag —
+    # or the planner itself rejected it as a goal request. Detours are
+    # answered on the normal path with the active plan left intact.
+    # A genuine NEW goal — flag recognized or not — has an actionable
+    # goal AND the planner flagged it as a goal request, so it
+    # executes as a fresh plan and replaces the active one.
+    plan_detour = bool(
+        execution.planner_result
+        and not execution.planner_result.continues_active_plan
+        and (
+            (understanding.semantic.goal or "").lower() in DETOUR_GOALS
+            or not execution.planner_result.is_goal_request
+        )
+    )
+
     # ============================================
     # 4. TOOLS
     # ============================================
@@ -126,16 +156,22 @@ def think(user_message: str):
 
     # ============================================
     # 4b. MODEL SELECTION
-    # Deterministic lookup — no LLM call.
+    # The Brain requests a routing decision from the
+    # Model Router and passes the decision's model
+    # into the LLM Interface. The Brain never knows
+    # model names or routing rules.
     # ============================================
 
-    model_config = select_model(understanding)
-    response_model = model_config.get("model")
+    routing_decision = route_model(
+        understanding.semantic.capability
+    )
+    response_model = routing_decision.model
 
     print("\n========== BRAIN ==========")
     print("Tool Result  :", repr(tool_result))
     print("Use Planning :", reasoning.use_planning)
-    print("Model        :", response_model)
+    print("Capability   :", routing_decision.category)
+    print("Model        :", response_model, f"({routing_decision.role})")
     print("===========================\n")
 
     if tool_result is not None:
@@ -163,6 +199,39 @@ def think(user_message: str):
     print("============================\n")
 
     if memory_result == "stored":
+
+        # A goal-accomplishment request ("build a game", "learn
+        # python") is often ALSO extracted as a memory write. The
+        # write has already happened — the side effect is kept. But
+        # when Reasoning flagged planning, the user asked for a
+        # plan, so the plan is the answer. This only widens the
+        # stored path; the memory write is a quiet side effect.
+        if (
+            reasoning.use_planning
+            and execution.planner_result
+            and not plan_detour
+        ):
+
+            response = execution_manager.execute_plan(
+                execution.planner_result,
+                understanding,
+                reasoning,
+                execution,
+                model=response_model,
+            )
+
+            return {
+                "understanding": understanding,
+                "reasoning":     reasoning,
+                "execution":     execution,
+                "response":      _clean_response(response),
+            }
+
+        # Mid-plan detour: answer as a plain stored-fact ack. The
+        # planner output was judged unrelated to the active plan, so
+        # it must not shape this response — and the active plan stays.
+        if plan_detour:
+            execution.planner_result = None
 
         prompt   = build_prompt(understanding, execution)
         response = llm.generate(prompt, model=response_model)
@@ -397,13 +466,18 @@ def think(user_message: str):
     # 6. PLANNING PATH
     # ============================================
 
-    if reasoning.use_planning and execution.planner_result:
+    if (
+        reasoning.use_planning
+        and execution.planner_result
+        and not plan_detour
+    ):
 
-        response = _execute_plan(
+        response = execution_manager.execute_plan(
             execution.planner_result,
             understanding,
+            reasoning,
             execution,
-            response_model,
+            model=response_model,
         )
 
         return {
@@ -416,6 +490,12 @@ def think(user_message: str):
     # ============================================
     # 7. CONVERSATION PATH
     # ============================================
+
+    # A detour reaches here with planner output that is unrelated to
+    # the active plan. Drop it so the normal answer is not shaped by
+    # a plan the user never asked for; the active plan is untouched.
+    if plan_detour:
+        execution.planner_result = None
 
     prompt   = build_prompt(understanding, execution)
     response = llm.generate(prompt, model=response_model)
@@ -501,49 +581,3 @@ def _ask_for_confirmation(old_text, new_text, model=None):
         )
 
     return response
-
-
-def _execute_plan(plan, understanding, execution, model=None):
-    """
-    Executes an ExecutionPlan and returns the final response.
-
-    Handles clarification requests, then walks steps.
-    All steps currently route through the prompt builder.
-    Phase 5 adds real tool/web branching here.
-    """
-
-    if plan.requires_clarification and plan.missing_information:
-        missing = ", ".join(plan.missing_information)
-        return (
-            f"To help you with this I need a bit more detail. "
-            f"Could you tell me: {missing}?"
-        )
-
-    for step in plan.steps:
-
-        step.completed = True
-
-        if step.action == "generate_response":
-            prompt   = build_prompt(understanding, execution)
-            response = llm.generate(prompt, model=model)
-            if response:
-                step.result  = response
-                step.success = True
-                return response
-
-        if step.action == "ask_clarification":
-            if plan.missing_information:
-                missing = ", ".join(plan.missing_information)
-                return f"To help you with this I need: {missing}."
-            return (
-                "Could you give me a bit more detail "
-                "about what you need?"
-            )
-
-        # retrieve_memory, search_web, use_tool, analyze —
-        # real implementations in Phase 5.
-        step.completed = True
-
-    prompt   = build_prompt(understanding, execution)
-    response = llm.generate(prompt, model=model)
-    return response or "I'm not sure how to respond."

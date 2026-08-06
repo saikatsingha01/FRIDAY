@@ -18,6 +18,14 @@ class ReasoningResult:
     use_vision:   bool = False
     use_planning: bool = False
 
+    # True when use_planning was enabled ONLY by the continuity
+    # gate — i.e. the message itself was not a goal (no planning
+    # flag, not a planning goal, not a short follow-up), but an
+    # active plan exists. Lets the caller distinguish a genuine
+    # new goal from a mid-plan detour (question, fact statement)
+    # so a detour never replaces the active plan.
+    continuity_only: bool = False
+
     continue_conversation: bool = True
 
 
@@ -70,6 +78,50 @@ class ReasoningEngine:
             return False
 
         if len((understanding.raw_text or "").split()) > 5:
+            return False
+
+        return True
+
+    def _continues_active_plan(self, understanding) -> bool:
+        """
+        Universal planning-continuity gate.
+
+        A plan was generated in an earlier turn and is still the
+        active goal. A follow-up that keeps that conversation alive
+        stays on the planning path so the goal is never abandoned
+        mid-thread ("no, not game dev — just python" after a learn-
+        python plan; "ok so what is the first step"). The PLANNER is
+        the arbiter of whether the new message truly continues the
+        goal; this gate only decides whether the planner gets a
+        chance.
+
+        Reads structured contract fields only — never message text.
+        Questions are passed through deliberately: a continuation
+        question ("what is the first step") is indistinguishable
+        from an unrelated one ("what is the weather") at the intent
+        level, so the planner arbitrates both. When the planner
+        decides the question does NOT continue the goal, the
+        reasoning layer marks it as a detour (continuity_only) and
+        the caller answers it on the normal path without replacing
+        the active plan. Pure conversation and greetings are strong
+        signals the user is not driving a goal forward and are
+        skipped. Ends the active plan on a detected session end.
+        """
+        from src.core.context_manager import (
+            get_active_plan,
+            clear_active_plan,
+        )
+
+        if get_active_plan() is None:
+            return False
+
+        if understanding.metadata.get("end_session") is True:
+            clear_active_plan()
+            return False
+
+        intent = (understanding.semantic.intent or "").lower().strip()
+
+        if intent in {"conversation", "greeting"}:
             return False
 
         return True
@@ -132,13 +184,22 @@ class ReasoningEngine:
         # required_systems.planning flag, with a narrow
         # goal fallback. Categories are topics, not
         # tasks — a science question is NOT a plan.
+        # The continuity gate adds messages that keep
+        # an existing active plan alive. continuity_only
+        # records when the gate is the sole reason
+        # planning is on, so mid-plan detours can be
+        # answered normally without replacing the goal.
         # ==========================================
 
-        result.use_planning = (
+        base_planning = (
             understanding.required_systems.planning
             or goal in PLANNING_GOALS
             or self._is_short_followup(understanding)
         )
+        continuity = self._continues_active_plan(understanding)
+
+        result.use_planning = base_planning or continuity
+        result.continuity_only = continuity and not base_planning
 
         return result
 

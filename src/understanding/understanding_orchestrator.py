@@ -18,6 +18,10 @@ from src.understanding.emotion_analyzer import analyze_emotion
 from src.understanding.context_analyzer import analyze_context
 from src.understanding.triage import classify_trivial
 
+from src.contracts.capability import (
+    CapabilityCategory,
+)
+
 from src.memory.memory_fact import MemoryFact, now_iso
 from src.memory.knowledge_normalizer import (
     normalize_for_understanding,
@@ -385,6 +389,7 @@ class UnderstandingOrchestrator:
             category=TRIVIAL_CATEGORIES.get(
                 category, "social"
             ),
+            capability=CapabilityCategory.SOCIAL,
             entities=[],
             confidence=1.0,
         )
@@ -535,6 +540,7 @@ class UnderstandingOrchestrator:
             goal=semantic.get("goal"),
             intent=semantic.get("intent"),
             category=semantic.get("category"),
+            capability=semantic.get("capability"),
             entities=semantic.get("entities", []),
             time_reference=semantic.get("time_reference"),
             confidence=semantic.get("confidence", 0.0),
@@ -612,6 +618,32 @@ class UnderstandingOrchestrator:
             planning=systems.get("planning", False),
             reasoning=systems.get("reasoning", True),
         )
+
+        # =====================================
+        # PLANNING FLAG AUTHORITY
+        # The full understanding prompt is too
+        # large for the small model to label
+        # goal-accomplishment requests reliably:
+        # "i want to learn python" comes back as
+        # goal=remember_information with
+        # planning=False, so the plan never runs.
+        # For command/request messages a dedicated
+        # micro-classifier is the authority — the
+        # same precedent as end_session above.
+        # =====================================
+
+        if (
+            not understanding.required_systems.planning
+            and semantic.get("intent")
+            in ("command", "request")
+        ):
+            from src.understanding.end_session_analyzer import (
+                detect_planning_request,
+            )
+
+            understanding.required_systems.planning = (
+                detect_planning_request(user_message)
+            )
 
         understanding.constraints = raw_understanding.get(
             "constraints", {}

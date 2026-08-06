@@ -68,6 +68,44 @@ _TOPIC_DISMISSAL_PROMPT = (
 )
 
 
+_PLANNING_PROMPT = (
+    "You are classifying whether the user has stated a MULTI-STEP "
+    "GOAL that the assistant should plan or help accomplish over "
+    "several actions or steps — learning something new, building or "
+    "creating something, organizing a schedule, or completing a "
+    "project.\n\n"
+    "Reply only YES or NO.\n\n"
+    "YES examples (the user wants a plan or step-by-step help to "
+    "achieve a larger goal):\n"
+    "- \"i want to build a game\" -> YES\n"
+    "- \"i want to learn python\" -> YES\n"
+    "- \"study for exams\" -> YES\n"
+    "- \"help me finish my project\" -> YES\n"
+    "- \"make me a study schedule\" -> YES\n"
+    "- \"i want to learn to play guitar\" -> YES\n"
+    "- \"plan my week\" -> YES\n"
+    "- \"help me get fit\" -> YES\n"
+    "- \"i want to write a book\" -> YES\n"
+    "- \"teach me how to code\" -> YES\n\n"
+    "NO examples (single-step commands, memory statements, "
+    "questions, or explanations — NOT a multi-step goal):\n"
+    "- \"turn off the lights\" -> NO\n"
+    "- \"play a song\" -> NO\n"
+    "- \"set a timer\" -> NO\n"
+    "- \"what is my favorite food\" -> NO\n"
+    "- \"my favorite food is lasagna\" -> NO\n"
+    "- \"remember my favorite food is sushi\" -> NO\n"
+    "- \"forget my favorite food\" -> NO\n"
+    "- \"what time is it\" -> NO\n"
+    "- \"explain how electric cars work\" -> NO\n"
+    "- \"tell me a joke\" -> NO\n"
+    "- \"hello\" -> NO\n"
+    "- \"see you later\" -> NO\n\n"
+    "User message: {msg}\n"
+    "Answer (YES or NO):"
+)
+
+
 _CLASSIFIER_PROMPT = (
     "You are classifying whether the user is ENDING THE SESSION "
     "or telling the assistant to go offline, sleep, rest, stop "
@@ -140,6 +178,38 @@ def detect_end_session(user_message: str) -> bool:
     """
     try:
         prompt = _CLASSIFIER_PROMPT.format(
+            msg=_strip_lead_interjections(user_message)
+        )
+        response = llm.generate(prompt)
+        label = (response or "").strip().lower()
+        label = label.strip("\"'`.,;: ")
+        return label == "yes"
+    except Exception:
+        return False
+
+
+def detect_planning_request(user_message: str) -> bool:
+    """
+    Focused PLANNING-REQUEST classifier for the Understanding
+    Layer.
+
+    The full understanding prompt is too large for the small model
+    to label goal-accomplishment requests reliably: "i want to
+    build a game" / "i want to learn python" / "study for exams"
+    come back as goal=remember_information with planning=False, so
+    the plan never runs. A dedicated micro-prompt is the authority
+    for whether the user stated a multi-step goal — the same
+    precedent as end_session and topic-dismissal.
+
+    Conservative by construction: only the exact 'YES' label is
+    accepted. A false negative (a missed plan) is safe — the
+    conversation simply proceeds without a plan. A false positive
+    routes a single-step request through the planner, which answers
+    it anyway, so the failure mode is a longer response, not a
+    broken one.
+    """
+    try:
+        prompt = _PLANNING_PROMPT.format(
             msg=_strip_lead_interjections(user_message)
         )
         response = llm.generate(prompt)

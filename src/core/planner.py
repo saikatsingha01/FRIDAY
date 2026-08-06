@@ -9,6 +9,7 @@ from src.contracts.planner import (
     ExecutionPlan,
     PlanStep,
     PlanStatus,
+    PlannerInput,
 )
 
 from src.ai.llm_interface import llm
@@ -58,6 +59,8 @@ class Planner:
         recent_context: list = None,
         memories: list = None,
         episodes: list = None,
+        reasoning=None,
+        active_plan=None,
     ) -> str:
 
         # Inject recent conversation so planner
@@ -132,6 +135,50 @@ class Planner:
 
         urgency = understanding.emotion.urgency or "unknown"
 
+        # Reasoning decisions — which systems Reasoning judged this
+        # request needs. Informational only: the planner plans WITH
+        # what is available (memory already retrieved, web/tools
+        # gated), and never invents availability the Reasoning layer
+        # did not grant.
+        reasoning_block = ""
+        if reasoning is not None:
+            flags = []
+            for name in (
+                "use_memory",
+                "use_episodes",
+                "use_context",
+                "use_tools",
+                "use_web",
+                "use_planning",
+            ):
+                if getattr(reasoning, name, False):
+                    flags.append(name.replace("use_", ""))
+            if flags:
+                reasoning_block = (
+                    "Reasoning decisions (which systems are available "
+                    "for this request): "
+                    + ", ".join(flags)
+                    + ".\n"
+                )
+
+        # The plan currently in progress. When present, the new
+        # message is likely a follow-up to it. The planner decides
+        # whether it continues the same goal or is a new one.
+        active_block = ""
+        if active_plan:
+            goal      = active_plan.get("goal", "")
+            goal_text = active_plan.get("goal_text", "")
+            steps     = active_plan.get("steps", [])
+            active_block = (
+                "Active plan already in progress (from earlier in "
+                "this conversation):\n"
+                f"  Goal: {goal}\n"
+                f"  Original request: {goal_text}\n"
+                f"  Steps so far: "
+                + ("; ".join(steps) if steps else "none")
+                + "\n\n"
+            )
+
         return (
             "You are FRIDAY's Universal Planning Engine.\n\n"
 
@@ -146,6 +193,8 @@ class Planner:
             "Required JSON structure:\n"
             "{\n"
             '    "goal": "concise description of what the user wants",\n'
+            '    "continues_active_plan": false,\n'
+            '    "is_goal_request": false,\n'
             '    "goal_type": "research / creative / technical / planning / operational / conversational",\n'
             '    "requires_clarification": false,\n'
             '    "missing_information": [],\n'
@@ -204,11 +253,60 @@ class Planner:
             "  7. Return ONLY valid JSON.\n"
             "  8. Use every constraint the user provided (time available, "
             "deadlines, specific topics, breaks, resources) directly in the "
-            "steps. Do not invent constraints the user did not give.\n\n"
+            "steps. Do not invent constraints the user did not give.\n"
+            "  9. continues_active_plan: set TRUE when the user's message "
+            "continues the SAME goal as the active plan — a correction, a "
+            "follow-up, an answer to your question, more detail, or a new "
+            "constraint on the same goal. When in doubt while an active "
+            "plan exists, default to TRUE. Set FALSE when the user has "
+            "clearly moved on to a different topic or request: a new "
+            "subject or task of their own, an unrelated question, a "
+            "different goal. A message that states a NEW concrete "
+            "request of its own is FALSE even if it uses words that "
+            "also appear in the active plan. When TRUE, merge the new "
+            "information into the plan: drop missing_information items "
+            "the user just provided, and update or extend the steps. Do "
+            "not restart the plan from scratch for a continuation. When "
+            "FALSE, ignore the active plan and create a fresh plan.\n"
+            "  10. is_goal_request: the planner's own judgment of whether "
+            "the user's message is a goal the user wants you to work "
+            "toward. TRUE for a task, plan, learning, building, or "
+            "preparation request. FALSE for on-the-spot trivia that does "
+            "not warrant an execution plan: an unrelated question, a bare "
+            "statement of a fact, or a greeting. When the message "
+            "continues the active plan, keep this TRUE (the active goal "
+            "is still a goal).\n\n"
+
+            "Examples of continues_active_plan (active plan: learn Python):\n"
+            "- \"no its different from game development, i just want python\" -> TRUE\n"
+            "- \"i have zero coding experience\" -> TRUE\n"
+            "- \"and i can only spend one hour a day on it\" -> TRUE\n"
+            "- \"ok what is step one then\" -> TRUE\n"
+            "- \"what is the weather in bangalore\" -> FALSE\n"
+            "- \"i want to plan a trip to paris\" -> FALSE\n"
+            "- \"tell me a joke\" -> FALSE\n\n"
+
+            "Examples of continues_active_plan (active plan: build a "
+            "personal blog):\n"
+            "- \"right, but i am a total beginner\" -> TRUE\n"
+            "- \"i want to organize my study plan\" -> FALSE (new goal, "
+            "different subject)\n"
+            "- \"teach me the piano\" -> FALSE (new goal)\n"
+            "- \"what is the weather like in tokyo\" -> FALSE (unrelated "
+            "question)\n\n"
+
+            "Examples of is_goal_request:\n"
+            "- \"teach me the piano\" -> TRUE\n"
+            "- \"i want to build a website\" -> TRUE\n"
+            "- \"i want to organize my study plan\" -> TRUE\n"
+            "- \"what is the weather in bangalore\" -> FALSE\n"
+            "- \"my favorite color is blue\" -> FALSE\n"
+            "- \"tell me a joke\" -> FALSE\n\n"
 
             + memory_block
             + episodes_block
             + context_block
+            + active_block
 
             + "User goal:\n"
             + understanding.raw_text + "\n\n"
@@ -220,19 +318,26 @@ class Planner:
             f"Entities:\n{entities_text}\n"
             f"Time reference: {time_text}\n"
             f"Urgency: {urgency}\n"
+            + reasoning_block
         )
 
     def plan(
         self,
-        understanding: LanguageUnderstanding,
-        recent_context: list = None,
-        memories: list = None,
-        episodes: list = None,
+        planner_input: PlannerInput,
     ) -> ExecutionPlan:
+
+        understanding = planner_input.understanding
+        recent_context = planner_input.recent_context
+        memories = planner_input.memories
+        episodes = planner_input.episodes
+        reasoning = planner_input.reasoning
+        active_plan = planner_input.active_plan
 
         print("\n========== PLANNER ==========")
         print("Goal     :", understanding.raw_text)
         print("Category :", understanding.semantic.category)
+        if active_plan:
+            print("Active   :", active_plan.get("goal", ""))
 
         response = llm.generate(
             self._build_prompt(
@@ -240,6 +345,8 @@ class Planner:
                 recent_context,
                 memories,
                 episodes,
+                reasoning,
+                active_plan,
             ),
             num_predict=4096,
             format_json=True,
@@ -553,13 +660,29 @@ class Planner:
                 )
                 action = self.DEFAULT_ACTION
 
+            step_id = item.get("step_id", len(steps) + 1)
+            # step_id lands in a set (executor completion tracking);
+            # keep it hashable no matter what the LLM emits.
+            if not isinstance(step_id, (str, int)):
+                step_id = len(steps) + 1
+
+            depends = item.get("depends_on", [])
+            # The planner LLM occasionally returns depends_on as a
+            # list of objects instead of step_id strings. Only string
+            # entries are valid references — anything else is dropped
+            # so the executor's set(step.depends_on) can never hit an
+            # unhashable element.
+            if not isinstance(depends, list):
+                depends = []
+            depends = [d for d in depends if isinstance(d, str)]
+
             steps.append(PlanStep(
-                step_id=item.get("step_id", len(steps) + 1),
+                step_id=step_id,
                 title=item.get("title", "Step"),
                 description=item.get("description", ""),
                 action=action,
                 parameters=item.get("parameters", {}),
-                depends_on=item.get("depends_on", []),
+                depends_on=depends,
                 metadata=item.get("metadata", {}),
             ))
 
@@ -576,6 +699,12 @@ class Planner:
         return ExecutionPlan(
             goal=data.get("goal", ""),
             goal_type=data.get("goal_type", "general"),
+            continues_active_plan=(
+                data.get("continues_active_plan") is True
+            ),
+            is_goal_request=(
+                data.get("is_goal_request") is True
+            ),
             steps=steps,
             requires_clarification=data.get(
                 "requires_clarification", False

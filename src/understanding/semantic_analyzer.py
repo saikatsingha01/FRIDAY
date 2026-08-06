@@ -10,6 +10,7 @@ def analyze_semantics(raw_understanding: dict):
     - Goal
     - Intent
     - Category
+    - Capability
     - Entities
     - Time Reference
     """
@@ -23,6 +24,8 @@ def analyze_semantics(raw_understanding: dict):
             "intent": None,
 
             "category": None,
+
+            "capability": None,
 
             "entities": [],
 
@@ -44,6 +47,10 @@ def analyze_semantics(raw_understanding: dict):
 
         "category": raw_understanding.get(
             "category"
+        ),
+
+        "capability": raw_understanding.get(
+            "capability"
         ),
 
         "entities": raw_understanding.get(

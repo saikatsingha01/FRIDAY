@@ -109,6 +109,7 @@ gaming
 food
 identity
 project
+file_system
 science
 education
 planning
@@ -139,6 +140,7 @@ web
 tool_use
 device
 automation
+file_system
 learning
 security
 system
@@ -146,6 +148,7 @@ system
 capability describes the KIND OF WORK FRIDAY must do for this message — not the topic. Choose the capability that best matches the task:
 
 - memory: personal facts stored or recalled about the user (my favorite X, do you know my name, what do you know about me).
+  Hardware the user owns is a personal fact: "my laptop has an RTX 4050" -> capability memory, NEVER device.
 - knowledge: factual questions about the world, concepts, or courses (capital of France, what is B.Tech).
 - science: explaining natural phenomena and how things work (photosynthesis, gravity, how a capacitor works).
 - mathematics: solving calculations, equations, or quantitative problems.
@@ -158,13 +161,32 @@ capability describes the KIND OF WORK FRIDAY must do for this message — not th
 - summarization: condensing text or a past conversation.
 - social: greetings, farewells, thanks, small talk, acknowledgment.
 - device: controlling or acknowledging hardware and device actions.
+  CRITICAL NEGATIVES: "search the web", "google X", "look up X" are
+  ALWAYS capability 'web' - NEVER 'device'. Searching is not launching.
+  Opening a folder, listing files, or reading a directory is
+  'file_system' - NEVER 'device'.
+  When the user asks to launch/open/start an application
+  (chrome, spotify, notepad, calculator), that is
+  capability 'device' - extract the application name as an entity with
+  label "application".
+  Example: "launch my chrome browser" -> capability device, entities
+  [{"text": "chrome browser", "label": "application"}].
 - web: real-time external information (news, weather, current prices).
 - tool_use: using a specific tool (calculator, files, terminal).
 - vision: images or visual content.
 - audio: sound or speech content.
 - automation: repeated or scheduled actions.
+- file_system: reading, listing, creating, or managing files and folders.
+  Extract the folder/file name as an entity with label "location".
+  Commands that list, read, or create files and folders ("list the
+  files in X", "what is inside X", "create a folder") are ALWAYS
+  capability 'file_system' - NEVER 'device'.
+  Example: "list the files in my project folder" -> capability
+  file_system, entities [{"text": "project folder", "label": "location"}].
 - security: safety or privacy related requests.
-- system: questions about FRIDAY herself or the system.
+- system: running a command in a terminal or changing system state.
+  "run ... command in the terminal", "execute ..." use capability system.
+- system_info: questions about FRIDAY herself or the system.
 - reasoning: complex analysis and strategic thinking.
 - general: anything that fits no other capability.
 
@@ -651,6 +673,40 @@ Output:
   "conversation_state": "new_topic",
   "emotion": "neutral",
   "entities": [{"text": "rice", "label": "food", "confidence": 0.99}],
+  "time_reference": null,
+  "required_systems": {
+    "memory": true,
+    "episodes": false,
+    "context": false,
+    "tools": false,
+    "web": false,
+    "vision": false,
+    "planning": false,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0
+}
+
+Input: remember that my laptop has an RTX 4050
+Output:
+{
+  "goal": "remember_information",
+  "intent": "command",
+  "category": "hardware",
+  "capability": "memory",
+  "memory_operation": "store",
+  "canonical_fact": "My laptop has an RTX 4050",
+  "uncertain_terms": [],
+  "persistence_class": "permanent",
+  "memory_category": "device",
+  "memory_tags": ["laptop", "RTX 4050"],
+  "missing_information": [],
+  "memory_scope": "semantic",
+  "conversation_state": "new_topic",
+  "emotion": "neutral",
+  "entities": [{"text": "RTX 4050", "label": "hardware", "confidence": 0.99}],
   "time_reference": null,
   "required_systems": {
     "memory": true,
@@ -1164,10 +1220,106 @@ Output:
   },
   "constraints": {},
   "metadata": {},
+  "confidence": 1.0Input: launch my chrome browser
+Output:
+{
+  "goal": "open_application",
+  "intent": "command",
+  "category": "general",
+  "capability": "device",
+  "memory_operation": null,
+  "canonical_fact": null,
+  "uncertain_terms": [],
+  "persistence_class": "unknown",
+  "memory_category": null,
+  "memory_tags": [],
+  "missing_information": [],
+  "memory_scope": "none",
+  "conversation_state": "new_topic",
+  "emotion": "neutral",
+  "entities": [{"text": "chrome browser", "label": "application", "confidence": 0.99}],
+  "time_reference": null,
+  "required_systems": {
+    "memory": false,
+    "episodes": false,
+    "context": false,
+    "tools": true,
+    "web": false,
+    "vision": false,
+    "planning": false,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
   "confidence": 1.0
 }
 
-Input: teach me the basics of git
+Input: remember that my laptop has an RTX 4050
+Output:
+{
+  "goal": "remember_information",
+  "intent": "command",
+  "category": "hardware",
+  "capability": "memory",
+  "memory_operation": "store",
+  "canonical_fact": "My laptop has an RTX 4050",
+  "uncertain_terms": [],
+  "persistence_class": "permanent",
+  "memory_category": "device",
+  "memory_tags": ["laptop", "RTX 4050"],
+  "missing_information": [],
+  "memory_scope": "semantic",
+  "conversation_state": "new_topic",
+  "emotion": "neutral",
+  "entities": [{"text": "RTX 4050", "label": "hardware", "confidence": 0.99}],
+  "time_reference": null,
+  "required_systems": {
+    "memory": true,
+    "episodes": false,
+    "context": false,
+    "tools": false,
+    "web": false,
+    "vision": false,
+    "planning": false,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0
+}
+
+Input: search the web for the weather in tokyo
+Output:
+{
+  "goal": "search_web",
+  "intent": "command",
+  "category": "weather",
+  "capability": "web",
+  "memory_operation": null,
+  "canonical_fact": null,
+  "uncertain_terms": [],
+  "persistence_class": "unknown",
+  "memory_category": null,
+  "memory_tags": [],
+  "missing_information": [],
+  "memory_scope": "none",
+  "conversation_state": "new_topic",
+  "emotion": "neutral",
+  "entities": [{"text": "tokyo", "label": "location", "confidence": 0.99}],
+  "time_reference": null,
+  "required_systems": {
+    "memory": false,
+    "episodes": false,
+    "context": false,
+    "tools": false,
+    "web": true,
+    "vision": false,
+    "planning": false,
+    "reasoning": true
+  },
+  "constraints": {},
+  "metadata": {},
+  "confidence": 1.0Input: teach me the basics of git
 Output:
 {
   "goal": "create",

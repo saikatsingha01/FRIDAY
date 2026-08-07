@@ -3,7 +3,16 @@ from src.contracts.planner import (
     PlannerInput,
     PlanStatus,
 )
+from src.contracts.tool import ToolResult
 from src.core.memory_router import memory_router
+from src.core.tool_router import (
+    route_tool,
+    tool_required,
+    resolved_tool_capability,
+    capability_has_tool,
+    has_launch_signal,
+)
+from src.execution.tool_executor import tool_executor
 
 
 class ExecutionManager:
@@ -140,16 +149,64 @@ class ExecutionManager:
 
         # ==========================================
         # TOOLS — Phase 5
+        # The ToolRouter selects the tools; the
+        # ToolExecutor runs them under the permission
+        # gate. Structured ToolResults are collected —
+        # never free-form text.
+        #
+        # The gate is tool_required() — Reasoning flags
+        # OR the resolved capability alone. The small
+        # Understanding model sometimes misses the
+        # tools/web booleans for file/web requests, so
+        # the capability itself must be enough to enter
+        # this path (file-queries-never-fire bug).
+        #
+        # HONESTY (BUG 5/6/7): when the tool path was
+        # entered because a tool capability genuinely
+        # resolved — OR because the structured fields prove
+        # this is an application launch (has_launch_signal;
+        # the small model sometimes drifts the flag AND the
+        # capability label on repeat turns) — but the router
+        # could not build a single concrete request, an
+        # explicit failure ToolResult is synthesized. The
+        # prompt then shows an action that did not complete
+        # instead of an empty TOOL RESULTS block, so the
+        # response model can never hallucinate a silent
+        # success ("I opened the file manager"). Pure flag
+        # noise (use_tools without any tool capability) is left
+        # untouched so chat turns stay chat.
         # ==========================================
 
-        if reasoning.use_tools:
-            pass
+        if tool_required(reasoning.understanding, reasoning):
+            requests = route_tool(
+                reasoning.understanding,
+                reasoning,
+            )
+            results = tool_executor.execute(requests)
+
+            if not results and (
+                capability_has_tool(
+                    resolved_tool_capability(reasoning.understanding)
+                )
+                or has_launch_signal(reasoning.understanding)
+            ):
+                results = [
+                    ToolResult(
+                        tool_name="tool_router",
+                        action="dispatch",
+                        status="failure",
+                        error="no_tool_selected",
+                    )
+                ]
+
+            result.tool_results = results
 
         # ==========================================
         # WEB — Phase 5
+        # Web is handled as a tool (web_search).
         # ==========================================
 
-        if reasoning.use_web:
+        if reasoning.use_web and not result.tool_results:
             pass
 
         # ==========================================

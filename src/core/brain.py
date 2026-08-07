@@ -1,12 +1,8 @@
 from src.understanding.understanding_orchestrator import analyze
 from src.core.reasoning_engine import reasoning_engine
 from src.execution.execution_manager import execution_manager
-from src.core.tool_router import route_tool
 from src.memory.memory_decision import process_memory, memory_decision
-from src.core.response_generator import (
-    generate_response,
-    generate_trivial_response,
-)
+from src.core.response_generator import generate_trivial_response
 from src.ai.prompt_builder import build_prompt
 from src.ai.llm_interface import llm
 from src.ai.model_router import route as route_model
@@ -150,9 +146,14 @@ def think(user_message: str):
 
     # ============================================
     # 4. TOOLS
+    # Tool selection and execution happen inside the
+    # ExecutionManager (use_tools branch): Reasoning
+    # decided need, the ToolRouter selected, the
+    # ToolExecutor ran them under the permission gate.
+    # The structured ToolResults ride on
+    # execution.tool_results into the prompt builder —
+    # the Brain never touches raw tool text.
     # ============================================
-
-    tool_result = route_tool(user_message)
 
     # ============================================
     # 4b. MODEL SELECTION
@@ -168,19 +169,13 @@ def think(user_message: str):
     response_model = routing_decision.model
 
     print("\n========== BRAIN ==========")
-    print("Tool Result  :", repr(tool_result))
+    print("Tool Results  :", len(execution.tool_results))
+    for tr in execution.tool_results:
+        print("  -", tr.tool_name, "->", tr.status)
     print("Use Planning :", reasoning.use_planning)
     print("Capability   :", routing_decision.category)
     print("Model        :", response_model, f"({routing_decision.role})")
     print("===========================\n")
-
-    if tool_result is not None:
-        return {
-            "understanding": understanding,
-            "reasoning":     reasoning,
-            "execution":     execution,
-            "response":      generate_response(tool_result),
-        }
 
     # ============================================
     # 5. MEMORY DECISION

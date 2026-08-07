@@ -1993,6 +1993,88 @@
                 }
             },
             "changed_at": "2026-08-05T19:58:14.916006"
+        },
+        {
+            "old_memory": {
+                "id": 146,
+                "text": "The Spotify application is open now.",
+                "category": "general",
+                "importance": 1,
+                "confidence": 100,
+                "persistence": "temporal",
+                "tags": [],
+                "source_text": "open spotify",
+                "created_at": "2026-08-07T16:23:24.640080",
+                "updated_at": "2026-08-07T16:23:24.640080",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 148,
+                "text": "I'm open Spotify in the default browser.",
+                "category": "general",
+                "importance": 1,
+                "confidence": 100,
+                "persistence": "temporal",
+                "tags": [],
+                "source_text": "open spotify",
+                "created_at": "2026-08-07T23:11:06.929014",
+                "updated_at": "2026-08-07T23:11:06.929014",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-07T23:11:10.359276"
+        },
+        {
+            "old_memory": {
+                "id": 148,
+                "text": "I'm open Spotify in the default browser.",
+                "category": "general",
+                "importance": 1,
+                "confidence": 100,
+                "persistence": "temporal",
+                "tags": [],
+                "source_text": "open spotify",
+                "created_at": "2026-08-07T16:23:24.640080",
+                "updated_at": "2026-08-07T23:11:10.357275",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 149,
+                "text": "I'm currently open on the Spotify application, as I was previously used to manage a different task.",
+                "category": "general",
+                "importance": 1,
+                "confidence": 100,
+                "persistence": "temporal",
+                "tags": [],
+                "source_text": "open spotify",
+                "created_at": "2026-08-07T23:12:08.108439",
+                "updated_at": "2026-08-07T23:12:08.108439",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-07T23:12:11.301288"
         }
     ]
 }

@@ -62,6 +62,20 @@ class ReasoningEngine:
         except Exception:
             return False
 
+    def _is_launch_signal(self, understanding) -> bool:
+        """
+        True when the structured fields prove an application launch,
+        regardless of the Understanding model's tools flag. Lazy import
+        keeps the layers decoupled (tool_router never imports this
+        module). A repeat "open spotify" keeps need_tools live even
+        when prior conversation makes the small model drop the flag.
+        """
+        try:
+            from src.core.tool_router import has_launch_signal
+            return has_launch_signal(understanding)
+        except Exception:
+            return False
+
     def _is_short_followup(self, understanding) -> bool:
         """
         Short follow-ups ("yes you tell me", "go ahead") are planning
@@ -138,6 +152,13 @@ class ReasoningEngine:
         systems = understanding.required_systems
         goal    = (understanding.semantic.goal or "").lower()
 
+        # Deterministic launch gate — structured fields plus, on a
+        # long repeat where the Understanding model lost every signal
+        # (KI-009), the user's own "open/launch X" words. Computed
+        # once; it keeps the tool path live AND shields the turn from
+        # the planning gate.
+        launch_signal = self._is_launch_signal(understanding)
+
         # ==========================================
         # MEMORY
         # ==========================================
@@ -172,9 +193,18 @@ class ReasoningEngine:
 
         # ==========================================
         # TOOLS / WEB / VISION
+        # use_tools follows the Understanding flag OR the
+        # deterministic launch signal. The flag alone is not
+        # trustworthy for launches: on a repeat "open spotify"
+        # the small model sees prior conversation mentioning
+        # Spotify and drops required_systems.tools — the
+        # structured launch signal keeps the decision stable
+        # and the request evaluated fresh every turn.
         # ==========================================
 
-        result.use_tools  = systems.tools
+        result.use_tools  = (
+            systems.tools or launch_signal
+        )
         result.use_web    = systems.web
         result.use_vision = systems.vision
 
@@ -198,8 +228,18 @@ class ReasoningEngine:
         )
         continuity = self._continues_active_plan(understanding)
 
-        result.use_planning = base_planning or continuity
-        result.continuity_only = continuity and not base_planning
+        # A launch command is a fresh, self-contained action request —
+        # the planning gate must never hijack it. On a long repeat the
+        # small model drifts launch turns into the planning path
+        # (KI-009: "open notepad" -> "I'll continue with step 2 of the
+        # execution plan", empty TOOL RESULTS). And the Phase 5
+        # planner's tool steps do not execute tools anyway, so a
+        # planned launch would only produce an empty tool block. The
+        # launch signal pins the turn to the direct tool path.
+        result.use_planning = (base_planning or continuity) and not launch_signal
+        result.continuity_only = (
+            continuity and not base_planning and not launch_signal
+        )
 
         return result
 

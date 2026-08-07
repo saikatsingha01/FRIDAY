@@ -61,6 +61,13 @@ class VoiceAssistant:
 
     def run(self):
 
+        # The personal voice companion is trusted with app launches —
+        # "launch chrome" must work directly, not ask for permission
+        # every time. Every other dangerous class (file write/delete,
+        # terminal) stays denied by default.
+        from src.skills.permissions import permission_gate
+        permission_gate.grant("app_launch")
+
         print(
             "Friday voice mode activated."
         )

@@ -513,3 +513,581 @@ documented in `docs/KNOWN_ISSUE/KI-007.md`.
 Phase 4 Universal Model Router: 64/64 stress PASS (28 deterministic + 26
 e2e/trivial), zero crashes, real store untouched, legacy `select_model` API
 preserved.
+
+---
+
+## Session: Phase 5 Tool Intelligence — 42/42 PASS
+
+Date:
+2026-08-07
+
+## Major Achievements
+
+### Deterministic tool routing on structured Understanding only (Phase 5)
+
+The goal: a Tool Intelligence layer where Reasoning decides *if* tools are
+needed, the router only *selects* registered tools, and the executor only
+*executes*. Raw user text never reaches Tool Intelligence. Verified with a
+42-check stress harness (`p5_stress_50.py`): 15 deterministic + 24 e2e +
+3 trivial, all PASS, real `brain.think()` runs against real Ollama.
+
+- New `src/contracts/tool.py` — the single shared contract:
+  `ToolRequest` (`tool_name/action/parameters/reason/permission`),
+  `ToolResult` (`status` + `data/error` + `is_ok/is_denied` + metadata),
+  `ToolPermission` (`SAFE / FILE_WRITE / FILE_DELETE / TERMINAL /
+  APP_LAUNCH`, only SAFE allowed by default), `ToolMetadata` (description,
+  capabilities, needs_network, status, per-action permission map, errors).
+- New `src/skills/tool_base.py` — `BaseTool` with
+  `initialize()/shutdown()/execute()` and `ok()/fail()/denied()` helpers.
+- `src/skills/skill_registry.py` rewritten — `register(tool)/get_tool/
+  has_tool/all_tools/clear`, name-keyed instance registry (skills self-
+  register at import).
+- `src/skills/skill_loader.py` rewritten — `load_skills()` auto-discovers
+  every `*.py` in the package (imports the module, self-registration fires),
+  `ensure_loaded()` idempotent. Discovered set verified:
+  `['app_launcher', 'calculate', 'file_manager', 'terminal', 'web_search']`.
+- New `src/skills/permissions.py` — `PermissionGate` (module singleton
+  `permission_gate`): denied-by-default, grants via env
+  `FRIDAY_TOOL_PERMS` or `permission_gate.grant(...)`; `allowed()/check()`.
+- Five production tools, each a registered `BaseTool`:
+  - `web_search.py` — DuckDuckGo HTML scrape (urllib, UA header,
+    `result__a`/`result__snippet` regex, `uddg=` link unwrap, 15s timeout).
+    Verified live with real network hits in the stress run.
+  - `file_manager.py` — read/write/list/delete, sandboxed `_resolve()`
+    against the project root; `..`/absolute escapes return `path_escape`.
+  - `terminal.py` — `subprocess.run(shell=True)`, 30s timeout, TERMINAL
+    permission, denied by default.
+  - `app_launcher.py` — `os.startfile`, Windows-only, denied by default.
+  - `calculator.py` — rewritten from `eval()` to an `ast`-based evaluator;
+    `Call` nodes are rejected (`__import__('os')` verified blocked →
+    `invalid_expression`); back-compat `calculate(expression)` kept.
+- `src/core/tool_router.py` rewritten — `route_tool(understanding,
+  reasoning)` → `list[ToolRequest]`. Capability-variant normalization table
+  (off-enum LLM variants → canonical tool), capability→tool selection (the
+  ONLY selection mechanism — the goal-based table was dropped), per-tool
+  request builders that return `None` when no usable structured parameter
+  exists (a tool never fires on garbage input).
+- `src/execution/tool_executor.py` — `tool_executor.execute(requests)` →
+  `list[ToolResult]`; permission precedence request → action-schema →
+  tool-metadata; catches every exception into a structured `failure`; logs
+  every run via `src/utils/tool_logger.py` (JSONL `logs/tools.log`, never
+  raises — the data source for Phase 6 Reflection).
+- `src/execution/execution_manager.py` — `use_tools/use_web` branch routes +
+  executes into `result.tool_results`.
+- `src/core/brain.py` — the old raw-text `route_tool(user_message)` call and
+  its `generate_response(tool_result)` short-circuit removed; generation is
+  pure (bounded retry loop, deterministic `math.isclose` for numbers); the
+  raw-text `handle_command` API is gone.
+- `src/ai/prompt_builder.py` — new `_format_tool_results()`; a `TOOL RESULTS`
+  section in the prompt; an `is_tool` instruction block (results are the
+  source of truth — report failures/denials honestly, never invent output).
+- `src/core/skill_manager.py` — compat adapter over `tool_executor.execute()`
+  (no keyword matching); nothing imports it today but it preserves the
+  `run_skill(name, action, parameters)` name for any legacy callers.
+- `whisper_test.py` updated to the new pipeline (`think()` instead of the
+  removed `handle_command`).
+
+### CRITICAL FINDING (probe-verified): Understanding is off-enum again
+
+Same KI-007 pattern as Phase 4. Live Understanding output for tool
+requests: `capability="web_search"|"file_system"|"device"|"searching"|
+"information"|"file management"`, `goal="open_application"|"create"|
+"request"` even for file operations, `required_systems.tools=True` is
+reliable but `web=True` fires for explicit search/price queries only,
+and entities are often empty (`[]` for "create a folder for my project",
+"launch spotify", "run the ls command"). Consequences and design:
+
+- The router normalizes capability variants
+  (`searching|information|web_search|search`→`web`,
+  `file_system|file management`→`automation`, `device_control`→`device`,
+  `terminal|system_control`→`system`) and selects on capability alone.
+- The goal field is unreliable and is NOT a routing input. file_manager
+  fires on capability alone (list is read-only and safe; write/delete are
+  separately permission-gated).
+- app_launcher/terminal require a non-empty entity; with empty entities
+  the router returns no request — a tool never fires with garbage input.
+  Device/system messages therefore degrade to a text answer (safe).
+- math/knowledge/social requests never route to a tool.
+
+### 42-check stress battery — 42/42 PASS
+
+`p5_stress_50.py`: Part A deterministic (auto-discovery registers 5 tools;
+4 capability variants → web_search; file_system → file_manager; device
+without entities → no tool; no-tool-flags → empty; permission defaults
+safe/write/delete/terminal/app_launch; grant works). Part B e2e (10
+web-triggering → `web_search` fired with live hits; 4 file-triggering →
+`file_manager`; 4 device/system without entities → no tool; 5 non-tool +
+2 math → no tool; 3 trivial → zero LLM calls). Part C prompt includes the
+`TOOL RESULTS` section. Every run uses a fresh scratch store; real
+`src/memory/*.json` untouched; `logs/tools.log` written by design.
+
+### Bugs found and fixed during the stress run
+
+- file_manager write was allowed by default — per-action permissions
+  added to `ToolMetadata` and enforced by the executor (verified denied
+  then granted).
+- The `path is False` escape check in `_resolve()` was shadowed by a
+  `not path` check — reordered so absolute/`..` escapes are caught.
+- Self-inflicted `_format_entities` regression (a missing
+  `entities = understanding.semantic.entities` line crashed
+  `build_prompt`) — restored and probe-verified.
+- file_manager request builder still required a trusted `goal`; the
+  model emits `open_application` for file ops, so capability alone now
+  gates it (safe list action by default).
+
+### Pre-existing, out of scope (documented, not fixed)
+
+- `main.py` / `src/core/assistant.py` (Phase-1 voice entry point) import
+  `logger` / `start_assistant` / `src.file_manager.manager` etc. that no
+  longer exist in the rewritten tree — stale since Phase 2, not part of
+  the live `brain` pipeline (nothing in `src` imports them).
+- `src/understanding/entity_extractor.py` / `time_parser.py` reference
+  `src.understanding.understanding_models`, which does not exist in the
+  current tree — same stale Phase-1/2 class. The live Understanding
+  pipeline (`llm_understanding.py` / `semantic_analyzer.py`) does not
+  import them.
+
+## Observations
+
+- On an unreliable Understanding layer, capability + entity presence is a
+  safe routing signal; the permission gate is the real safety net (only
+  SAFE actions fire by default). Not firing a tool is always safer than
+  firing one with garbage input.
+- `tools=True` from `required_systems` is the reliable trigger; `web=True`
+  alone also fires web_search (checked as an OR).
+- Registered-tool auto-discovery keeps the loader fully decoupled from
+  tool implementations — adding a tool is just dropping a `*.py` module.
+
+## Known Issues (new, deferred)
+
+- KI-009: Understanding LLM emits off-enum `capability` variants and
+  unreliable `goal`/`entities` for tool requests (documented above). The
+  router absorbs the variants and degrades safely (no tool fires on empty
+  entities), but app_launcher/terminal rarely fire from the LLM path as a
+  result — direct `run_skill`/grants remain the reliable path for them.
+- KI-007: Understanding LLM off-enum `capability` variants cause a graceful
+  downgrade to DEFAULT_CHAT (safe, documented) — re-checked this phase; the
+  same pattern drives KI-009.
+- KI-008: Nondeterministic Understanding `memory_operation` store
+  misclassification on a math message derails the answer into a memory
+  clarification (safe; router correct in both sessions).
+
+## Milestone Reached
+
+Phase 5 Tool Intelligence: 42/42 stress PASS (15 deterministic + 24 e2e +
+3 trivial), zero crashes, real store untouched, raw-text routing removed,
+`TOOL RESULTS` section verified in the prompt, tools.log written for
+Phase 6 Reflection.
+
+---
+
+## Session: Phase 5 response-quality sub-task — how FRIDAY talks about completed actions
+
+Date:
+2026-08-07
+
+Scope was strictly the response-generation instructions in
+`src/ai/prompt_builder.py` (the `is_tool` block). No architecture, tool,
+contract, router, executor, or execution change; no keyword matching.
+
+- Rewrote the `is_tool` response instructions per the 8 rules: never mention
+  tools/modules/APIs/implementation; never narrate future actions after
+  execution; treat results as completed facts; natural summaries over raw
+  dumps; prefer names over paths/IDs; voice-optimized output; keep honesty;
+  preserve all existing safety rules.
+- Added a dynamic non-success branch: when any ToolResult is
+  `permission_denied` or `failure`, the model receives a short, forceful
+  directive to describe NO output and say only that permission is needed /
+  the action could not be done — instead of the naturalness block it was
+  previously fabricating results against.
+- Verified live (`p5_response_probe.py`, `p5_honesty_probe.py`): weather,
+  prices, file listings now narrated naturally with zero implementation
+  leaks and no "let me search" future-narration; permission-denied and
+  failure results produce honest short replies ("I need your permission…")
+  with no invented output. Full 42/42 stress re-run still PASS.
+- Documented residual: "create a folder for my project" still over-claims
+  creation — a KI-009 routing artifact (list fires instead of write, so a
+  `success` result pattern-completes) that response instructions cannot
+  resolve (six variants tried); requires a routing or model fix.
+
+---
+
+## Session: Phase 6 — Tool Intelligence stabilization (universal fixes)
+
+Date:
+2026-08-07
+
+Scope: fix the four live tool-integration bugs (web narration, file queries
+never firing tools, leaked tool/path internals + dict-crash in tool results,
+chrome not launching) with universal deterministic fixes, then verify with a
+~255-test stress suite without regressing earlier phases.
+
+- **Crash guard.** `_extract_fact_value` in `memory_analyzer` no longer crashes
+  when the LLM emits a dict/JSON fact value (trapped + stringified).
+- **Tool-gated execution.** `execution_manager` tool branch is gated on
+  `tool_required(...)` so non-tool turns never enter the tool path.
+- **Safe tool rendering.** `_format_tool_results` / `_render_tool_payload`
+  rewritten: no tool names, paths, dict dumps, or URLs leak into the response
+  prompt; section body renders after the `TOOL RESULTS` header; failure and
+  permission_denied results render a short directive, `None` when empty.
+- **Chrome launch pipeline.** `app_launcher` gained alias/path resolution
+  (`chrome`, `google chrome`, `browser`, ... → `msedge.exe`/Chrome path),
+  and `voice_assistant.run()` grants `app_launch` so voice launches work.
+- **Understanding prompt rebuild (contrast-trio).** Added `file_system`
+  capability, memory/device/file_system descriptions with negatives
+  (search ≠ launch, opening a folder ≠ device, hardware the user owns is a
+  personal fact), and a chrome/memory/web JSON-example trio. A lone chrome
+  example primed everything toward `device` (A/B verified); the trio keeps
+  memory/device/web/file stable together.
+- **Router rescues (root-cause, deterministic).** `_FILE_LABELS`
+  (location/file/folder/directory/path) + entity-text folder/path regex +
+  `_NON_FILE_GOALS` guard redirect `device` turns onto `file_manager`;
+  `_COMMAND_LABELS` redirect terminal-intent onto `terminal`; `_NON_APP_LABELS`
+  stop non-app turns from firing `app_launcher`. `goal=search_web` fires
+  `web_search` even when the web flag is missing (bypasses the local web
+  block); local caps never co-fire web.
+- **Verification.** New `p6_stress_500.py` harness (parts A–G, checkpointed,
+  resume-capable) covers router determinism, prompt-rendering, memory/context/
+  model-router units, LLM classification→routing batteries, full e2e think()
+  tool runs, earlier-phase e2e, and robustness/honesty. Full run:
+  **255/255 PASS**. Re-runs: p5_stress_50 42/42, p4_stress_50 64/64,
+  p5_response_probe 5/5, p5_honesty_probe PASS — no regressions.
+
+---
+
+## Session: Phase 5 Application Launcher audit — 66/66 PASS
+
+Date:
+2026-08-07
+
+Scope: the App Launcher, hardened end to end so an "open the file manager"
+turn can never fabricate a successful launch. The audit ran from the
+structured Understanding to the ToolResult and the spoken reply.
+
+- **Universal catalog.** `src/skills/app_catalog.py` became the single source
+  of installed apps: Start-Menu/Desktop `.lnk` walk, Uninstall registry
+  (HKLM + WOW6432Node + HKCU, `DisplayIcon`/`InstallLocation`), Steam
+  `libraryfolders.vdf` → `steam://rungameid/{id}`, Epic manifests, OS
+  utilities from `_BUILTINS`, and WindowsApps aliases scanning
+  `%LOCALAPPDATA%\Microsoft\WindowsApps`, `%LOCALAPPDATA%\Microsoft\Windows\Apps`,
+  and `C:\Program Files\WindowsApps` (dedup by filename). This machine's
+  probe: start_menu 99, builtin 15, registry 23, windowsapps 39 → 176
+  entries; Spotify found at its WindowsApps alias, `which()` failed for it.
+  No hardcoded names or paths remain anywhere in the launch pipeline.
+- **Resolver** (`app_catalog.resolve(app)` → found/ambiguous/not_found):
+  exact 100, token-subset 85/90, aligned 86, prefix 82, substring 78,
+  name-in-query 74, concat 84/76 (with `concat_variants` for trailing
+  pin-category words), single-token fuzzy ≥0.78 (84 when ratio ≥0.8 and the
+  pinned name token is ≥5 chars, else 72), multi-token fuzzy 80, whole-string
+  capped at 70; confident threshold 82, ambiguity band 12;
+  `_collapse_duplicates` keeps only the longer token-superset entry.
+  Search words split into `_FILLER` (`the|a|an|please|open|launch|start|
+  run|me|my`), `_SKIPPABLE_CATEGORY` (`browser|program`) and
+  `_PIN_CATEGORY` (`app|application|manager|viewer|player`) — pin words are
+  real name parts, so "whats app" no longer collapses into "Whats New" and
+  an all-category query like "browser" matches nothing (`pinned_any`).
+  `_aligned_match` pins query tokens in natural name order with fuzzy pins
+  gated to multi-token queries AND pinned name tokens ≥5 chars — this killed
+  the "chrome" → "Microsoft Office Home 2024" ambiguity. Single-token fuzzy
+  was rebuilt as `_single_pin(token, name_tokens) → (ratio, len)`.
+- **Launcher** (`src/skills/app_launcher.py`) rewritten: launch action only,
+  Windows-only, resolves through the catalog, and reports path-free results —
+  not_found → `ToolResult(status="not_found")`; ambiguous → `ok` with
+  `data.ambiguous=True` and the candidate list (never a guess, never a
+  launch); found → `os.startfile(target)` with `data={"launched": True,
+  "detail": <display name>}`. Old `_ALIASES`/`_KNOWN_PATHS` deleted.
+- **Router rescue.** `src/core/tool_router.py` pins the `open_application`
+  goal to the `device` capability after the file/folder rescue
+  (`goal == "open_application" and tool_cap != "automation" → device`), so a
+  `web`/`general` misclassification of "open spotify" / "launch spotify"
+  always reaches the launcher. Exposed public `resolved_tool_capability()`
+  and `capability_has_tool()`.
+- **Honest execution.** `src/execution/execution_manager.py` synthesizes a
+  failure ToolResult (`tool_router/dispatch/no_tool_selected`) when a
+  capability resolves to a registered tool but no request routable — the
+  "open file manager with no entity" turn now honestly reports it could not
+  do it instead of going silent; pure flag noise stays result-free.
+- **Honest prompt.** `src/ai/prompt_builder.py`: ambiguous results render
+  "matches more than one application — ask the user which one" with the
+  candidate list, and an `_is_ambiguous` block forbids picking/claiming
+  success; the non-success branch now says an empty/only-failure TOOL
+  RESULTS section means nothing ran and forbids claiming success; the
+  stale-context guard moved into BASE_HONESTY_RULES ("Respond only to the
+  current message and the TOOL RESULTS above. Ignore … earlier turns").
+- **Verification.** New `p5_launch_validation.py` (parts R resolution / G
+  routing / L launcher with mocked `os.startfile` / P prompt rendering /
+  H honesty e2e with a real LLM): **66/66 PASS** after fixes — the first
+  run (60/66) exposed the chrome/Office ambiguity and a fake-injected
+  ambiguity that matched as FOUND; both fixed. Catalog probes re-verified:
+  chrome → FOUND, whats app → not_found, browser → NOT_FOUND, studio →
+  AMBIGUOUS (Visual Studio Code / Visual Studio Installer). Full re-runs of
+  all phases stay green: p6_stress_500 **255/255**, p5_stress_50 42/42,
+  p4_stress_50 64/64, p5_response_probe 5/5, p5_honesty_probe PASS.
+
+---
+
+## Session: Launch Reliability Follow-up
+
+Date:
+2026-08-07
+
+### Bug Fixed — Packaged apps fail to activate via WindowsApps aliases
+
+Live user test: "launch spotify" reported success but the UI intermittently
+never opened. Chrome and File Explorer (`.lnk` targets) always worked.
+`resolve("spotify")` pointed at
+`C:\Users\polis\AppData\Local\Microsoft\WindowsApps\Spotify.exe` — a store
+alias stub that `os.startfile` cannot reliably activate (tasklist showed
+only `SpotifyLauncher.exe` / `SpotifyXboxGamebarWebView`, no `Spotify.exe`).
+
+- `src/skills/app_catalog.py`: `_start_apps_aumids()` runs
+  `Get-StartApps | ConvertTo-Json` once per process (45 s timeout,
+  CREATE_NO_WINDOW, UTF-8, filters `scheme://` AppIDs), attaches `aumid`
+  to every WindowsApps entry, and `resolve()` carries it.
+- `src/skills/app_launcher.py`: entries with an AUMID activate via
+  `subprocess.Popen(["explorer.exe", "shell:AppsFolder\\" + aumid])`;
+  `os.startfile(target)` stays for `.lnk`/registry/builtin entries and as
+  the fallback if shell activation throws.
+- Universal (any packaged app, not just Spotify); live-verified —
+  `launcher.execute("spotify")` returns success and multiple `Spotify.exe`
+  UI processes run.
+
+### Bug Fixed — "launch brave browser" fired a web search
+
+Understanding returned capability=web, goal=create, entity
+`(brave, application)`; the router sent it to `web_search`. Fix in
+`src/core/tool_router.py`: a `web` capability with an `application`-labeled
+entity is a launch signal unless the goal is explicit
+(`search_web`/`retrieve_web`/`find_information`); real searches keep
+`topic`/`query` entities on `web_search`.
+
+### Bug Fixed — "open file explorer" dropped its entity
+
+Model returned no entities → nothing routable → honest `no_tool_selected`.
+Fix in `src/core/tool_router.py`: for `open_application` + device with no
+entities, `_fallback_app_reference()` recovers the app name from the user's
+own words (folder/path text rejected) and the name still passes the safe
+resolver.
+
+### Verification
+
+`p5_launch_validation.py` extended to 73 checks (AUMID launch assertion,
+startfile fallback, brave rescue, web-search-stays-web, entity-less
+fallback, folder-text rejection). Full regressions re-run green:
+**73/73**, p6_stress_500 **256/256**, p5_stress_50 42/42, p4_stress_50
+64/64, response probe 5/5, honesty probe PASS. Live
+`launcher.execute("spotify")` → success + `Spotify.exe` UI running.
+No commit made (per standing instruction).
+
+---
+
+## Session: Sequential-Launch Execution/Context Fix
+
+Date:
+2026-08-07
+
+### Bug Fixed — repeated launch turns stop executing tools
+
+Reproducing "open spotify" four times in a row: turn 2 dropped `Need Tools`
+(`False`) with `TOOL RESULTS: None` and Friday fabricated "I'm opening
+Spotify… playing some music"; turn 3 had `Need Tools: True` but still no
+results. On long repeats the model fully drifts: `use_tools=False` plus
+planning hijack ("I'll continue with step 2 of the execution plan…") or
+misrouting "open steam" onto `web_search` (claimed "Steam is open now").
+
+Two fix layers:
+
+- **Layer 1 — deterministic launch-signal gate** (already in):
+  `tool_router.has_launch_signal` (`goal == "open_application"` or an
+  `application`-labeled entity) forces `tool_cap="device"`; `route_tool`
+  routes launch signals to `app_launcher`; `execution_manager` synthesizes
+  an honest failure ToolResult when a resolvable capability has no route;
+  `reasoning_engine` sets `use_tools` to include the launch signal.
+- **Layer 2 — raw-text launch recovery + planning/web suppression**
+  (`src/core/tool_router.py` + `src/core/reasoning_engine.py`):
+  - `_raw_text_launch_ref` strips pre-verb fillers, requires the literal
+    first token `open`/`launch`, and recovers the app reference from the
+    user's own words (folder/path text and single letters rejected).
+  - `has_launch_signal` checks raw text first, so a raw launch wins even
+    over a drifted web goal.
+  - `route_tool` hoists the launch signal above the web/cap logic and sets
+    `use_web=False` / `goal_search_web=False` — "open steam" never goes to
+    `web_search`.
+  - `reasoning_engine` suppresses planning on launch turns
+    (`use_planning`/`continuity_only` gated by `not launch_signal`) — no
+    more "continue the plan" hijack.
+  - Safety invariant kept: only a literal leading `open`/`launch` triggers
+    the raw gate; chat/web/terminal/system turns and folder hints never
+    fire `app_launcher`; genuine web requests stay on `web_search`.
+
+### Verification
+
+- New `p5_seq_launch.py` — 28-turn sequential launch harness (repeated
+  spotify + notepad / file explorer / steam / unknown app): **28/28 PASS**,
+  every launch turn re-executes, final unknown-app turn reports `not_found`
+  honestly.
+- `p5_launch_validation.py` extended to 74 checks (G battery gained
+  raw-text recovery cases; H1 uses non-launch text): **74/74 PASS**
+  (R 41, G 15, L 11, P 4, H 3).
+- `p6_stress_500.py` checkpoint cleared, full re-run: **255/255 PASS**
+  (A 79, B 13, C 35, D 72, E 24, F 16, G 16).
+- `p5_stress_50` 42/42 · `p4_stress_50` 64/64 · `p5_response_probe` 5/5 ·
+  `p5_honesty_probe` PASS.
+- No commit made (per standing instruction).
+
+---
+
+## Session: Packaged-App Discovery (WhatsApp not_found)
+
+Date:
+2026-08-07
+
+### Bug Fixed — "launch whatsapp" resolved to not_found
+
+Live test: "launch whatsapp" → `app_launcher -> not_found`. No permission
+window appeared because the catalog could not resolve the app at all (a
+not_found never reaches the permission gate). WhatsApp Desktop is a packaged
+(Store/MSIX) app. The catalog's WindowsApps discovery only scanned
+`%LOCALAPPDATA%\Microsoft\WindowsApps` for `.exe` alias stubs — WhatsApp
+exposes no stub, so it was invisible. Spotify worked because it does expose
+a stub. (Earlier "launch whatsapp asked for permission then didn't open":
+the permission gate fires before resolution, so it asked, then resolution
+honestly returned not_found.)
+
+Fix in `src/skills/app_catalog.py` + `src/skills/app_launcher.py`,
+universal, no hardcoded apps:
+
+- `_start_apps_index()` caches the parsed `Get-StartApps` shell index once
+  per process (replaces the AUMID-only cache; `_start_apps_aumids()` now
+  derives from it).
+- `_discover_start_apps()` adds every packaged-app entry whose AppID is a
+  real AUMID (contains `!`), skipped when a higher-priority source already
+  covers the same name. Entries activate via `shell:AppsFolder`.
+- `_launchable()` treats AUMID targets as launchable.
+- Launcher fallback: entries with a real target file keep the
+  `os.startfile` fallback (unchanged); AUMID-only entries retry the shell
+  activation once, then fail honestly.
+- Dedupe priorities unchanged — Start Menu / registry / builtin / alias
+  stubs still win over the Start-Apps entry for the same name.
+
+New coverage on this host: WhatsApp, Teams, Photos, XBOX, Outlook, Media
+Player, Copilot, Snipping Tool, Clock, Weather, ~38 more packaged apps.
+
+### Verification
+
+- `resolve("whatsapp")` → WhatsApp (AUMID), `resolve("whats app")` →
+  WhatsApp (never collapses into "Whats New"); every other R-battery
+  reference unchanged.
+- `p5_launch_validation.py`: whatsapp/`whats app` expectations corrected
+  (they previously asserted `not_found` under a wrong "not installed"
+  comment) → **74/74 PASS**.
+- `p5_seq_launch.py` re-run live (results cleared): **28/28 PASS**.
+- `p6_stress_500` routing checkpoint green (255/255; routing is unaffected
+  by catalog content).
+- Live `launcher.execute("whatsapp")` → `status=success`,
+  `WhatsApp.Root` process running.
+- No commit made (per standing instruction).
+
+---
+
+## Session: Response-layer fix — launch success narration
+
+Date:
+2026-08-08
+
+Scope was strictly the response generation in `src/ai/prompt_builder.py`
+(issue #2 only, per the user's instruction). The launch pipeline itself was
+already working — every launch turn showed `app_launcher -> success`. The
+problem was that Friday's spoken replies about successful launches were
+wrong: "launch whats app" produced a fabricated file listing ("...WhatsApp.
+exe, WhatsApp.apk..."), "launch lenovo vantage" echoed a permission refusal
+("I'm not sure I can launch... without your permission, as it's a hardware
+device...") even though `launched: True`, and "launch microsoft store"
+rambled about stale Lenovo devices from earlier turns. Issue #1 (says it
+opened when it doesn't) was explicitly out of scope.
+
+### Root cause (in the response prompt, not the router/launcher)
+
+- A successful launch rendered in TOOL RESULTS as
+  `- Action: launch / launched: True / detail: WhatsApp` — a raw boolean
+  line the small model (llama3.2:1b) does not read as "the app is now
+  open", so it invents a file listing instead (primed by the generic
+  "If a listing is long..." wording for file tools).
+- The success instructions were file/weather-oriented and said nothing
+  about launches: no rule that the app is ALREADY open, no rule against
+  permission talk, and nothing strong enough to override the
+  `(hardware)` ENTITIES label plus the stale permission-refusal exchange
+  in RECENT CONVERSATION (llama3.2:3b fixated on those).
+
+### Fix (universal, structural — no app names or keywords)
+
+- `_render_tool_payload`: dedicated `app_launcher` branch renders a
+  successful launch as `Opened application: <detail>` instead of the raw
+  `launched: True / detail: ...` scalar lines.
+- `build_prompt`: new instruction branch for `is_tool AND all success AND
+  all app_launcher/launch` results. It tells the model the applications
+  are already open; to confirm each in one short natural sentence naming
+  the app exactly as shown; to never ask for or mention permission; that
+  a launch produces no files/folders/content so nothing may be invented;
+  and to ignore ENTITIES MENTIONED and RECENT CONVERSATION entirely
+  (TOOL RESULTS are the only facts). Applies to any application; other
+  tool paths (search/list/read/mixed) keep the existing instructions.
+
+### Verification
+
+- Offline repro of all three failing turns with real `build_prompt` +
+  real LLM (payload shapes taken from the live failures): whatsapp →
+  "WhatsApp is open.", lenovo → "Lenovo Vantage is open.", store →
+  "Microsoft Store is open." — zero file-list, permission-echo, or
+  stale-ramble hits.
+- `p5_response_probe.py` **5/5 PASS**, `p5_honesty_probe.py` **PASS**
+  (both exercise the real prompt + real LLM end to end).
+- Launcher layer untouched (no re-run of the physical launch harnesses
+  needed; `app_catalog` / `app_launcher` / router / executor unchanged).
+- No commit made (per standing instruction).
+
+---
+
+## Session: Manual-test follow-up — two documented residuals (no code changes)
+
+Date:
+2026-08-08
+
+Investigation only, per the user's instruction ("find the root cause and
+document it, no need to touch and edit the code"). Two residuals from the
+user's own manual tests were root-caused and documented as new known issues.
+No code, router, launcher, or prompt changes were made.
+
+### Residual 1 — "open file explorer" sometimes lists the project files instead of launching (KI-010)
+
+Reproduced deterministically with the real `route_tool`: when the
+Understanding model labels the "file explorer" entity `file`/`location`
+(instead of `application` — plausible because the app name contains the word
+"file"), the `_FILE_LABELS` folder/path rescue
+(`tool_router.py:341-346`) redirects the launch to file_manager, and the
+`open_application` pin (`tool_router.py:354`) deliberately does not override
+`automation`. file_manager's `list` with no path defaults to the workspace
+root (`file_manager.py:86-87`) and lists `C:\project friday`. The response
+model then narrates "File Explorer is open" (the user asked to open it) and
+reads the project files. The intermittency is purely the Understanding
+label; once the label fires, the hijack is deterministic. Documented in
+`docs/KNOWN_ISSUE/KI-010.md`.
+
+### Residual 2 — launch-turn reply occasionally repeats the immediately preceding answer (KI-011)
+
+After "what is the price of the nvidia rtx 5070", the very next "launch
+chrome" turn (Chrome launched fine) sometimes repeated the GPU price.
+RECENT CONVERSATION carries the prior Q&A verbatim into the launch turn's
+prompt, and the llama3.2:1b response model does not always follow the soft
+"Ignore ... RECENT CONVERSATION" instruction — an intermittent context bleed.
+Offline, 5 runs of the exact shape (GPU Q&A context + successful Chrome
+launch + real LLM) all returned only "Chrome is open.", matching a rare
+echo. Documented in `docs/KNOWN_ISSUE/KI-011.md`.
+
+### Verification / status
+
+- Routing repro evidence in KI-010 (label→tool table). Response repro
+  evidence in KI-011 (5/5 clean offline).
+- No harnesses were re-run (no code changed). Real store untouched.
+- No commit made (per standing instruction). User will perform further
+  manual tests before Phase 6.

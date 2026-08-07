@@ -197,6 +197,12 @@ def _extract_fact_value(canonical_fact):
     preferences like "I like jazz") return None — they carry no
     separable value and are never touched by the value-origin guard.
     """
+    if not isinstance(canonical_fact, str):
+        # The Understanding model occasionally fills canonical_fact
+        # with structured content (dict/list) instead of a sentence.
+        # The value-origin guard is a no-op for those — never crash
+        # on a non-string fact.
+        return None
     text = (canonical_fact or "").strip()
     if not text:
         return None

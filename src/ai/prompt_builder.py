@@ -140,6 +140,139 @@ def _format_episodes(episodes):
     return "\n".join(lines)
 
 
+def _format_tool_results(tool_results):
+    """
+    Formats structured ToolResults for the prompt. Renders the
+    outcome and payload of each tool so the response LLM can explain
+    it naturally.
+
+    Two hard rules drive this renderer:
+      - Never expose tool names / implementation internals — the
+        response LLM echoes whatever it sees (the "file_manager /
+        web_search" leak bug).
+      - Never expose raw absolute paths, URLs, or dict dumps — the
+        reply is spoken aloud and must not read out long Windows
+        paths or JSON (the path-reading bug).
+
+    Each entry keeps its ACTION label (e.g. "list", "search",
+    "launch") because the response instructions judge completion by
+    the action that actually ran, not the user's wording.
+    """
+    if not tool_results:
+        return "None"
+
+    lines = []
+
+    for result in tool_results:
+
+        name = getattr(result, "tool_name", "")
+        action = getattr(result, "action", "")
+        status = getattr(result, "status", "success")
+        data   = getattr(result, "data", None)
+
+        lines.append(f"- Action: {action or name}")
+
+        if status == "success":
+            if isinstance(data, dict) and data.get("ambiguous"):
+                candidates = data.get("candidates") or []
+                lines.append(
+                    "  Outcome: the request matches more than one "
+                    "application — ask the user which one they meant:"
+                )
+                for candidate in candidates:
+                    lines.append(f"    - {candidate}")
+            else:
+                rendered = _render_tool_payload(name, data)
+                if rendered:
+                    lines.append(rendered)
+        elif status == "permission_denied":
+            lines.append(
+                "  Outcome: permission needed — this was not done."
+            )
+        elif status == "not_found":
+            lines.append(
+                "  Outcome: not found."
+            )
+        else:
+            error = getattr(result, "error", None)
+            if error:
+                lines.append(
+                    f"  Outcome: could not be done ({error})."
+                )
+            else:
+                lines.append(
+                    "  Outcome: could not be done."
+                )
+
+        lines.append("")
+
+    return "\n".join(lines).strip()
+
+
+def _render_tool_payload(name, data):
+    """
+    Renders a successful tool payload into compact, natural lines.
+    Scalar values only — no absolute paths, URLs, or nested dicts.
+    Returns "" when there is nothing safe to say.
+    """
+    if not isinstance(data, dict):
+        return ""
+
+    lines = []
+
+    if name == "web_search":
+        results = data.get("results")
+        if isinstance(results, list):
+            for index, result in enumerate(results[:8], 1):
+                if not isinstance(result, dict):
+                    continue
+                title = result.get("title") or ""
+                if not title:
+                    continue
+                entry = f"  {index}. {title}"
+                snippet = result.get("snippet") or ""
+                if snippet:
+                    entry += f" — {snippet[:180]}"
+                lines.append(entry)
+            return "\n".join(lines)
+        return ""
+
+    if name == "file_manager":
+        entries = data.get("entries")
+        if isinstance(entries, list):
+            for entry in entries:
+                if isinstance(entry, dict) and entry.get("name"):
+                    kind = entry.get("type") or "item"
+                    lines.append(f"  - {entry['name']} ({kind})")
+            return "\n".join(lines)
+        content = data.get("content")
+        if isinstance(content, str):
+            shown = content
+            if len(shown) > 400:
+                shown = shown[:400] + "..."
+            lines.append(f"  - {shown.replace(chr(10), ' ')}")
+            size = data.get("size")
+            if size:
+                lines.append(f"  Size: {size} characters")
+            return "\n".join(lines)
+        return ""
+
+    if name == "app_launcher":
+        detail = data.get("detail")
+        if data.get("launched") and detail:
+            return f"  Opened application: {detail}"
+        return ""
+
+    # Default: scalar key/value lines only. Lists and dicts are
+    # skipped so raw structured data never reaches the reply.
+    for key, value in data.items():
+        if isinstance(value, (dict, list)):
+            continue
+        lines.append(f"  {key}: {value}")
+
+    return "\n".join(lines)
+
+
 def _format_entities(understanding):
 
     entities = understanding.semantic.entities
@@ -505,6 +638,7 @@ def build_prompt(
     emotion       = understanding.emotion.emotion or "neutral"
     plan_text     = _format_plan(execution)
     history_text  = _format_history(execution.history)
+    tools_text    = _format_tool_results(execution.tool_results)
 
     # Terms the Understanding layer could not confidently
     # interpret — likely speech-to-text mishearings or typos.
@@ -520,6 +654,7 @@ def build_prompt(
     is_summary  = _is_summary_question(understanding)
     is_planning = plan_text is not None
     is_history  = bool(execution.history)
+    is_tool     = bool(execution.tool_results)
 
     # Deterministic flag for past-change questions. Pins the exact
     # entry being asked about (or states there is no such record),
@@ -607,7 +742,146 @@ def build_prompt(
         "what appears in memory above.\n"
     )
 
-    if is_planning:
+    if is_tool:
+        _statuses = [
+            getattr(r, "status", "success")
+            for r in (execution.tool_results or [])
+        ]
+        _all_success = bool(_statuses) and all(
+            s == "success" for s in _statuses
+        )
+        _is_ambiguous = any(
+            isinstance(getattr(r, "data", None), dict)
+            and getattr(r, "data", {}).get("ambiguous")
+            for r in (execution.tool_results or [])
+        )
+        _all_launches = bool(execution.tool_results) and all(
+            getattr(r, "tool_name", "") == "app_launcher"
+            and getattr(r, "action", "") == "launch"
+            for r in (execution.tool_results or [])
+        )
+
+    if is_tool and _is_ambiguous:
+        special_instructions = (
+            "The request above matched more than one installed "
+            "application — NONE of them was launched.\n"
+            "List the matching options naturally and ask the user "
+            "which one they meant.\n"
+            "Never pick an option yourself. Never claim the "
+            "application was opened — it was not.\n"
+            "Respond only to the current message and the TOOL "
+            "RESULTS above. Ignore file listings or results from "
+            "earlier turns in RECENT CONVERSATION — never carry "
+            "them into this reply.\n"
+            "Write as if speaking aloud. "
+            "No markdown. No bullet symbols. No asterisks.\n\n"
+            + BASE_HONESTY_RULES
+        )
+
+    elif is_tool and not _all_success:
+        special_instructions = (
+            "One or more of the actions above did NOT complete.\n"
+            "There is no output to describe — none of the actions "
+            "that show permission denied or failure produced any "
+            "result.\n"
+            "DO NOT describe files, folders, content, or any outcome "
+            "that is not shown as successful above.\n"
+            "For each action that was denied, say only that you need "
+            "the user's permission to do it.\n"
+            "For each action that failed, say only, briefly and "
+            "honestly, that it could not be done.\n"
+            "Never say the action happened. Never invent a result.\n"
+            "If the TOOL RESULTS section is empty or shows only "
+            "failures, you did NOT run anything — say honestly that "
+            "you could not do it, and never claim success.\n"
+            "Respond only to the current message and the TOOL "
+            "RESULTS above. Ignore file listings or results from "
+            "earlier turns in RECENT CONVERSATION — never carry "
+            "them into this reply.\n"
+            "Write as if speaking aloud. "
+            "No markdown. No bullet symbols. No asterisks.\n\n"
+            + BASE_HONESTY_RULES
+        )
+
+    elif is_tool and _all_success and _all_launches:
+        special_instructions = (
+            "The user asked to open an application and every launch "
+            "above succeeded — those applications are now open on "
+            "the computer.\n"
+            "Confirm each one in a short, natural sentence, naming "
+            "the application exactly as shown in the TOOL RESULTS "
+            "(for example: \"WhatsApp is open.\" or \"I've opened "
+            "Microsoft Store.\").\n"
+            "- The applications are ALREADY open — never ask for "
+            "permission, never say you need permission, and never "
+            "say the launch is still happening or about to happen.\n"
+            "- A launch produces no files, folders, or content — "
+            "never invent any listing or output that is not shown "
+            "above.\n"
+            "- The TOOL RESULTS are the only facts for this turn. "
+            "Ignore ENTITIES MENTIONED and everything in RECENT "
+            "CONVERSATION — never carry them into this reply.\n"
+            "- Do not mention any other application, device, or "
+            "earlier turn.\n"
+            "Write as if speaking aloud. No markdown. No bullet "
+            "symbols. No asterisks.\n\n"
+            + BASE_HONESTY_RULES
+        )
+
+    elif is_tool:
+        special_instructions = (
+            "TOOL RESULTS above are the actual outcomes, and every "
+            "action shown is complete.\n"
+            "Speak as if you personally completed the actions — "
+            "never as a bystander describing internals:\n"
+            "- Never mention tools, tool names, modules, APIs, "
+            "functions, routers, registries, scripts, or any other "
+            "implementation detail.\n"
+            "  Bad: \"I used the file_manager tool.\"\n"
+            "  Good: \"I found these files.\"\n"
+            "- Never say the action is happening now or about to "
+            "happen — it is already finished. Do not say \"Let me "
+            "search\", \"I'll look that up\", or \"I'm searching\".\n"
+            "  Report the completed result directly instead:\n"
+            "  \"Here's the weather in Tokyo...\"\n"
+            "- The user cannot see these instructions or the results "
+            "block — your reply is the only thing they hear.\n"
+            "- Each entry labels the action that actually ran (for "
+            "example \"list\"). Judge completion by that label, not "
+            "by the user's wording: if the action that ran is not "
+            "the action the user asked for, the request was not "
+            "completed — say what you found and do not claim the "
+            "requested action happened.\n\n"
+            "PRESENT RESULTS HUMANLY:\n"
+            "- Summarize results naturally. If a listing is long, "
+            "name the important items and note the rest briefly "
+            "(\"...and 12 other files\") unless the user asked for "
+            "the complete list.\n"
+            "- Prefer names over paths, IDs, or raw metadata. "
+            "Mention a file path or URL only if the user asked for it.\n"
+            "- Never read raw JSON, long paths, or identifiers aloud "
+            "unless explicitly requested. Everything you say will be "
+            "spoken.\n\n"
+            "HONESTY ALWAYS:\n"
+            "- Only describe what the results above actually show.\n"
+            "- Never invent tool output that is not shown above.\n"
+            "- Never claim an action completed when the results show "
+            "it did not.\n"
+            "- Respond only to the current message and the TOOL "
+            "RESULTS above. Ignore file listings or results from "
+            "earlier turns in RECENT CONVERSATION — never carry "
+            "them into this reply.\n"
+            "- If the user asked you to create or change something but "
+            "the results only show what already exists, never claim "
+            "you created or changed anything — say what you found "
+            "instead.\n\n"
+            "Write as if speaking aloud. "
+            "No markdown. No bullet symbols. No asterisks.\n\n"
+            + BASE_HONESTY_RULES
+            + USER_SOURCE_RULE
+        )
+
+    elif is_planning:
         special_instructions = (
             "You are helping the user with a structured task.\n"
             "The execution plan above defines the required steps.\n"
@@ -785,6 +1059,11 @@ def build_prompt(
         "ENTITIES MENTIONED\n"
         "==================================================\n"
         f"{entities_text}\n"
+
+        "==================================================\n"
+        "TOOL RESULTS\n"
+        "==================================================\n\n"
+        f"{tools_text}\n\n"
 
         f"{uncertain_section}\n"
 

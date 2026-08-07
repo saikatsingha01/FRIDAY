@@ -728,6 +728,129 @@
                 "memory": 1.0,
                 "retrieval": 1.0
             }
+        },
+        {
+            "id": 144,
+            "text": "launched at gbt",
+            "category": "general",
+            "importance": 1,
+            "confidence": 100,
+            "persistence": "temporal",
+            "tags": [],
+            "source_text": "launched at gbt",
+            "created_at": "2026-08-07T13:19:01.203365",
+            "updated_at": "2026-08-07T13:19:01.203365",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 145,
+            "text": "main brave browser",
+            "category": "general",
+            "importance": 1,
+            "confidence": 100,
+            "persistence": "temporal",
+            "tags": [
+                "brave",
+                "browser"
+            ],
+            "source_text": "main brave browser",
+            "created_at": "2026-08-07T15:53:32.227075",
+            "updated_at": "2026-08-07T15:53:32.227075",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 147,
+            "text": "You have granted permission to launch WhatsApp on this device.",
+            "category": "general",
+            "importance": 3,
+            "confidence": 100,
+            "persistence": "permanent",
+            "tags": [
+                "whatsapp"
+            ],
+            "source_text": "yes you have the permission launch it",
+            "created_at": "2026-08-07T22:32:22.518926",
+            "updated_at": "2026-08-07T22:32:22.518926",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 149,
+            "text": "I'm currently open on the Spotify application, as I was previously used to manage a different task.",
+            "category": "general",
+            "importance": 1,
+            "confidence": 100,
+            "persistence": "temporal",
+            "tags": [],
+            "source_text": "open spotify",
+            "created_at": "2026-08-07T16:23:24.640080",
+            "updated_at": "2026-08-07T23:12:11.274903",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 150,
+            "text": "Lenovo One Touch",
+            "category": "general",
+            "importance": 1,
+            "confidence": 100,
+            "persistence": "temporal",
+            "tags": [
+                "lenovo one touch"
+            ],
+            "source_text": "launch lenovo one touch",
+            "created_at": "2026-08-07T23:18:58.372504",
+            "updated_at": "2026-08-07T23:18:58.372504",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 151,
+            "text": "LinkedIn is a social networking platform.",
+            "category": "general",
+            "importance": 1,
+            "confidence": 100,
+            "persistence": "temporal",
+            "tags": [
+                "linkedin"
+            ],
+            "source_text": "launch linkedin",
+            "created_at": "2026-08-08T00:30:36.004180",
+            "updated_at": "2026-08-08T00:30:36.004180",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
         }
     ]
 }

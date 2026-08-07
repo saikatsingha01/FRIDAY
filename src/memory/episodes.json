@@ -423,6 +423,126 @@
             "semantic_ids": [
                 99
             ]
+        },
+        {
+            "id": 52,
+            "summary": "Conversation about launch chrome, open spotify, open spotify...",
+            "keywords": [
+                "chrome",
+                "explorer",
+                "file",
+                "launch",
+                "open",
+                "spotify"
+            ],
+            "importance": 5,
+            "timestamp": "2026-08-07T16:11:07.964820",
+            "session_id": "session-2026-08-07T161107",
+            "start_time": "2026-08-07T16:10:45.213871",
+            "end_time": "2026-08-07T16:11:07.964244"
+        },
+        {
+            "id": 53,
+            "summary": "Conversation about launch chrome, open spotify, open spotify...",
+            "keywords": [
+                "chrome",
+                "explorer",
+                "file",
+                "launch",
+                "open",
+                "spotify"
+            ],
+            "importance": 5,
+            "timestamp": "2026-08-07T16:15:53.728258",
+            "session_id": "session-2026-08-07T161553",
+            "start_time": "2026-08-07T16:15:21.329361",
+            "end_time": "2026-08-07T16:15:53.727714"
+        },
+        {
+            "id": 54,
+            "summary": "Conversation about launch chrome, open spotify, open spotify...",
+            "keywords": [
+                "chrome",
+                "explorer",
+                "file",
+                "launch",
+                "open",
+                "spotify"
+            ],
+            "importance": 5,
+            "timestamp": "2026-08-07T16:17:51.396715",
+            "session_id": "session-2026-08-07T161751",
+            "start_time": "2026-08-07T16:17:23.418688",
+            "end_time": "2026-08-07T16:17:51.379864"
+        },
+        {
+            "id": 55,
+            "summary": "Previously: The Spotify application is open now.. This was updated to: I'm open Spotify in the default browser..",
+            "keywords": [
+                "application",
+                "browser.",
+                "default",
+                "i'm",
+                "now.",
+                "open",
+                "spotify",
+                "the"
+            ],
+            "importance": 1,
+            "timestamp": "2026-08-07T23:11:10.367278",
+            "semantic_ids": [
+                146
+            ]
+        },
+        {
+            "id": 56,
+            "summary": "Previously: I'm open Spotify in the default browser.. This was updated to: I'm currently open on the Spotify application, as I was previously used to manage a different task..",
+            "keywords": [
+                "application,",
+                "browser.",
+                "currently",
+                "default",
+                "different",
+                "i'm",
+                "manage",
+                "open",
+                "previously",
+                "spotify",
+                "task.",
+                "the",
+                "used",
+                "was"
+            ],
+            "importance": 1,
+            "timestamp": "2026-08-07T23:12:11.331472",
+            "semantic_ids": [
+                148
+            ]
+        },
+        {
+            "id": 57,
+            "summary": "Conversation about google the latest price of nvidia 5070 gpu, launch discord, launch chrome...",
+            "keywords": [
+                "5070",
+                "chrome",
+                "discord",
+                "explorer",
+                "file",
+                "google",
+                "latest",
+                "launch",
+                "lenovo",
+                "microsoft",
+                "nvidia",
+                "price",
+                "store",
+                "vantage"
+            ],
+            "importance": 5,
+            "timestamp": "2026-08-08T00:36:17.859365",
+            "session_id": "session-2026-08-08T003617",
+            "start_time": "2026-08-08T00:32:52.185354",
+            "end_time": "2026-08-08T00:36:17.841324"
         }
     ]
 }

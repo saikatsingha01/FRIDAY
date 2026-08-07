@@ -1,44 +1,42 @@
-from src.skills.skill_registry import get_skill
+# ==========================================================
+# SKILL MANAGER (compatibility adapter)
+#
+# Phase 5 — the old keyword-based run_skill() is gone. Skills
+# are now registered BaseTools executed via the ToolExecutor.
+# This module keeps a thin compatibility wrapper for any caller
+# that still references run_skill() by name; it executes a named
+# tool directly without keyword matching.
+# ==========================================================
+
+from src.contracts.tool import ToolRequest
+from src.skills import skill_registry
+from src.execution.tool_executor import tool_executor
 
 
-def run_skill(command):
+def run_skill(name, action="evaluate", parameters=None):
     """
-    Executes a registered skill if one matches
-    the user's command.
-
-    Returns:
-        Skill result (str/object) if handled.
-        None if no skill matches.
+    Execute a registered tool by name. Keyword matching is gone —
+    callers must pass the registered tool name explicitly.
+    Returns the structured ToolResult.
     """
-
-    if not command:
+    if not name:
         return None
 
-    command = command.strip()
+    tool = skill_registry.get_tool(name)
 
-    skill = get_skill(command)
-
-    if skill is None:
+    if tool is None:
         return None
 
-    try:
+    request = ToolRequest(
+        tool_name=name,
+        action=action,
+        parameters=parameters or {},
+        permission=tool.metadata.permission,
+    )
 
-        # Calculator skill
-        if command.startswith("calculate"):
+    results = tool_executor.execute([request])
 
-            expression = command.replace(
-                "calculate",
-                "",
-                1
-            ).strip()
+    if not results:
+        return None
 
-            return skill(expression)
-
-        # Generic skills
-        return skill(command)
-
-    except Exception as error:
-
-        return (
-            f"Skill execution failed: {error}"
-        )
+    return results[0]

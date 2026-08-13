@@ -712,7 +712,7 @@ contract, router, executor, or execution change; no keyword matching.
 
 ---
 
-## Session: Phase 6 — Tool Intelligence stabilization (universal fixes)
+## Session: Phase 5 — Tool Intelligence stabilization (universal fixes)
 
 Date:
 2026-08-07
@@ -1091,3 +1091,327 @@ echo. Documented in `docs/KNOWN_ISSUE/KI-011.md`.
 - No harnesses were re-run (no code changed). Real store untouched.
 - No commit made (per standing instruction). User will perform further
   manual tests before Phase 6.
+
+---
+
+## Session: Universal Filesystem Stabilization (Phase 5)
+
+Date:
+2026-08-08
+
+Scope was the whole filesystem pipeline: resolver, file manager, tool
+router, and prompt rendering. Three live-user bugs were fixed at the
+root: "location of marvel's spider-man 2 game" drifted to a web search;
+"location of ... in my pc" was hijacked into the app launcher; and
+"what's inside my games folder in c drive" fell back to the project
+root and hallucinated a game listing.
+
+### New: `src/utils/path_resolver.py`
+
+Deterministic, read-only universal resolver with `ResolvedPath{found,
+path, kind, exists}` (absolute/relative refs return `found=True` with
+`exists=False` for not-yet-existing write targets). Resolution tiers:
+absolute → known folder (shell `SHGetKnownFolderPath`, OneDrive-aware,
+with aliases like `photos`→`pictures`) → drive reference → workspace/cwd
+alias → explicit relative → bounded name search (exact-before-fuzzy,
+shallow-before-deep, drive roots before profile/workspace; `_SKIP_DIRS`
+system/cache pruning, max depth 3 / 5000 entries). Guardrails: no silent
+fallback to the project root (a miss is always a structured
+`not_found`); type-descriptor stopwords are singular only (`game` is a
+stopword, `games` is a real folder); fuzzy containment requires both
+tokens >= 2 chars ("spiderman" can never match "01.a.problem").
+
+### Rewritten: `src/skills/file_manager.py`
+
+Sandbox removed; resolver-dispatch in. Actions `read`/`write`
+(FILE_WRITE)/`list`/`delete` (FILE_DELETE)/`locate`. `_locate` checks
+`resolved.exists` and returns `not_found` carrying `metadata.requested`
+when the target is absent — locate is always honest.
+
+### Updated: `src/core/tool_router.py`
+
+`_filesystem_reference` / `_filesystem_action` /
+`_filesystem_locate_signal`. The locate rescue beats the launch pin and
+forces web off (a locate is never a launch, never a web search); the
+folder/path rescue wins over `open_application` only for folder/path
+labels; machine-scope words ("my pc") are excluded from the reference.
+`file_manager` requests now carry `parameters={"path": ref}` or `{}`
+(empty → structured `empty_path` failure, so the response model can
+never hallucinate contents).
+
+### Updated: `src/ai/prompt_builder.py`
+
+`file_manager` success with `found` renders `Found: <path> (<kind>)`;
+a miss renders `Outcome: not found: '<requested>'.` — the reply names
+exactly what was asked for.
+
+### Verification
+
+- New `p7_fs_stress.py` — 59 deterministic checks in 4 parts
+  (R resolver 30, T tool 15, P prompt 4, G routing 10): **59/59 PASS**,
+  including the three live bugs' exact request shapes offline with the
+  real router + executor (locate spiderman variants → `C:\games\Marvel's
+  Spider-Man 2`; "games folder in c drive" → real `C:\games` listing;
+  "python problem folder" → real `C:\python problem`; `list C:/nope` →
+  not_found, no workspace fallback).
+- New `p7_quick_smoke.py` end-to-end routes — all correct.
+- `p6_stress_500` full clean re-run after the resolver `exists`/alias
+  edits: **255/255 PASS** (A 79, B 13, C 35, D 72, E 24, F 16, G 16).
+- `p5_launch_validation` 74/74 · `p5_seq_launch` 28/28 ·
+  `p5_response_probe` 5/5 · `p5_honesty_probe` PASS — launcher/web
+  layers unaffected by the filesystem changes.
+- `python -m py_compile` clean on all four touched modules.
+- Docs written: `docs/FILESYSTEM_AUDIT_REPORT.md`,
+  `docs/KNOWN_ISSUE/KI-012.md` (non-Windows known-folder env-var
+  fallback, documented limitation, accepted).
+- No commit made (per standing instruction).
+
+## Session: Phase 5 — Live-voice fix & 50-conversation proof
+
+Date:
+2026-08-08
+
+Follow-up to the Phase 5 filesystem-stabilization work. Replayed the four live-voice complaint shapes
+through the real voice-pipeline stack (Understanding model → router →
+executor → LLM response) and fixed them at the root. Each fix was
+proved both deterministically and in a 50-turn live-style harness.
+
+### The four live failures (all reproduced deterministically)
+
+1. Folder-content requests returned `empty_path` — the Understanding
+   model dropped every entity ("take and tell me whats inside my python
+   revision folder"), so no reference reached the resolver.
+2. A drive-only surviving entity ("...in the c drive and i grant you the
+   permission") resolved to `C:\` — the drive root — instead of the
+   requested folder.
+3. Read/list (ToolPermission.SAFE) turns hallucinated a "type grant"
+   permission ask in the reply.
+4. "tell me the location of my ... game in my device" launched the game
+   instead of locating it — `application`/`open_application` labels beat
+   the locate signal.
+
+### Updated: `src/core/tool_router.py`
+
+- `_SCOPE_LOCATION_RE` and `_MACHINE_SCOPE` now include "device";
+  machine scope never reads as a launch target.
+- New `_LOCATE_STRONG_RE` ("find the location of X", "locate X",
+  "search my files") pins a turn to the filesystem even when the
+  Understanding model classified it as a web search or app launch.
+- `_filesystem_locate_signal` also counts `application`-labeled entities
+  when the phrasing is a locate ask — a locate is never a launch.
+- New `_FS_FRAME_WORDS`: verbs/modals/pronouns/copula/question words and
+  conversation-frame filler (including "take/bring/grab/pull/pass/turn/
+  say/stop/start", "everything/anything/something/just/only/some/all",
+  "permission/grant") stripped from raw text when the reference must be
+  recovered after entity loss. "drive" is deliberately kept so "c drive"
+  scopes to `C:\`.
+- New `_raw_filesystem_reference`: when entities are dropped, recover the
+  reference from raw text (requires ≥ 2 alphanumeric tokens), then run it
+  through the safe resolver — never a silent guess.
+- New `_best_filesystem_reference`: picks the more specific resolved
+  target between the structured ref and the raw-text ref (both go
+  through `resolve_reference`; a raw ref miss becomes an honest
+  `not_found`).
+- File-manager request builder wires the fallback; `_filesystem_action`
+  reads the locate intent from intent + goal + raw text.
+
+### Updated: `src/ai/prompt_builder.py`
+
+- Failure block: reading/listing/locating NEVER requires permission;
+  "not found" is never a permission issue; the "grant" keyword must
+  never appear; an empty listing must be reported as empty; never name
+  files not shown in TOOL RESULTS.
+- Launch-success block: MUST confirm each launched application by its
+  exact name; never a generic greeting, never ask permission, never say
+  the launch is still happening.
+- Generic success block: the TOOL RESULTS listing is the complete and
+  ONLY set of entries — never add names from memory or from what the
+  folder name suggests (fixes the sparse/empty-list fabrication).
+- `file_manager` list render: empty folder renders "the folder is
+  empty"; non-empty renders "Complete listing (N entries)" — so the
+  response model can no longer invent contents when nothing was shown.
+
+### Updated: `src/ai/model_router.py`
+
+- `DEVICE` capability moved from `FAST_CHAT` (1b) to `DEFAULT_CHAT`
+  (3b). The 1b model answered successful launches with the canned
+  "I'm ready to help. What's on your mind?" and never named the app; the
+  3b model confirms ("Notepad is open."). Launch routing/execution is
+  unaffected — only the response model for device turns.
+
+### Verification
+
+- `repro_live.py` — all four live shapes PASS deterministically (games
+  no-entities → real `C:\games` list; drive-only entity → same; locate
+  spiderman in my device → `C:\games\Marvel's Spider-Man 2`; python
+  revision no-entities → real list).
+- `p7_fs_stress.py` extended with the four LIVE regression shapes —
+  **63/63 PASS**.
+- `convo50.py` — new 50-conversation live-style harness (real pipeline,
+  real LLM): 16 list turns against the real disk (every listed entry
+  inside the exact folder, never the drive root), 12 locate turns
+  (exact real paths), 11 launch turns (right app + confirmation), plus
+  web/no-tool sanity and the multi-turn block. **50/50 PASS.** The
+  harness also caught and fixed two checker bugs (`m[0]` on
+  `findall` flagged single characters; connector words glued into
+  filename tokens) and the response-model prose issues above.
+- `p5_launch_validation` 74/74 · `p5_seq_launch` 28/28 ·
+  `p5_response_probe` 5/5 · `p5_honesty_probe` PASS —
+  launcher/web layers unaffected by the router/model changes.
+- `python -m py_compile` clean on all touched modules.
+- No commit made (per standing instruction).
+
+---
+
+## Session: Phase 5 — Universal filesystem new-file detection & 60-conversation proof
+
+Date:
+2026-08-08
+
+Final Phase 5 deliverable: prove FRIDAY's universal filesystem resolver
+detects **freshly created** folders/files anywhere on the machine (C, D,
+E drives; Downloads; OneDrive Desktop; OneDrive Documents; profile root;
+nested custom folders) through natural voice phrasing — then run a
+60-turn live harness end to end. No launcher changes (out of scope for
+this task). All previous fixes verified intact.
+
+### Test harness: 10 probe folders/files
+
+Created real items on disk, never hardcoded anywhere in FRIDAY:
+
+- `C:\friday_probe_a\report.txt`, `D:\friday_probe_b\{notes.md,
+  rootfile.txt}`, `E:\friday_probe_c\data.log`,
+  `C:\Users\polis\Downloads\friday_probe_d\hello.txt`,
+  `C:\Users\polis\OneDrive\Desktop\friday_probe_e\desktop.txt`,
+  `C:\Users\polis\OneDrive\Documents\friday_probe_f\doc.txt`,
+  `C:\Users\polis\friday_probe_g\readme.txt`,
+  `C:\test code\friday_probe_i\inner.txt`, `E:\my games\friday_probe_j\
+  kappa.txt`. (A write to `C:\friday_probe_h.txt` was denied by admin —
+  superseded by `rootfile.txt` inside probe_b.)
+
+### Root causes found and fixed
+
+1. `src/utils/path_resolver.py` — `_deep_entries` walked all roots
+   against ONE shared `seen` set and ONE shared depth/count budget, so a
+   C:\ walk exhausted the depth before the profile/Downloads/Desktop/
+   Documents roots were visited — those probes silently missed. Each
+   root now walks independently with its own depth + budget.
+2. `src/core/tool_router.py` — the single-letter frame word "i" was
+   stripped, turning "friday probe i" into "friday probe" which silently
+   matched `friday_probe_a`. `_raw_filesystem_reference` now re-attaches
+   a single-letter frame token sitting directly next to a surviving name
+   token.
+3. `src/core/tool_router.py` — "read my rootfile dot txt file" fired
+   `list` because read-detection required a `file`-labeled entity (the
+   entities were dropped). `_filesystem_action` now reads `read`/
+   `read_file`/`readfile` from intent/goal.
+4. `src/utils/path_resolver.py` — dictation ("rootfile dot txt" →
+   `rootfile.txt`) and `<name> <known folder>` scoping ("friday probe e
+   desktop") were missing. New `_spoken_filename` plus resolver stages
+   6a/6b, both only tried after the unscoped name search misses.
+
+`p8_newfile_probe.py` — new live-router harness, zero entities, same
+phrasing as real voice turns: was 5/10 before the fixes (probes d/e/f
+`not_found`, rootfile "NO TOOL FIRED", probe i resolved to the wrong
+folder) → **10/10 PASS**.
+
+### Live-pipeline routing gap (60-convo run)
+
+The 60-turn live harness caught a routing layer the deterministic probe
+cannot: the small Understanding model misclassifies natural phrasing —
+"what is inside my friday probe a folder" → `device`/`open_application`
+with an `application` entity (fired the launcher); "list what is inside
+friday probe e on my desktop" → `memory`/`hardware` (no tool at all);
+"read my rootfile dot txt file" → `device`/`open_application`. Fixed in
+`src/core/tool_router.py`:
+
+- New `_FS_QUERY_TEXT_RE`: a filesystem ask is "what's/what is inside",
+  "contents of", or a list/show/read verb + a folder/file/known-folder
+  word — never a launch, web, or chat phrase.
+- New rescue in `route()`: a matching raw-text query pins the turn to
+  `automation` (file_manager) BEFORE the `open_application`/launch pins
+  run; explicit web-search goals are never hijacked.
+- `_filesystem_action` also detects a literal "read" verb in raw text
+  (the live model sets `goal=open_application`, so intent+goal alone
+  never carried the read signal).
+- `tool_required()` now enters the tool path for a raw-text filesystem
+  query even when the capability resolves to memory/hardware — the
+  execution gate previously kept `route()` from ever running.
+
+### Verification
+
+- `convo50.py` extended to **60 turns** (50 prior + 10 new-file probes)
+  with a new `read` checker branch. **60/60 PASS.** (Turn 6 — an
+  already-empty real folder — flaked once to a transient model
+  fabrication on first run; re-verified 5/5 clean on retry, and the
+  run then passed 60/60.)
+- `p8_newfile_probe.py` 10/10 PASS after all fixes.
+- Deterministic regression suites re-verified AFTER the routing fixes:
+  `p7_fs_stress.py` 63/63 · `p5_launch_validation.py` 74/74 ·
+  `p5_seq_launch.py` 28/28 · `p5_response_probe.py` 5/5 ·
+  `p5_honesty_probe.py` PASS (forbidden hits none) ·
+  `python -m py_compile` clean on all touched modules.
+- All 10 probe folders/files removed after proof — machine state
+  restored; `Get-ChildItem` confirms nothing remains.
+- No commit made (per standing instruction).
+---
+
+## Live-voice regressions: dictated follow-up + launch-on-chat
+
+Two live-voice regressions reported. Both root-caused, fixed, and proven end to end.
+
+### Issue 1 — follow-up on a just-listed nested directory failed
+
+"whats inside that rock underscore paper underscore caesar directory" right after
+listing `C:\python projects` returned not_found (then drifted to a web search).
+Two independent causes:
+
+- Dictated separators: whisper wrote "underscore" literally into the reference.
+  `_spoken_filename()` generalized from a single "name dot ext" to ANY spoken
+  separator between alphanumeric tokens ("rock underscore paper underscore
+  caesar" -> "rock_paper_caesar"); new public `normalize_spoken_reference()`.
+- Conversation-scoped follow-up with STT drift: the real folder is
+  `rock_paper_seizor` ("caesar" was a whisper error). Added a session-scoped
+  `last_listed_scope` (set by file_manager after a successful directory list)
+  plus `_scoped_followup_search()` in `src/utils/path_resolver.py`: when every
+  normal resolution misses, a tolerant majority-token match inside the just-listed
+  directory resolves it. Two entries tying for the top hit count is an ambiguous
+  miss, never a guess; scope is only consulted after all normal paths miss, so a
+  real name / known folder / drive / absolute path always wins.
+
+Files: `src/utils/path_resolver.py` (scope state, `_scoped_followup_search`,
+`resolve_reference(scope=...)`, 6c stage), `src/skills/file_manager.py`
+(`set_last_listed_scope` on successful directory list).
+
+### Issue 2 — Chrome launched on a pure chat turn
+
+"okay lets have some brief conversation..." reached the launcher with an app
+"chrome browser" the model FABRICATED (goal=open_application + application
+entity, raw text had no launch verb). Root cause: the router trusted fabricated
+open_application structs with no gate. Fix in `src/core/tool_router.py`:
+
+- New `_raw_text_is_launch()`: the user's own words must carry an explicit
+  launch verb (open/launch/start/run) after politeness filler — raw text is the
+  only signal the Understanding model cannot hallucinate.
+- `has_launch_signal()` now requires a raw launch verb for structured launches.
+- `_build_tool_request()` app_launcher branch returns None without a launch verb.
+- `tool_required()` returns False for a device capability without a launch verb
+  (when the tools flag is off) — the fabricated turn never enters the tool path.
+  When the model DID set the flag, the H1 honest-failure contract is preserved
+  (BUG 5/6/7 guard: never a silent success). `_PRE_VERB_FILLER` gained "you" so
+  "can you start steam" / "can you open notepad for me" still launch.
+
+### Verification (machine fixtures recreated, then removed)
+
+- `p8_newfile_probe.py` 10/10 PASS, `convo50.py` 60/60 PASS (turns 6 and 19
+  flaked once to model fabrication on empty/Unicode-named listings; both clean
+  on retry — pre-existing, unrelated to these changes).
+- Deterministic suites: `p5_launch_validation.py` 74/74, `p5_seq_launch.py`
+  28/28, `p7_fs_stress.py` 63/63, `p5_response_probe.py` 5/5,
+  `p5_honesty_probe.py` PASS, custom `fix_probe.py` 17/17,
+  `chat_regression.py` 10/10 (pure chat turns: zero launches, zero web
+  searches, including the exact bug message), live follow-up turn lists
+  `rock_paper_seizor` (entries `main.py`).
+- `python -m py_compile` clean on all touched modules.
+- All 10 probe fixtures removed after proof; machine state restored.
+- No commit made (per standing instruction).

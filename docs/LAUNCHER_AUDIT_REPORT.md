@@ -16,7 +16,7 @@ tool even when Understanding drops its structured signals).
 |---|---|
 | Launch audit (`p5_launch_validation`) | **74/74 PASS** (R 41, G 15, L 11, P 4, H 3) |
 | Sequential launch (`p5_seq_launch`) | **28/28 PASS** |
-| Phase 6 stress (`p6_stress_500`) | **255/255 PASS** |
+| Phase 5 stress (`p6_stress_500`) | **255/255 PASS** |
 | p5 stress / p4 stress / response / honesty | 42/42 · 64/64 · 5/5 · PASS |
 | Catalog index (this machine) | 216 entries (start_menu 98, builtin 15, registry 23, windowsapps 80) |
 | Hardcoded app names/paths in launch pipeline | 0 |

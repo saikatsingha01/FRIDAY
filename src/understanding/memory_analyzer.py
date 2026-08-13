@@ -609,6 +609,99 @@ def analyze_memory(raw_understanding: dict):
         if "semantic" not in memory_types:
             memory_types.append("semantic")
 
+    # --------------------------------------------------
+    # Rule 14
+    # Filesystem state is never a durable memory fact.
+    # FRIDAY answers "what is inside X", "list X", "show me
+    # X", "read X" with a FRESH tool inspection on every
+    # request, so an inspection request must never write a
+    # canonical fact — the small Understanding model has
+    # been observed fabricating folder contents as a
+    # "store" (the exact mechanism that produced stale,
+    # cross-contaminated folder listings in memory).
+    # Statements that assert the current content-state of a
+    # location ("X is empty", "X has files in it") describe
+    # the same dynamic state and never become durable facts
+    # either. Only a stable location fact ("my projects
+    # folder is in the C drive") stays a store. Detection
+    # is closed-class structural vocabulary (location nouns,
+    # inspection frames, state predicates) — never folder
+    # names or topic keywords — so it generalizes to any
+    # path on any machine.
+    # --------------------------------------------------
+
+    # Closed-class nouns for filesystem locations.
+    fs_location_nouns = {
+        "folder", "folders", "directory", "directories",
+        "dir", "dirs", "drive", "path", "file", "files",
+        "desktop", "desktops",
+    }
+
+    # Closed-class frames that ask FRIDAY to inspect a
+    # location's CURRENT contents. The frames carry no
+    # content about WHICH location — only that the user
+    # wants the fresh state reported.
+    fs_inspection_frames = (
+        "whats inside", "what is inside", "whats in",
+        "what is in", "whats within", "what is within",
+        "inside of", "show me", "list", "contents of",
+        "contents in", "tell me what", "look inside",
+        "check what", "what does", "what do", "read ",
+    )
+
+    # Content-state predicates: words that assert what a
+    # location currently contains.
+    fs_state_words = (
+        "empty", "contains", "contained", "contain",
+        "consists", "subfolder", "sub-folder",
+        "includes", "included",
+    )
+
+    # Content nouns that pair with "has/have/got" to assert
+    # what is INSIDE a location. Deliberately excludes the
+    # location nouns themselves so "I have a folder on my
+    # desktop" (a stable location fact) is never suppressed.
+    fs_content_nouns = (
+        "subfolder", "subfolders", "items", "stuff",
+        "inside", "in it",
+    )
+
+    has_location = bool(tokens & fs_location_nouns)
+
+    has_inspection_frame = any(
+        frame in raw_text for frame in fs_inspection_frames
+    )
+
+    has_state_word = any(
+        word in raw_text for word in fs_state_words
+    )
+
+    has_possession = bool({"has", "have", "got"} & tokens)
+
+    has_content_marker = any(
+        noun in raw_text for noun in fs_content_nouns
+    )
+
+    is_inspection = has_location and has_inspection_frame
+
+    is_content_state_statement = (
+        has_location
+        and (
+            has_state_word
+            or (has_possession and has_content_marker)
+        )
+    )
+
+    if is_inspection:
+        memory_operation = "query"
+        canonical_fact = None
+        if "semantic" not in memory_types:
+            memory_types.append("semantic")
+
+    elif is_content_state_statement:
+        memory_operation = None
+        canonical_fact = None
+
     requires_memory = len(memory_types) > 0
 
     return {

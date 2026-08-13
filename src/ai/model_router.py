@@ -78,7 +78,11 @@ CATEGORY_ROLE_MAP = {
     # vision / audio model exists.
     CapabilityCategory.VISION:        ModelRole.DEFAULT_CHAT,
     CapabilityCategory.AUDIO:         ModelRole.DEFAULT_CHAT,
-    CapabilityCategory.DEVICE:        ModelRole.FAST_CHAT,
+    # Device actions (app launches) produce a real side effect the user
+    # must hear confirmed. The 1b FAST_CHAT model answers launch
+    # confirmations with a canned greeting instead of naming the
+    # launched app, so device turns use the default chat model.
+    CapabilityCategory.DEVICE:        ModelRole.DEFAULT_CHAT,
     CapabilityCategory.AUTOMATION:    ModelRole.DEFAULT_CHAT,
     CapabilityCategory.SECURITY:      ModelRole.FAST_CHAT,
     CapabilityCategory.SYSTEM:        ModelRole.FAST_CHAT,

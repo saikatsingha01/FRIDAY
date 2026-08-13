@@ -15,6 +15,20 @@ from src.core.tool_router import (
 from src.execution.tool_executor import tool_executor
 
 
+def _safe_print(*args, **kwargs):
+    """Print that handles Unicode encoding errors on Windows cp1252 console."""
+    try:
+        print(*args, **kwargs)
+    except UnicodeEncodeError:
+        safe_args = []
+        for arg in args:
+            if isinstance(arg, str):
+                safe_args.append(arg.encode("cp1252", errors="replace").decode("cp1252"))
+            else:
+                safe_args.append(str(arg).encode("cp1252", errors="replace").decode("cp1252"))
+        print(*safe_args, **kwargs)
+
+
 class ExecutionManager:
 
     """
@@ -220,30 +234,30 @@ class ExecutionManager:
         # DEBUG
         # ==========================================
 
-        print("\n========== EXECUTION ==========")
-        print("Need Memory   :", reasoning.use_memory)
-        print("Need Episodes :", reasoning.use_episodes)
-        print("Need Context  :", reasoning.use_context)
-        print("Need Tools    :", reasoning.use_tools)
-        print("Need Web      :", reasoning.use_web)
-        print("Need Vision   :", reasoning.use_vision)
-        print("Need Planning :", reasoning.use_planning)
-        print()
-        print("Retrieved Memories :", len(result.memories))
-        print("Retrieved Episodes :", len(result.episodes))
-        print("Retrieved Context  :", len(result.context))
+        _safe_print("\n========== EXECUTION ==========")
+        _safe_print("Need Memory   :", reasoning.use_memory)
+        _safe_print("Need Episodes :", reasoning.use_episodes)
+        _safe_print("Need Context  :", reasoning.use_context)
+        _safe_print("Need Tools    :", reasoning.use_tools)
+        _safe_print("Need Web      :", reasoning.use_web)
+        _safe_print("Need Vision   :", reasoning.use_vision)
+        _safe_print("Need Planning :", reasoning.use_planning)
+        _safe_print()
+        _safe_print("Retrieved Memories :", len(result.memories))
+        _safe_print("Retrieved Episodes :", len(result.episodes))
+        _safe_print("Retrieved Context  :", len(result.context))
 
         if result.planner_result:
-            print(
+            _safe_print(
                 "Plan Steps         :",
                 len(result.planner_result.steps)
             )
-            print(
+            _safe_print(
                 "Needs Clarification:",
                 result.planner_result.requires_clarification
             )
 
-        print("===============================\n")
+        _safe_print("===============================\n")
 
         return result
 

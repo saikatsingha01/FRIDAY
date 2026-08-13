@@ -2075,6 +2075,123 @@
                 }
             },
             "changed_at": "2026-08-07T23:12:11.301288"
+        },
+        {
+            "old_memory": {
+                "id": 155,
+                "text": "My favorite color is blue",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "favorite color",
+                    "blue"
+                ],
+                "source_text": "remember my favorite color is blue",
+                "created_at": "2026-08-11T19:26:55.557863",
+                "updated_at": "2026-08-11T19:26:55.557863",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 156,
+                "text": "My favorite color is now green",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "favorite color",
+                    "green"
+                ],
+                "source_text": "my favorite color is now green",
+                "created_at": "2026-08-11T19:27:12.429549",
+                "updated_at": "2026-08-11T19:27:12.429549",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-11T19:27:15.512071"
+        },
+        {
+            "old_memory": {
+                "id": 156,
+                "text": "My favorite color is now green",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "favorite color",
+                    "green"
+                ],
+                "source_text": "my favorite color is now green",
+                "created_at": "2026-08-11T19:26:55.557863",
+                "updated_at": "2026-08-11T19:27:15.494221",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": null,
+            "changed_at": "2026-08-11T19:28:40.568735"
+        },
+        {
+            "old_memory": {
+                "id": 158,
+                "text": "prepe isn't a movie, it's a coffee brand",
+                "category": "general",
+                "importance": 1,
+                "confidence": 100,
+                "persistence": "temporal",
+                "tags": [],
+                "source_text": "yes prepe isnt a movie its the coffee brand so please update your memory and",
+                "created_at": "2026-08-14T03:59:38.622677",
+                "updated_at": "2026-08-14T03:59:38.622677",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 159,
+                "text": "Prepe is a coffee brand",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "coffee",
+                    "prepe"
+                ],
+                "source_text": "no no you are still doing it wrong prepe isnt a movie its a coffee brand that theres nothing called prepe",
+                "created_at": "2026-08-14T04:00:21.489869",
+                "updated_at": "2026-08-14T04:00:21.489869",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-14T04:00:24.606889"
         }
     ]
 }

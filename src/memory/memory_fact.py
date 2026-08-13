@@ -120,8 +120,12 @@ class MemoryFact:
             confidence below UNCERTAINTY_THRESHOLD.
         """
         if self.uncertain_terms:
+            if self.confidence is None:
+                return False
             return self.confidence < UNCERTAINTY_THRESHOLD
 
+        if self.confidence is None:
+            return False
         return self.confidence < LOW_CONFIDENCE_FLOOR
 
     def confidence_breakdown(self) -> Dict[str, float]:

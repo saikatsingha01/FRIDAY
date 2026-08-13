@@ -1,18 +1,37 @@
-from src.understanding.understanding_orchestrator import analyze
+﻿from src.understanding.understanding_orchestrator import analyze
 from src.core.reasoning_engine import reasoning_engine
 from src.execution.execution_manager import execution_manager
 from src.memory.memory_decision import process_memory, memory_decision
-from src.core.response_generator import generate_trivial_response
+from src.core.response_generator import (
+    generate_trivial_response,
+    guard_listing_response,
+    guard_path_response,
+    guard_web_response,
+)
 from src.ai.prompt_builder import build_prompt
 from src.ai.llm_interface import llm
 from src.ai.model_router import route as route_model
 from src.core.context_manager import maybe_rollover
 
 
+def _safe_print(*args, **kwargs):
+    """Print that handles Unicode encoding errors on Windows cp1252 console."""
+    try:
+        print(*args, **kwargs)
+    except UnicodeEncodeError:
+        safe_args = []
+        for arg in args:
+            if isinstance(arg, str):
+                safe_args.append(arg.encode("cp1252", errors="replace").decode("cp1252"))
+            else:
+                safe_args.append(str(arg).encode("cp1252", errors="replace").decode("cp1252"))
+        print(*safe_args, **kwargs)
+
+
 # Passive knowledge-lookup goals. When the planner decides such a
 # message does NOT continue the active plan, it is a mid-plan
 # question ("what is the weather in tokyo", "how far is X from Y",
-# "tell me a joke") — never a plan to execute. Deterministic and
+# "tell me a joke") â€” never a plan to execute. Deterministic and
 # independent of the flaky Understanding planning flag, so a weather
 # question detours even when Understanding routed it to the planner.
 DETOUR_GOALS = {
@@ -24,7 +43,7 @@ DETOUR_GOALS = {
 def _clean_response(text: str) -> str:
     """
     Strips markdown formatting that breaks TTS.
-    The LLM sometimes ignores the no-markdown instruction —
+    The LLM sometimes ignores the no-markdown instruction â€”
     this is a safety net, not the primary fix.
     """
 
@@ -36,11 +55,11 @@ def _clean_response(text: str) -> str:
     # Remove bold/italic markers
     text = re.sub(r"\*{1,3}(.+?)\*{1,3}", r"\1", text)
 
-    # Remove leading bullet symbols (*, -, •) from lines
+    # Remove leading bullet symbols (*, -, â€¢) from lines
     lines = []
     for line in text.splitlines():
         stripped = line.lstrip()
-        if stripped.startswith(("* ", "- ", "• ", "· ")):
+        if stripped.startswith(("* ", "- ", "â€¢ ", "Â· ")):
             line = line.replace(
                 stripped[:2], "", 1
             )
@@ -54,10 +73,35 @@ def _clean_response(text: str) -> str:
     return text.strip()
 
 
+def _final_response(response: str, execution, understanding=None):
+    """
+    Applies the filesystem answer guard (deterministic) then the
+    local-path truth guard, then the web grounding guard, then the
+    TTS cleanup, in that order. The listing guard guarantees the
+    reply never names a file or folder the tool results did not
+    produce; the path guard guarantees a local path is only ever
+    spoken when a successful file_manager result on this turn
+    produced it (never from a web page or memory); the web guard
+    guarantees factual claims from web search are grounded in snippets.
+    """
+    guarded = guard_listing_response(response, execution.tool_results)
+    guarded = guard_path_response(
+        guarded,
+        execution.tool_results,
+        getattr(understanding, "raw_text", None) if understanding else None,
+    )
+    guarded = guard_web_response(
+        guarded,
+        execution.tool_results,
+        getattr(understanding, "raw_text", None) if understanding else None,
+    )
+    return _clean_response(guarded)
+
+
 def think(user_message: str):
 
     # ============================================
-    # 0. CONTEXT — roll an idle session into an
+    # 0. CONTEXT â€” roll an idle session into an
     # episode before reading the working buffer.
     # ============================================
 
@@ -67,7 +111,7 @@ def think(user_message: str):
     # 1. UNDERSTANDING
     # analyze() returns (understanding, memory_fact).
     # MemoryFact carries only the memory write
-    # instruction — never raw user text.
+    # instruction â€” never raw user text.
     # ============================================
 
     understanding, memory_fact = analyze(user_message)
@@ -78,7 +122,7 @@ def think(user_message: str):
         }
 
     # ============================================
-    # 1b. TRIAGE FAST-PATH — zero LLM calls.
+    # 1b. TRIAGE FAST-PATH â€” zero LLM calls.
     # Trivial social messages ("hello", "bye",
     # "thanks") get a template response. The
     # generative LLM is never invoked.
@@ -129,10 +173,10 @@ def think(user_message: str):
     # A "detour" is a message the planner judged unrelated to the
     # active plan (not a continuation) AND not something to execute:
     # either its semantic goal is a passive lookup (weather, distance,
-    # joke) — deterministic, independent of the flaky planning flag —
+    # joke) â€” deterministic, independent of the flaky planning flag â€”
     # or the planner itself rejected it as a goal request. Detours are
     # answered on the normal path with the active plan left intact.
-    # A genuine NEW goal — flag recognized or not — has an actionable
+    # A genuine NEW goal â€” flag recognized or not â€” has an actionable
     # goal AND the planner flagged it as a goal request, so it
     # executes as a fresh plan and replaces the active one.
     plan_detour = bool(
@@ -151,7 +195,7 @@ def think(user_message: str):
     # decided need, the ToolRouter selected, the
     # ToolExecutor ran them under the permission gate.
     # The structured ToolResults ride on
-    # execution.tool_results into the prompt builder —
+    # execution.tool_results into the prompt builder â€”
     # the Brain never touches raw tool text.
     # ============================================
 
@@ -168,14 +212,14 @@ def think(user_message: str):
     )
     response_model = routing_decision.model
 
-    print("\n========== BRAIN ==========")
-    print("Tool Results  :", len(execution.tool_results))
+    _safe_print("\n========== BRAIN ==========")
+    _safe_print("Tool Results  :", len(execution.tool_results))
     for tr in execution.tool_results:
-        print("  -", tr.tool_name, "->", tr.status)
-    print("Use Planning :", reasoning.use_planning)
-    print("Capability   :", routing_decision.category)
-    print("Model        :", response_model, f"({routing_decision.role})")
-    print("===========================\n")
+        _safe_print("  -", tr.tool_name, "->", tr.status)
+    _safe_print("Use Planning :", reasoning.use_planning)
+    _safe_print("Capability   :", routing_decision.category)
+    _safe_print("Model        :", response_model, f"({routing_decision.role})")
+    _safe_print("===========================\n")
 
     # ============================================
     # 5. MEMORY DECISION
@@ -185,19 +229,19 @@ def think(user_message: str):
 
     memory_result = process_memory(memory_fact)
 
-    print("\n========== MEMORY ==========")
-    print("Operation :", memory_fact.operation)
-    print("Fact      :", memory_fact.canonical_fact)
-    print("Uncertain :", memory_fact.uncertain_terms)
-    print("Confidence:", memory_fact.confidence)
-    print("Result    :", repr(memory_result))
-    print("============================\n")
+    _safe_print("\n========== MEMORY ==========")
+    _safe_print("Operation :", memory_fact.operation)
+    _safe_print("Fact      :", memory_fact.canonical_fact)
+    _safe_print("Uncertain :", memory_fact.uncertain_terms)
+    _safe_print("Confidence:", memory_fact.confidence)
+    _safe_print("Result    :", repr(memory_result))
+    _safe_print("============================\n")
 
     if memory_result == "stored":
 
         # A goal-accomplishment request ("build a game", "learn
         # python") is often ALSO extracted as a memory write. The
-        # write has already happened — the side effect is kept. But
+        # write has already happened â€” the side effect is kept. But
         # when Reasoning flagged planning, the user asked for a
         # plan, so the plan is the answer. This only widens the
         # stored path; the memory write is a quiet side effect.
@@ -219,12 +263,12 @@ def think(user_message: str):
                 "understanding": understanding,
                 "reasoning":     reasoning,
                 "execution":     execution,
-                "response":      _clean_response(response),
+                "response":      _final_response(response, execution, understanding),
             }
 
         # Mid-plan detour: answer as a plain stored-fact ack. The
         # planner output was judged unrelated to the active plan, so
-        # it must not shape this response — and the active plan stays.
+        # it must not shape this response â€” and the active plan stays.
         if plan_detour:
             execution.planner_result = None
 
@@ -238,7 +282,7 @@ def think(user_message: str):
             "understanding": understanding,
             "reasoning":     reasoning,
             "execution":     execution,
-            "response":      _clean_response(response),
+            "response":      _final_response(response, execution, understanding),
         }
 
     # ============================================
@@ -262,8 +306,8 @@ def think(user_message: str):
             "A stored fact was just replaced by the user.\n"
             f"  Old: {old_text}\n"
             f"  New: {new_text}\n"
-            "Briefly acknowledge the change naturally — e.g. "
-            "\"I've updated that from [old] to [new].\" — without "
+            "Briefly acknowledge the change naturally â€” e.g. "
+            "\"I've updated that from [old] to [new].\" â€” without "
             "adding any other memory details.\n"
         )
 
@@ -277,7 +321,7 @@ def think(user_message: str):
             "understanding": understanding,
             "reasoning":     reasoning,
             "execution":     execution,
-            "response":      _clean_response(response),
+            "response":      _final_response(response, execution, understanding),
             "memory_update": {
                 "old": old_text,
                 "new": new_text,
@@ -308,8 +352,8 @@ def think(user_message: str):
             "The user just asked you to forget one or more stored "
             "facts.\n"
             f"  Removed: {', '.join(old_texts) if old_texts else 'memory'}\n"
-            "Briefly acknowledge the removal naturally — e.g. "
-            "\"I've forgotten that.\" — without adding any other "
+            "Briefly acknowledge the removal naturally â€” e.g. "
+            "\"I've forgotten that.\" â€” without adding any other "
             "memory details.\n"
         )
 
@@ -323,7 +367,7 @@ def think(user_message: str):
             "understanding": understanding,
             "reasoning":     reasoning,
             "execution":     execution,
-            "response":      _clean_response(response),
+            "response":      _final_response(response, execution, understanding),
             "memory_update": {
                 "deleted": old_texts,
             },
@@ -362,7 +406,7 @@ def think(user_message: str):
             "understanding": understanding,
             "reasoning":     reasoning,
             "execution":     execution,
-            "response":      _clean_response(response),
+            "response":      _final_response(response, execution, understanding),
         }
 
     # ============================================
@@ -370,14 +414,14 @@ def think(user_message: str):
     # A term in the message could not be
     # confidently interpreted (likely a mishearing
     # or typo). Never store it. Ask the user what
-    # they meant — universally, no keyword lists.
+    # they meant â€” universally, no keyword lists.
     # ============================================
 
     if memory_result == "needs_clarification":
 
         # If the underlying question is world-knowledge (not personal),
         # answer from general knowledge first, then surface the
-        # uncertain term. Bug 7 — a misheard "btag" should not block
+        # uncertain term. Bug 7 â€” a misheard "btag" should not block
         # an answer about B.Tech. "requires_memory" alone is not
         # reliable here (the Understanding LLM sometimes flags memory
         # for "Do you know about the B.Tech course?"); a question
@@ -399,7 +443,7 @@ def think(user_message: str):
         )
 
         if is_world_q:
-            # Fall through to conversation path — world knowledge
+            # Fall through to conversation path â€” world knowledge
             # questions should be answered, not blocked by uncertain
             # terms.
             prompt   = build_prompt(understanding, execution)
@@ -412,7 +456,7 @@ def think(user_message: str):
                 "understanding": understanding,
                 "reasoning":     reasoning,
                 "execution":     execution,
-                "response":      _clean_response(response),
+                "response":      _final_response(response, execution, understanding),
             }
 
         response = _ask_for_clarification(
@@ -426,7 +470,7 @@ def think(user_message: str):
             "understanding": understanding,
             "reasoning":     reasoning,
             "execution":     execution,
-            "response":      _clean_response(response),
+            "response":      _final_response(response, execution, understanding),
         }
 
     # ============================================
@@ -454,7 +498,7 @@ def think(user_message: str):
             "understanding": understanding,
             "reasoning":     reasoning,
             "execution":     execution,
-            "response":      _clean_response(response),
+            "response":      _final_response(response, execution, understanding),
         }
 
     # ============================================
@@ -479,7 +523,7 @@ def think(user_message: str):
             "understanding": understanding,
             "reasoning":     reasoning,
             "execution":     execution,
-            "response":      _clean_response(response),
+            "response":      _final_response(response, execution, understanding),
         }
 
     # ============================================
@@ -502,7 +546,7 @@ def think(user_message: str):
         "understanding": understanding,
         "reasoning":     reasoning,
         "execution":     execution,
-        "response":      _clean_response(response),
+        "response":      _final_response(response, execution, understanding),
     }
 
 
@@ -516,7 +560,7 @@ def _ask_for_clarification(
     Builds a response that asks the user to clarify a
     term FRIDAY could not confidently interpret.
 
-    This is universal — driven by the LLM's judgment of
+    This is universal â€” driven by the LLM's judgment of
     uncertain_terms, never by a hardcoded word list.
 
     Falls back to a safe generic request if the LLM

@@ -1,12 +1,16 @@
 # ==========================================================
 # FILE MANAGER TOOL
 #
-# Phase 5 — read / write / list / delete files and directories.
+# Phase 5 — read / write / list / delete / locate files and
+# directories anywhere on the machine. Every reference runs
+# through the universal path resolver: absolute paths, drive
+# letters, known folders, and folder/file names all resolve to
+# a real absolute path or an explicit not_found. There is NO
+# silent fallback to the workspace — a reference that cannot be
+# resolved is an honest miss, never an implicit listing.
 #
-# Scoped to a base directory so a structured action can never
-# wander outside the workspace. Write and delete are
-# permission-gated (denied by default). Never decides whether to
-# run; never sees raw user text.
+# Write and delete are permission-gated (denied by default).
+# Never decides whether to run; never sees raw user text.
 # ==========================================================
 
 import os
@@ -20,11 +24,10 @@ from src.contracts.tool import (
 )
 from src.skills.skill_registry import register
 from src.skills.tool_base import BaseTool
-
-
-# Base sandbox for file actions. All paths resolve inside this.
-DEFAULT_BASE = os.path.normpath(
-    os.path.join(os.path.dirname(__file__), "..", "..")
+from src.utils.path_resolver import (
+    locate_reference,
+    resolve_reference,
+    set_last_listed_scope,
 )
 
 
@@ -33,8 +36,8 @@ class FileManagerTool(BaseTool):
     metadata = ToolMetadata(
         name="file_manager",
         description=(
-            "Read, write, list or delete files and directories "
-            "inside the workspace sandbox."
+            "Read, write, list, delete or locate files and directories "
+            "anywhere on the machine."
         ),
         capabilities=["tool_use", "automation"],
         goals=["create", "plan", "solve_problem"],
@@ -42,7 +45,7 @@ class FileManagerTool(BaseTool):
         actions={
             "read": {
                 "permission": ToolPermission.SAFE,
-                "input": {"path": "str — file path relative to base"},
+                "input": {"path": "str — file path, folder name, or drive"},
                 "output": {"content": "str", "size": "int"},
             },
             "write": {
@@ -52,7 +55,7 @@ class FileManagerTool(BaseTool):
             },
             "list": {
                 "permission": ToolPermission.SAFE,
-                "input": {"path": "str (optional, default base)"},
+                "input": {"path": "str — folder path, name, or drive"},
                 "output": {"entries": "list of {name, path, type}"},
             },
             "delete": {
@@ -60,11 +63,16 @@ class FileManagerTool(BaseTool):
                 "input": {"path": "str"},
                 "output": {"deleted": "bool"},
             },
+            "locate": {
+                "permission": ToolPermission.SAFE,
+                "input": {"path": "str — file or folder reference"},
+                "output": {"found": "bool", "path": "str", "kind": "str"},
+            },
         },
         needs_network=False,
         errors=[
-            "unsupported_action", "empty_path", "path_escape",
-            "not_found", "is_dir", "io_error",
+            "unsupported_action", "empty_path", "not_found",
+            "is_dir", "io_error",
         ],
     )
 
@@ -78,16 +86,27 @@ class FileManagerTool(BaseTool):
                 f"unsupported_action: {action}",
             )
 
-        path = self._resolve(request.parameters.get("path"))
+        raw = request.parameters.get("path")
 
-        if path is False:
-            return self.fail(request, "path_escape")
-
-        if action == "list" and not path:
-            path = DEFAULT_BASE
-
-        if action != "list" and not path:
+        if raw is None or not str(raw).strip():
             return self.fail(request, "empty_path")
+
+        reference = str(raw).strip()
+
+        # A locate is resolved through locate_reference — it only ever
+        # reports paths that EXIST right now, distinguishes exact /
+        # normalized / fuzzy matches, and collects multiple matches so
+        # a duplicate name can be reported honestly. It runs before the
+        # shared not_found gate because its miss shape differs.
+        if action == "locate":
+            return self._locate(request, reference)
+
+        resolved = resolve_reference(reference)
+
+        if not resolved.found:
+            return self._not_found(request, reference)
+
+        path = resolved.path
 
         try:
             if action == "read":
@@ -115,7 +134,7 @@ class FileManagerTool(BaseTool):
             return self.fail(request, "is_dir")
 
         if not os.path.exists(path):
-            return self.fail(request, "not_found")
+            return self._not_found(request, path)
 
         started = time.time()
 
@@ -159,11 +178,11 @@ class FileManagerTool(BaseTool):
                     "name": os.path.basename(path),
                     "path": path,
                     "type": "file",
-                }]},
+                }], "path": path},
             )
 
         if not os.path.isdir(path):
-            return self.fail(request, "not_found")
+            return self._not_found(request, path)
 
         entries = []
 
@@ -175,11 +194,17 @@ class FileManagerTool(BaseTool):
                 "type": "dir" if os.path.isdir(full) else "file",
             })
 
-        return self.ok(request, data={"entries": entries})
+        # The entries are now "recently seen" by the user. A follow-up
+        # that refers to one of them ("whats inside that <name>
+        # directory") can resolve tolerantly inside this directory even
+        # when a whispered name drifts a token.
+        set_last_listed_scope(path)
+
+        return self.ok(request, data={"entries": entries, "path": path})
 
     def _delete(self, request, path):
         if not os.path.exists(path):
-            return self.fail(request, "not_found")
+            return self._not_found(request, path)
 
         started = time.time()
 
@@ -195,43 +220,45 @@ class FileManagerTool(BaseTool):
             duration_ms=int((time.time() - started) * 1000),
         )
 
+    def _locate(self, request, reference):
+        located = locate_reference(reference)
+        if not located.found:
+            return self._not_found(request, reference)
+        kind = located.kind or (
+            "dir" if os.path.isdir(located.path) else "file"
+        )
+        data = {
+            "found": True,
+            "path": located.path,
+            "kind": kind,
+            "match": located.match,
+            "requested": reference,
+        }
+        if len(located.candidates) > 1:
+            data["candidates"] = [
+                {
+                    "path": cand.path,
+                    "kind": cand.kind or (
+                        "dir" if os.path.isdir(cand.path) else "file"
+                    ),
+                    "match": cand.match,
+                }
+                for cand in located.candidates
+            ]
+        return self.ok(request, data=data)
+
     # ==========================================
-    # SAFETY
+    # FAILURE
     # ==========================================
 
-    def _resolve(self, raw_path):
-        """
-        Resolve a structured relative path against DEFAULT_BASE.
-        Returns:
-          - an absolute normalized path on success
-          - False when the path escapes the sandbox
-          - None when the path is empty
-        """
-        if raw_path is None:
-            return None
-
-        path = str(raw_path).strip()
-
-        if not path:
-            return None
-
-        # Strip a leading slash / drive letter so only relative
-        # paths within the workspace are addressable.
-        path = path.replace("\\", "/").lstrip("/")
-
-        path = re_sub_drive(path)
-
-        full = os.path.normpath(os.path.join(DEFAULT_BASE, path))
-
-        if not full.startswith(os.path.normpath(DEFAULT_BASE)):
-            return False
-
-        return full
-
-
-def re_sub_drive(path):
-    import re
-    return re.sub(r"^[a-zA-Z]:", "", path)
+    def _not_found(self, request, requested):
+        return ToolResult(
+            tool_name=request.tool_name,
+            action=request.action,
+            status="not_found",
+            error="not_found",
+            metadata={"requested": requested},
+        )
 
 
 file_manager_tool = FileManagerTool()

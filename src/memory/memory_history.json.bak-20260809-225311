@@ -1,0 +1,2171 @@
+{
+    "history": [
+        {
+            "old_memory": {
+                "id": 1,
+                "text": "My favorite food is rice",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 3,
+                "text": "My favorite food is chicken curry",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "changed_at": "2026-08-01T15:21:20.055011"
+        },
+        {
+            "old_memory": {
+                "id": 2,
+                "text": "My favorite game is Sekiro",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 4,
+                "text": "My favorite game is Post of Sushiva now",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "changed_at": "2026-08-01T15:21:44.227458"
+        },
+        {
+            "old_memory": {
+                "id": 4,
+                "text": "My favorite game is Post of Sushiva now",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 5,
+                "text": "My favorite game is Ghost of Tsushima",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "changed_at": "2026-08-01T15:22:35.393553"
+        },
+        {
+            "old_memory": {
+                "id": 1,
+                "text": "I am 70 kg",
+                "category": "identity",
+                "confidence": 80,
+                "importance": 5,
+                "created_at": "2026-08-01T00:00:00"
+            },
+            "new_memory": {
+                "id": 2,
+                "text": "I am 65 kg",
+                "category": "identity",
+                "confidence": 80
+            },
+            "changed_at": "2026-08-03T06:27:32.523315"
+        },
+        {
+            "old_memory": {
+                "id": 9,
+                "text": "I like red",
+                "category": "preference",
+                "confidence": 80,
+                "importance": 5
+            },
+            "new_memory": {
+                "id": 10,
+                "text": "I like blue",
+                "category": "preference",
+                "confidence": 90
+            },
+            "changed_at": "2026-08-03T06:27:32.526787"
+        },
+        {
+            "old_memory": {
+                "id": 8,
+                "text": "I am 70 kg",
+                "category": "identity",
+                "importance": 10,
+                "confidence": 80,
+                "persistence": "permanent",
+                "tags": [],
+                "source_text": "I am 70 kg",
+                "created_at": "2026-08-03T06:27:49.720914",
+                "updated_at": "2026-08-03T06:27:49.720914",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 0.8,
+                    "canonicalization": 1.0,
+                    "memory": 0.8,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 9,
+                "text": "I am 65 kg",
+                "category": "identity",
+                "importance": 10,
+                "confidence": 80,
+                "persistence": "permanent",
+                "tags": [],
+                "source_text": "I am 65 kg",
+                "created_at": "2026-08-03T06:27:49.722492",
+                "updated_at": "2026-08-03T06:27:49.722492",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 0.8,
+                    "canonicalization": 1.0,
+                    "memory": 0.8,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T06:27:49.722492"
+        },
+        {
+            "old_memory": {
+                "id": 5,
+                "text": "My favorite game is Ghost of Tsushima",
+                "category": "preference",
+                "confidence": 35,
+                "importance": 7
+            },
+            "new_memory": {
+                "id": 8,
+                "text": "My favorite game is Sekiro",
+                "category": "gaming",
+                "confidence": 100
+            },
+            "changed_at": "2026-08-03T06:36:42.093732"
+        },
+        {
+            "old_memory": {
+                "id": 1,
+                "text": "I am 70 kg",
+                "category": "identity",
+                "confidence": 80,
+                "importance": 5
+            },
+            "new_memory": {
+                "id": 2,
+                "text": "I am 65 kg",
+                "category": "identity",
+                "confidence": 80
+            },
+            "changed_at": "2026-08-03T06:36:42.096217"
+        },
+        {
+            "old_memory": {
+                "id": 5,
+                "text": "My favorite game is Ghost of Tsushima",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 8,
+                "text": "My favorite game is Sekiro",
+                "category": "gaming",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "favorite game",
+                    "sekiro"
+                ],
+                "source_text": "My favorite game is Sekiro",
+                "created_at": "2026-08-03T06:36:56.886892",
+                "updated_at": "2026-08-03T06:36:56.886892",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T06:36:57.125045"
+        },
+        {
+            "old_memory": {
+                "id": 5,
+                "text": "My favorite game is Ghost of Tsushima",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 9,
+                "text": "My favorite game is Sekiro",
+                "category": "gaming",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "favorite game",
+                    "sekiro"
+                ],
+                "source_text": "My favorite game is Sekiro",
+                "created_at": "2026-08-03T06:38:26.315898",
+                "updated_at": "2026-08-03T06:38:26.315898",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T06:38:26.607314"
+        },
+        {
+            "old_memory": {
+                "id": 5,
+                "text": "My favorite game is Ghost of Tsushima",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 9,
+                "text": "My favorite game is Sekiro",
+                "category": "gaming",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "favorite game",
+                    "sekiro"
+                ],
+                "source_text": "My favorite game is Sekiro",
+                "created_at": "2026-08-03T06:41:28.941549",
+                "updated_at": "2026-08-03T06:41:28.941549",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T06:41:29.297782"
+        },
+        {
+            "old_memory": {
+                "id": 9,
+                "text": "I am 70 kg",
+                "category": "general",
+                "importance": 3,
+                "confidence": 90,
+                "persistence": "unknown",
+                "tags": [
+                    "weight",
+                    "70 kg"
+                ],
+                "source_text": "I am 70 kg",
+                "created_at": "2026-08-03T16:24:45.668720",
+                "updated_at": "2026-08-03T16:24:45.668720",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 0.9,
+                    "canonicalization": 1.0,
+                    "memory": 0.9,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 12,
+                "text": "I weigh 70 kg",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "weight",
+                    "70 kg"
+                ],
+                "source_text": "I weigh 70 kg",
+                "created_at": "2026-08-03T16:25:37.454672",
+                "updated_at": "2026-08-03T16:25:37.454672",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T16:25:37.963959"
+        },
+        {
+            "old_memory": {
+                "id": 5,
+                "text": "My favorite game is Ghost of Tsushima",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 10,
+                "text": "My favorite game is Sekiro",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "My favorite game is Sekiro",
+                "created_at": "2026-08-03T16:28:41.870720",
+                "updated_at": "2026-08-03T16:28:41.870720",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T16:28:42.245917"
+        },
+        {
+            "old_memory": {
+                "id": 8,
+                "text": "I am 70 kg",
+                "category": "general",
+                "importance": 3,
+                "confidence": 90,
+                "persistence": "unknown",
+                "tags": [
+                    "weight",
+                    "70 kg"
+                ],
+                "source_text": "I am 70 kg",
+                "created_at": "2026-08-03T16:28:02.160749",
+                "updated_at": "2026-08-03T16:28:02.160749",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 0.9,
+                    "canonicalization": 1.0,
+                    "memory": 0.9,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 11,
+                "text": "I weigh 70 kg",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "weight",
+                    "70 kg"
+                ],
+                "source_text": "I weigh 70 kg",
+                "created_at": "2026-08-03T16:28:51.797428",
+                "updated_at": "2026-08-03T16:28:51.797428",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T16:28:52.184129"
+        },
+        {
+            "old_memory": {
+                "id": 3,
+                "text": "My favorite food is chicken curry",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 8,
+                "text": "My favorite food is rice",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "My favorite food is rice",
+                "created_at": "2026-08-03T16:29:22.051885",
+                "updated_at": "2026-08-03T16:29:22.051885",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T16:29:22.314473"
+        },
+        {
+            "old_memory": {
+                "id": 5,
+                "text": "My favorite game is Ghost of Tsushima",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 10,
+                "text": "My favorite game is Sekiro",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "My favorite game is Sekiro",
+                "created_at": "2026-08-03T17:51:51.187687",
+                "updated_at": "2026-08-03T17:51:51.187687",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T17:51:51.573043"
+        },
+        {
+            "old_memory": {
+                "id": 8,
+                "text": "I am 70 kg",
+                "category": "general",
+                "importance": 3,
+                "confidence": 90,
+                "persistence": "unknown",
+                "tags": [
+                    "weight",
+                    "70 kg"
+                ],
+                "source_text": "I am 70 kg",
+                "created_at": "2026-08-03T17:51:08.813317",
+                "updated_at": "2026-08-03T17:51:08.813317",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 0.9,
+                    "canonicalization": 1.0,
+                    "memory": 0.9,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 11,
+                "text": "I weigh 70 kg",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "weight",
+                    "70 kg"
+                ],
+                "source_text": "I weigh 70 kg",
+                "created_at": "2026-08-03T17:52:01.970470",
+                "updated_at": "2026-08-03T17:52:01.970470",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T17:52:02.404368"
+        },
+        {
+            "old_memory": {
+                "id": 3,
+                "text": "My favorite food is chicken curry",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 8,
+                "text": "My favorite food is rice",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "food",
+                    "rice"
+                ],
+                "source_text": "My favorite food is rice",
+                "created_at": "2026-08-03T17:52:56.934226",
+                "updated_at": "2026-08-03T17:52:56.934226",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T17:52:57.268763"
+        },
+        {
+            "old_memory": {
+                "id": 8,
+                "text": "I study Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I am learning Python for data science",
+                "created_at": "2026-08-03T17:54:26.075305",
+                "updated_at": "2026-08-03T17:54:26.075305",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 9,
+                "text": "I am learning Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I built a small pandas script to clean my CSV files",
+                "created_at": "2026-08-03T17:54:31.682875",
+                "updated_at": "2026-08-03T17:54:31.682875",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T17:54:32.147647"
+        },
+        {
+            "old_memory": {
+                "id": 5,
+                "text": "My favorite game is Ghost of Tsushima",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 10,
+                "text": "My favorite game is Sekiro",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "My favorite game is Sekiro",
+                "created_at": "2026-08-03T18:13:34.223783",
+                "updated_at": "2026-08-03T18:13:34.223783",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T18:13:34.610260"
+        },
+        {
+            "old_memory": {
+                "id": 8,
+                "text": "I am 70 kg",
+                "category": "general",
+                "importance": 3,
+                "confidence": 90,
+                "persistence": "unknown",
+                "tags": [
+                    "weight",
+                    "70 kg"
+                ],
+                "source_text": "I am 70 kg",
+                "created_at": "2026-08-03T18:12:54.247355",
+                "updated_at": "2026-08-03T18:12:54.247355",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 0.9,
+                    "canonicalization": 1.0,
+                    "memory": 0.9,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 11,
+                "text": "I weigh 70 kg",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "weight",
+                    "70 kg"
+                ],
+                "source_text": "I weigh 70 kg",
+                "created_at": "2026-08-03T18:13:44.296426",
+                "updated_at": "2026-08-03T18:13:44.296426",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T18:13:44.673107"
+        },
+        {
+            "old_memory": {
+                "id": 3,
+                "text": "My favorite food is chicken curry",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 8,
+                "text": "My favorite food is rice",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "food",
+                    "rice"
+                ],
+                "source_text": "My favorite food is rice",
+                "created_at": "2026-08-03T18:14:09.266861",
+                "updated_at": "2026-08-03T18:14:09.266861",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T18:14:09.530747"
+        },
+        {
+            "old_memory": {
+                "id": 8,
+                "text": "I study Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I am learning Python for data science",
+                "created_at": "2026-08-03T18:17:37.742392",
+                "updated_at": "2026-08-03T18:17:37.742392",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 9,
+                "text": "I am learning Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I built a small pandas script to clean my CSV files",
+                "created_at": "2026-08-03T18:17:42.573492",
+                "updated_at": "2026-08-03T18:17:42.573492",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T18:17:43.023915"
+        },
+        {
+            "old_memory": {
+                "id": 8,
+                "text": "I study Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I am learning Python for data science",
+                "created_at": "2026-08-03T18:19:18.845650",
+                "updated_at": "2026-08-03T18:19:18.845650",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 9,
+                "text": "I am learning Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I built a small pandas script to clean my CSV files",
+                "created_at": "2026-08-03T18:19:23.656555",
+                "updated_at": "2026-08-03T18:19:23.656555",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T18:19:24.072675"
+        },
+        {
+            "old_memory": {
+                "id": 8,
+                "text": "I study Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I am learning Python for data science",
+                "created_at": "2026-08-03T18:23:06.842164",
+                "updated_at": "2026-08-03T18:23:06.842164",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 9,
+                "text": "I am learning Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I built a small pandas script to clean my CSV files",
+                "created_at": "2026-08-03T18:23:11.721771",
+                "updated_at": "2026-08-03T18:23:11.721771",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T18:23:12.182498"
+        },
+        {
+            "old_memory": {
+                "id": 8,
+                "text": "I study Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I am learning Python for data science",
+                "created_at": "2026-08-03T18:26:36.638285",
+                "updated_at": "2026-08-03T18:26:36.638285",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 9,
+                "text": "I am learning Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I built a small pandas script to clean my CSV files",
+                "created_at": "2026-08-03T18:26:42.110658",
+                "updated_at": "2026-08-03T18:26:42.110658",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T18:26:42.537634"
+        },
+        {
+            "old_memory": {
+                "id": 8,
+                "text": "I study Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I am learning Python for data science",
+                "created_at": "2026-08-03T18:30:37.394538",
+                "updated_at": "2026-08-03T18:30:37.394538",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 9,
+                "text": "I am learning Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I built a small pandas script to clean my CSV files",
+                "created_at": "2026-08-03T18:30:42.235889",
+                "updated_at": "2026-08-03T18:30:42.235889",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T18:30:42.671409"
+        },
+        {
+            "old_memory": {
+                "id": 8,
+                "text": "I study Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I am learning Python for data science",
+                "created_at": "2026-08-03T18:32:32.479877",
+                "updated_at": "2026-08-03T18:32:32.479877",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 9,
+                "text": "I am learning Python for data science",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "I built a small pandas script to clean my CSV files",
+                "created_at": "2026-08-03T18:32:37.519465",
+                "updated_at": "2026-08-03T18:32:37.519465",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T18:32:37.966480"
+        },
+        {
+            "old_memory": {
+                "id": 5,
+                "text": "My favorite game is Ghost of Tsushima",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 10,
+                "text": "My favorite game is Sekiro",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "My favorite game is Sekiro",
+                "created_at": "2026-08-03T18:35:31.102021",
+                "updated_at": "2026-08-03T18:35:31.102021",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T18:35:31.478744"
+        },
+        {
+            "old_memory": {
+                "id": 8,
+                "text": "I am 70 kg",
+                "category": "general",
+                "importance": 3,
+                "confidence": 90,
+                "persistence": "unknown",
+                "tags": [
+                    "weight",
+                    "70 kg"
+                ],
+                "source_text": "I am 70 kg",
+                "created_at": "2026-08-03T18:34:51.473481",
+                "updated_at": "2026-08-03T18:34:51.473481",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 0.9,
+                    "canonicalization": 1.0,
+                    "memory": 0.9,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 11,
+                "text": "I weigh 70 kg",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "weight",
+                    "70 kg"
+                ],
+                "source_text": "I weigh 70 kg",
+                "created_at": "2026-08-03T18:35:41.236989",
+                "updated_at": "2026-08-03T18:35:41.236989",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T18:35:41.626740"
+        },
+        {
+            "old_memory": {
+                "id": 3,
+                "text": "My favorite food is chicken curry",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 35
+            },
+            "new_memory": {
+                "id": 8,
+                "text": "My favorite food is rice",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "food",
+                    "rice"
+                ],
+                "source_text": "My favorite food is rice",
+                "created_at": "2026-08-03T18:36:06.702333",
+                "updated_at": "2026-08-03T18:36:06.702333",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-03T18:36:06.958771"
+        },
+        {
+            "old_memory": {
+                "id": 36,
+                "text": "I am pursuing Biotech",
+                "category": "education",
+                "importance": 3,
+                "confidence": 57
+            },
+            "new_memory": {
+                "id": 37,
+                "text": "I prefer movies over indie music",
+                "category": "preference",
+                "importance": 4,
+                "confidence": 39,
+                "persistence": "permanent",
+                "tags": [
+                    "prefer",
+                    "movies",
+                    "indie",
+                    "music"
+                ],
+                "source_text": "I prefer movies over indie music",
+                "created_at": "2026-08-03T21:15:16.584233",
+                "updated_at": "2026-08-03T21:15:16.584233",
+                "confidence_breakdown": {
+                    "stt": 0.87,
+                    "understanding": 0.98,
+                    "canonicalization": 0.84,
+                    "memory": 0.95,
+                    "retrieval": 0.96
+                },
+                "retrieval_confidence": 0.33
+            },
+            "changed_at": "2026-08-03T21:15:16.584233"
+        },
+        {
+            "old_memory": {
+                "id": 37,
+                "text": "My history is from sci-fi novels",
+                "category": "hardware",
+                "importance": 7,
+                "confidence": 76
+            },
+            "new_memory": {
+                "id": 35,
+                "text": "I built a small movies with Kotlin",
+                "category": "programming",
+                "importance": 7,
+                "confidence": 64,
+                "persistence": "permanent",
+                "tags": [
+                    "built",
+                    "small",
+                    "movies",
+                    "kotlin"
+                ],
+                "source_text": "I built a small movies with Kotlin",
+                "created_at": "2026-08-03T21:15:16.584233",
+                "updated_at": "2026-08-03T21:15:16.584233",
+                "confidence_breakdown": {
+                    "stt": 0.82,
+                    "understanding": 0.83,
+                    "canonicalization": 0.98,
+                    "memory": 0.88,
+                    "retrieval": 0.98
+                },
+                "retrieval_confidence": 0.37
+            },
+            "changed_at": "2026-08-03T21:15:16.584233"
+        },
+        {
+            "old_memory": {
+                "id": 37,
+                "text": "I am from Delhi",
+                "category": "identity",
+                "importance": 7,
+                "confidence": 31
+            },
+            "new_memory": {
+                "id": 36,
+                "text": "I prefer coffee over black coffee",
+                "category": "preference",
+                "importance": 1,
+                "confidence": 46,
+                "persistence": "unknown",
+                "tags": [
+                    "prefer",
+                    "coffee",
+                    "black",
+                    "coffee"
+                ],
+                "source_text": "I prefer coffee over black coffee",
+                "created_at": "2026-08-03T21:15:16.584233",
+                "updated_at": "2026-08-03T21:15:16.584233",
+                "confidence_breakdown": {
+                    "stt": 0.95,
+                    "understanding": 0.9,
+                    "canonicalization": 0.89,
+                    "memory": 0.95,
+                    "retrieval": 0.89
+                },
+                "retrieval_confidence": 0.68
+            },
+            "changed_at": "2026-08-03T21:15:16.584233"
+        },
+        {
+            "old_memory": {
+                "id": 34,
+                "text": "I am scheduling learn guitar",
+                "category": "planning",
+                "importance": 6,
+                "confidence": 87
+            },
+            "new_memory": {
+                "id": 35,
+                "text": "My top pick for weather is ramen",
+                "category": "preference",
+                "importance": 6,
+                "confidence": 98,
+                "persistence": "transient",
+                "tags": [
+                    "weather",
+                    "ramen"
+                ],
+                "source_text": "My top pick for weather is ramen",
+                "created_at": "2026-08-03T21:15:16.584233",
+                "updated_at": "2026-08-03T21:15:16.584233",
+                "confidence_breakdown": {
+                    "stt": 0.97,
+                    "understanding": 0.83,
+                    "canonicalization": 0.82,
+                    "memory": 0.85,
+                    "retrieval": 0.98
+                },
+                "retrieval_confidence": 0.5
+            },
+            "changed_at": "2026-08-03T21:15:16.584233"
+        },
+        {
+            "old_memory": {
+                "id": 35,
+                "text": "You should remember that classical music",
+                "category": "memory",
+                "importance": 3,
+                "confidence": 71
+            },
+            "new_memory": {
+                "id": 34,
+                "text": "My major is Computer Engineering",
+                "category": "education",
+                "importance": 9,
+                "confidence": 30,
+                "persistence": "permanent",
+                "tags": [
+                    "major",
+                    "computer",
+                    "engineering"
+                ],
+                "source_text": "My major is Computer Engineering",
+                "created_at": "2026-08-03T21:15:16.584233",
+                "updated_at": "2026-08-03T21:15:16.584233",
+                "confidence_breakdown": {
+                    "stt": 0.9,
+                    "understanding": 0.89,
+                    "canonicalization": 0.91,
+                    "memory": 0.91,
+                    "retrieval": 0.87
+                },
+                "retrieval_confidence": 0.98
+            },
+            "changed_at": "2026-08-03T21:15:16.584233"
+        },
+        {
+            "old_memory": {
+                "id": 37,
+                "text": "My go-to language is TypeScript",
+                "category": "programming",
+                "importance": 6,
+                "confidence": 58
+            },
+            "new_memory": {
+                "id": 35,
+                "text": "I am scheduling learn Rust",
+                "category": "planning",
+                "importance": 4,
+                "confidence": 44,
+                "persistence": "transient",
+                "tags": [
+                    "scheduling",
+                    "learn"
+                ],
+                "source_text": "I am scheduling learn Rust",
+                "created_at": "2026-08-03T21:15:16.584233",
+                "updated_at": "2026-08-03T21:15:16.584233",
+                "confidence_breakdown": {
+                    "stt": 0.86,
+                    "understanding": 1.0,
+                    "canonicalization": 0.89,
+                    "memory": 0.9,
+                    "retrieval": 0.92
+                },
+                "retrieval_confidence": 0.87
+            },
+            "changed_at": "2026-08-03T21:15:16.584233"
+        },
+        {
+            "old_memory": {
+                "id": 96,
+                "text": "It takes me an hour to travel to work",
+                "category": "general",
+                "importance": 9,
+                "confidence": 73
+            },
+            "new_memory": {
+                "id": 95,
+                "text": "My goal is to finish a data dashboard",
+                "category": "project",
+                "importance": 6,
+                "confidence": 98,
+                "persistence": "transient",
+                "tags": [
+                    "finish",
+                    "dashboard"
+                ],
+                "source_text": "My goal is to finish a data dashboard",
+                "created_at": "2026-08-03T21:17:40.581815",
+                "updated_at": "2026-08-03T21:17:40.581815",
+                "confidence_breakdown": {
+                    "stt": 0.98,
+                    "understanding": 0.96,
+                    "canonicalization": 0.94,
+                    "memory": 0.97,
+                    "retrieval": 0.93
+                },
+                "retrieval_confidence": 0.95
+            },
+            "changed_at": "2026-08-03T21:17:40.581815"
+        },
+        {
+            "old_memory": {
+                "id": 96,
+                "text": "I am currently hooked on Stardew Valley",
+                "category": "gaming",
+                "importance": 8,
+                "confidence": 38
+            },
+            "new_memory": {
+                "id": 95,
+                "text": "My favorite color is charcoal",
+                "category": "preference",
+                "importance": 5,
+                "confidence": 38,
+                "persistence": "transient",
+                "tags": [
+                    "favorite",
+                    "color",
+                    "charcoal"
+                ],
+                "source_text": "My favorite color is charcoal",
+                "created_at": "2026-08-03T21:17:40.581815",
+                "updated_at": "2026-08-03T21:17:40.581815",
+                "confidence_breakdown": {
+                    "stt": 0.89,
+                    "understanding": 0.99,
+                    "canonicalization": 0.83,
+                    "memory": 0.96,
+                    "retrieval": 0.95
+                },
+                "retrieval_confidence": 0.91
+            },
+            "changed_at": "2026-08-03T21:17:40.581815"
+        },
+        {
+            "old_memory": {
+                "id": 97,
+                "text": "I remember that my favorite food is butter chicken",
+                "category": "memory",
+                "importance": 3,
+                "confidence": 90
+            },
+            "new_memory": {
+                "id": 97,
+                "text": "I code in Kotlin",
+                "category": "programming",
+                "importance": 2,
+                "confidence": 35,
+                "persistence": "permanent",
+                "tags": [
+                    "kotlin"
+                ],
+                "source_text": "I code in Kotlin",
+                "created_at": "2026-08-03T21:17:40.581815",
+                "updated_at": "2026-08-03T21:17:40.581815",
+                "confidence_breakdown": {
+                    "stt": 0.88,
+                    "understanding": 0.82,
+                    "canonicalization": 0.84,
+                    "memory": 0.85,
+                    "retrieval": 0.93
+                },
+                "retrieval_confidence": 0.92
+            },
+            "changed_at": "2026-08-03T21:17:40.581815"
+        },
+        {
+            "old_memory": {
+                "id": 94,
+                "text": "My favorite color is navy blue",
+                "category": "preference",
+                "importance": 9,
+                "confidence": 30
+            },
+            "new_memory": {
+                "id": 94,
+                "text": "I finished Zelda last week",
+                "category": "gaming",
+                "importance": 3,
+                "confidence": 80,
+                "persistence": "unknown",
+                "tags": [
+                    "finished",
+                    "zelda"
+                ],
+                "source_text": "I finished Zelda last week",
+                "created_at": "2026-08-03T21:17:40.581815",
+                "updated_at": "2026-08-03T21:17:40.581815",
+                "confidence_breakdown": {
+                    "stt": 0.92,
+                    "understanding": 0.87,
+                    "canonicalization": 0.87,
+                    "memory": 0.83,
+                    "retrieval": 1.0
+                },
+                "retrieval_confidence": 0.91
+            },
+            "changed_at": "2026-08-03T21:17:40.581815"
+        },
+        {
+            "old_memory": {
+                "id": 97,
+                "text": "I use a Dell XPS for gaming",
+                "category": "hardware",
+                "importance": 6,
+                "confidence": 61
+            },
+            "new_memory": {
+                "id": 95,
+                "text": "I cook pancakes on weekends",
+                "category": "food",
+                "importance": 10,
+                "confidence": 78,
+                "persistence": "permanent",
+                "tags": [
+                    "pancakes",
+                    "weekends"
+                ],
+                "source_text": "I cook pancakes on weekends",
+                "created_at": "2026-08-03T21:17:40.581815",
+                "updated_at": "2026-08-03T21:17:40.581815",
+                "confidence_breakdown": {
+                    "stt": 0.88,
+                    "understanding": 0.96,
+                    "canonicalization": 0.82,
+                    "memory": 0.98,
+                    "retrieval": 0.9
+                },
+                "retrieval_confidence": 0.51
+            },
+            "changed_at": "2026-08-03T21:17:40.581815"
+        },
+        {
+            "old_memory": {
+                "id": 97,
+                "text": "My hometown is Bangalore",
+                "category": "identity",
+                "importance": 8,
+                "confidence": 98
+            },
+            "new_memory": {
+                "id": 97,
+                "text": "Remember that I study MBA",
+                "category": "memory",
+                "importance": 5,
+                "confidence": 87,
+                "persistence": "unknown",
+                "tags": [
+                    "remember",
+                    "study"
+                ],
+                "source_text": "Remember that I study MBA",
+                "created_at": "2026-08-03T21:17:40.581815",
+                "updated_at": "2026-08-03T21:17:40.581815",
+                "confidence_breakdown": {
+                    "stt": 0.88,
+                    "understanding": 0.84,
+                    "canonicalization": 0.86,
+                    "memory": 0.97,
+                    "retrieval": 0.93
+                },
+                "retrieval_confidence": 0.8
+            },
+            "changed_at": "2026-08-03T21:17:40.581815"
+        },
+        {
+            "old_memory": {
+                "id": 126,
+                "text": "I really enjoy indie rock",
+                "category": "preference",
+                "importance": 4,
+                "confidence": 88
+            },
+            "new_memory": {
+                "id": 124,
+                "text": "I wake up at 9:30",
+                "category": "general",
+                "importance": 4,
+                "confidence": 37,
+                "persistence": "transient",
+                "tags": [],
+                "source_text": "I wake up at 9:30",
+                "created_at": "2026-08-03T21:18:16.577445",
+                "updated_at": "2026-08-03T21:18:16.577445",
+                "confidence_breakdown": {
+                    "stt": 0.86,
+                    "understanding": 0.83,
+                    "canonicalization": 0.92,
+                    "memory": 0.84,
+                    "retrieval": 0.85
+                },
+                "retrieval_confidence": 0.66
+            },
+            "changed_at": "2026-08-03T21:18:16.577445"
+        },
+        {
+            "old_memory": {
+                "id": 125,
+                "text": "My favorite color is olive green",
+                "category": "preference",
+                "importance": 10,
+                "confidence": 51
+            },
+            "new_memory": {
+                "id": 126,
+                "text": "I want to learn Rust next month",
+                "category": "planning",
+                "importance": 4,
+                "confidence": 54,
+                "persistence": "permanent",
+                "tags": [
+                    "learn",
+                    "month"
+                ],
+                "source_text": "I want to learn Rust next month",
+                "created_at": "2026-08-03T21:18:16.577445",
+                "updated_at": "2026-08-03T21:18:16.577445",
+                "confidence_breakdown": {
+                    "stt": 0.86,
+                    "understanding": 0.83,
+                    "canonicalization": 0.97,
+                    "memory": 0.85,
+                    "retrieval": 0.92
+                },
+                "retrieval_confidence": 0.5
+            },
+            "changed_at": "2026-08-03T21:18:16.577445"
+        },
+        {
+            "old_memory": {
+                "id": 125,
+                "text": "My name is Ananya",
+                "category": "identity",
+                "importance": 1,
+                "confidence": 50
+            },
+            "new_memory": {
+                "id": 127,
+                "text": "My best friend is Priya",
+                "category": "social",
+                "importance": 3,
+                "confidence": 69,
+                "persistence": "transient",
+                "tags": [
+                    "friend",
+                    "priya"
+                ],
+                "source_text": "My best friend is Priya",
+                "created_at": "2026-08-03T21:18:16.577445",
+                "updated_at": "2026-08-03T21:18:16.577445",
+                "confidence_breakdown": {
+                    "stt": 0.84,
+                    "understanding": 0.99,
+                    "canonicalization": 0.86,
+                    "memory": 0.88,
+                    "retrieval": 0.82
+                },
+                "retrieval_confidence": 0.74
+            },
+            "changed_at": "2026-08-03T21:18:16.577445"
+        },
+        {
+            "old_memory": {
+                "id": 127,
+                "text": "I usually watch anime on weekends",
+                "category": "general",
+                "importance": 10,
+                "confidence": 84
+            },
+            "new_memory": {
+                "id": 127,
+                "text": "I find genome editing relaxing",
+                "category": "emotional",
+                "importance": 7,
+                "confidence": 70,
+                "persistence": "transient",
+                "tags": [
+                    "genome",
+                    "editing",
+                    "relaxing"
+                ],
+                "source_text": "I find genome editing relaxing",
+                "created_at": "2026-08-03T21:18:16.577445",
+                "updated_at": "2026-08-03T21:18:16.577445",
+                "confidence_breakdown": {
+                    "stt": 0.89,
+                    "understanding": 0.84,
+                    "canonicalization": 0.92,
+                    "memory": 0.95,
+                    "retrieval": 0.91
+                },
+                "retrieval_confidence": 0.65
+            },
+            "changed_at": "2026-08-03T21:18:16.577445"
+        },
+        {
+            "old_memory": {
+                "id": 124,
+                "text": "I would eat ramen every day",
+                "category": "food",
+                "importance": 1,
+                "confidence": 55
+            },
+            "new_memory": {
+                "id": 127,
+                "text": "My best friend is Priya",
+                "category": "social",
+                "importance": 10,
+                "confidence": 95,
+                "persistence": "permanent",
+                "tags": [
+                    "friend",
+                    "priya"
+                ],
+                "source_text": "My best friend is Priya",
+                "created_at": "2026-08-03T21:18:16.577445",
+                "updated_at": "2026-08-03T21:18:16.577445",
+                "confidence_breakdown": {
+                    "stt": 0.87,
+                    "understanding": 0.84,
+                    "canonicalization": 0.85,
+                    "memory": 0.95,
+                    "retrieval": 0.84
+                },
+                "retrieval_confidence": 0.83
+            },
+            "changed_at": "2026-08-03T21:18:16.577445"
+        },
+        {
+            "old_memory": {
+                "id": 124,
+                "text": "My favorite color is navy blue",
+                "category": "preference",
+                "importance": 6,
+                "confidence": 42
+            },
+            "new_memory": {
+                "id": 125,
+                "text": "I am in my 2 year of Physics",
+                "category": "education",
+                "importance": 3,
+                "confidence": 77,
+                "persistence": "transient",
+                "tags": [
+                    "physics"
+                ],
+                "source_text": "I am in my 2 year of Physics",
+                "created_at": "2026-08-03T21:18:16.577445",
+                "updated_at": "2026-08-03T21:18:16.577445",
+                "confidence_breakdown": {
+                    "stt": 0.93,
+                    "understanding": 0.97,
+                    "canonicalization": 0.94,
+                    "memory": 0.93,
+                    "retrieval": 0.92
+                },
+                "retrieval_confidence": 0.55
+            },
+            "changed_at": "2026-08-03T21:18:16.577445"
+        },
+        {
+            "old_memory": {
+                "id": 132,
+                "text": "I study B.Tech Computer Science Engineering",
+                "category": "education",
+                "importance": 9,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "degree",
+                    "btech"
+                ],
+                "source_text": "tell me about the btec course that i am currently studying in",
+                "created_at": "2026-08-04T04:55:20.641883",
+                "updated_at": "2026-08-04T04:55:20.641883",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 133,
+                "text": "I study B.Tech",
+                "category": "education",
+                "importance": 9,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "degree",
+                    "btech"
+                ],
+                "source_text": "okay whats my laptop model",
+                "created_at": "2026-08-04T04:59:56.671783",
+                "updated_at": "2026-08-04T04:59:56.671783",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-04T04:59:59.153141"
+        },
+        {
+            "old_memory": {
+                "id": 133,
+                "text": "I study B.Tech",
+                "category": "education",
+                "importance": 9,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "degree",
+                    "btech"
+                ],
+                "source_text": "okay whats my laptop model",
+                "created_at": "2026-08-04T04:55:20.641883",
+                "updated_at": "2026-08-04T04:59:59.153141",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 134,
+                "text": "I study B.Tech Computer Science Engineering",
+                "category": "education",
+                "importance": 9,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "degree",
+                    "btech"
+                ],
+                "source_text": "this means this topic",
+                "created_at": "2026-08-04T05:04:59.371201",
+                "updated_at": "2026-08-04T05:04:59.371201",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-04T05:05:01.520743"
+        },
+        {
+            "old_memory": {
+                "id": 127,
+                "text": "My go-to comfort food is lasagna",
+                "category": "food",
+                "importance": 5,
+                "confidence": 79,
+                "persistence": "permanent",
+                "tags": [
+                    "go-to",
+                    "comfort",
+                    "lasagna"
+                ],
+                "source_text": "My go-to comfort food is lasagna",
+                "created_at": "2026-07-27T10:18:16.573504",
+                "updated_at": "2026-07-27T10:18:16.573504",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 0.8,
+                    "canonicalization": 0.91,
+                    "memory": 0.8,
+                    "retrieval": 0.8
+                },
+                "retrieval_confidence": 0.9
+            },
+            "new_memory": {
+                "id": 135,
+                "text": "My favorite food is lasagna",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "my favorite food is lasagna",
+                "created_at": "2026-08-04T05:47:28.841556",
+                "updated_at": "2026-08-04T05:47:28.841556",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-04T05:47:29.337627"
+        },
+        {
+            "old_memory": {
+                "id": 136,
+                "text": "My favorite drink is buttermilk",
+                "category": "general",
+                "importance": 3,
+                "confidence": 30,
+                "persistence": "unknown",
+                "tags": [],
+                "source_text": "my favorite drink is buttermilk",
+                "created_at": "2026-08-05T16:57:56.733846",
+                "updated_at": "2026-08-05T16:57:56.733846",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 0.3,
+                    "canonicalization": 1.0,
+                    "memory": 0.3,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 231,
+                "text": "My favorite drink is coffee",
+                "category": "preference",
+                "importance": 7,
+                "confidence": 30,
+                "persistence": "permanent",
+                "tags": [],
+                "source_text": null,
+                "created_at": "2026-08-05T17:06:13.630417",
+                "updated_at": "2026-08-05T17:06:13.630417",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 0.3,
+                    "canonicalization": 1.0,
+                    "memory": 0.3,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-05T17:06:14.737352"
+        },
+        {
+            "old_memory": {
+                "id": 117,
+                "text": "My hometown is Mumbai",
+                "category": "identity",
+                "importance": 2,
+                "confidence": 84,
+                "persistence": "permanent",
+                "tags": [
+                    "hometown",
+                    "mumbai"
+                ],
+                "source_text": "My hometown is Mumbai",
+                "created_at": "2026-07-18T08:18:16.571494",
+                "updated_at": "2026-07-18T08:18:16.571494",
+                "confidence_breakdown": {
+                    "stt": 0.83,
+                    "understanding": 0.93,
+                    "canonicalization": 0.99,
+                    "memory": 1.0,
+                    "retrieval": 0.94
+                },
+                "retrieval_confidence": 0.78
+            },
+            "new_memory": null,
+            "changed_at": "2026-08-05T19:50:15.643915"
+        },
+        {
+            "old_memory": {
+                "id": 137,
+                "text": "I am from Tokyo",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "tokyo",
+                    "from"
+                ],
+                "source_text": "update your memory im from tokyo not mumbai",
+                "created_at": "2026-08-05T19:48:32.373393",
+                "updated_at": "2026-08-05T19:48:32.373393",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": null,
+            "changed_at": "2026-08-05T19:50:15.670008"
+        },
+        {
+            "old_memory": {
+                "id": 104,
+                "text": "I told you before that I play Zelda",
+                "category": "memory",
+                "importance": 9,
+                "confidence": 73,
+                "persistence": "permanent",
+                "tags": [
+                    "before",
+                    "zelda"
+                ],
+                "source_text": "I told you before that I play Zelda",
+                "created_at": "2026-07-05T09:18:16.571494",
+                "updated_at": "2026-07-05T09:18:16.571494",
+                "confidence_breakdown": {
+                    "stt": 0.85,
+                    "understanding": 0.9,
+                    "canonicalization": 0.85,
+                    "memory": 0.82,
+                    "retrieval": 0.83
+                },
+                "retrieval_confidence": 0.5
+            },
+            "new_memory": {
+                "id": 139,
+                "text": "I remember that I just told you to update your memory and forget about Interstellar, but now I think Inception is my current favorite movie.",
+                "category": "general",
+                "importance": 1,
+                "confidence": 50,
+                "persistence": "temporal",
+                "tags": [],
+                "source_text": "i just like inception more than interstellar right now so i told you to update your memory and forget about interstellar and being my current favorite movie",
+                "created_at": "2026-08-05T19:56:19.714838",
+                "updated_at": "2026-08-05T19:56:19.714838",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 0.5,
+                    "canonicalization": 1.0,
+                    "memory": 0.5,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-05T19:56:22.245443"
+        },
+        {
+            "old_memory": {
+                "id": 114,
+                "text": "Remember that I study Computer Engineering",
+                "category": "memory",
+                "importance": 5,
+                "confidence": 73,
+                "persistence": "transient",
+                "tags": [
+                    "remember",
+                    "study",
+                    "computer",
+                    "engineering"
+                ],
+                "source_text": "Remember that I study Computer Engineering",
+                "created_at": "2026-06-07T13:18:16.571494",
+                "updated_at": "2026-06-07T13:18:16.571494",
+                "confidence_breakdown": {
+                    "stt": 0.99,
+                    "understanding": 0.81,
+                    "canonicalization": 0.82,
+                    "memory": 0.83,
+                    "retrieval": 0.95
+                },
+                "retrieval_confidence": 0.75
+            },
+            "new_memory": {
+                "id": 140,
+                "text": "I am planning to take admission in a B.Tech Computer Science Engineering course",
+                "category": "education",
+                "importance": 9,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "admission",
+                    "btech",
+                    "computer science engineering"
+                ],
+                "source_text": "i am planning to take admission in a btec computer science engineering course do you have anything to say",
+                "created_at": "2026-08-05T19:57:05.093601",
+                "updated_at": "2026-08-05T19:57:05.093601",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-05T19:57:07.759508"
+        },
+        {
+            "old_memory": {
+                "id": 99,
+                "text": "My favorite topic is quantum computing",
+                "category": "science",
+                "importance": 4,
+                "confidence": 41,
+                "persistence": "permanent",
+                "tags": [
+                    "favorite",
+                    "topic",
+                    "quantum",
+                    "computing"
+                ],
+                "source_text": "My favorite topic is quantum computing",
+                "created_at": "2026-06-24T08:18:16.571494",
+                "updated_at": "2026-06-24T08:18:16.571494",
+                "confidence_breakdown": {
+                    "stt": 0.82,
+                    "understanding": 0.93,
+                    "canonicalization": 0.82,
+                    "memory": 0.86,
+                    "retrieval": 0.85
+                },
+                "retrieval_confidence": 0.41
+            },
+            "new_memory": {
+                "id": 142,
+                "text": "I like Frappe more than Inception as my current favorite movie",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "favorite",
+                    "movie"
+                ],
+                "source_text": "i meant frappe",
+                "created_at": "2026-08-05T19:58:11.979194",
+                "updated_at": "2026-08-05T19:58:11.979194",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-05T19:58:14.916006"
+        },
+        {
+            "old_memory": {
+                "id": 146,
+                "text": "The Spotify application is open now.",
+                "category": "general",
+                "importance": 1,
+                "confidence": 100,
+                "persistence": "temporal",
+                "tags": [],
+                "source_text": "open spotify",
+                "created_at": "2026-08-07T16:23:24.640080",
+                "updated_at": "2026-08-07T16:23:24.640080",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 148,
+                "text": "I'm open Spotify in the default browser.",
+                "category": "general",
+                "importance": 1,
+                "confidence": 100,
+                "persistence": "temporal",
+                "tags": [],
+                "source_text": "open spotify",
+                "created_at": "2026-08-07T23:11:06.929014",
+                "updated_at": "2026-08-07T23:11:06.929014",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-07T23:11:10.359276"
+        },
+        {
+            "old_memory": {
+                "id": 148,
+                "text": "I'm open Spotify in the default browser.",
+                "category": "general",
+                "importance": 1,
+                "confidence": 100,
+                "persistence": "temporal",
+                "tags": [],
+                "source_text": "open spotify",
+                "created_at": "2026-08-07T16:23:24.640080",
+                "updated_at": "2026-08-07T23:11:10.357275",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 149,
+                "text": "I'm currently open on the Spotify application, as I was previously used to manage a different task.",
+                "category": "general",
+                "importance": 1,
+                "confidence": 100,
+                "persistence": "temporal",
+                "tags": [],
+                "source_text": "open spotify",
+                "created_at": "2026-08-07T23:12:08.108439",
+                "updated_at": "2026-08-07T23:12:08.108439",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-07T23:12:11.301288"
+        },
+        {
+            "old_memory": {
+                "id": 152,
+                "text": "The C Lab folder is empty, except for one subfolder named \"exam\".",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "c lab",
+                    "c drive"
+                ],
+                "source_text": "thanks for watching",
+                "created_at": "2026-08-09T07:37:33.912555",
+                "updated_at": "2026-08-09T07:37:33.912555",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 153,
+                "text": "My Python Projects folder in the C Drive is empty, except for one subfolder named \"exam\".",
+                "category": "general",
+                "importance": 3,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "c drive",
+                    "python projects"
+                ],
+                "source_text": "tell me whats inside my python projects folder in c drive",
+                "created_at": "2026-08-09T07:41:12.160176",
+                "updated_at": "2026-08-09T07:41:12.160176",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-09T07:41:15.303078"
+        },
+        {
+            "old_memory": {
+                "id": 143,
+                "text": "I want to learn Python and have no prior experience with programming",
+                "category": "education",
+                "importance": 9,
+                "confidence": 100,
+                "persistence": "permanent",
+                "tags": [
+                    "python",
+                    "programming"
+                ],
+                "source_text": "i just want to learn python help me",
+                "created_at": "2026-08-06T21:22:16.009507",
+                "updated_at": "2026-08-06T21:22:16.009507",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "new_memory": {
+                "id": 154,
+                "text": "The Python Projects folder in the C Drive is not empty, except for one subfolder named \"exam\", and the C Lab folder is also not empty, except for one subfolder named \"exam\".",
+                "category": "general",
+                "importance": 1,
+                "confidence": 100,
+                "persistence": "temporal",
+                "tags": [],
+                "source_text": "first of all the clap folder is not completely empty it has many more subfolders except the exam folder and second of all the python projects folder doesnt contain the exam folder it has many more files and the directory name rocktripper scissor inside it so you are mixing up two different folders",
+                "created_at": "2026-08-09T07:43:27.683127",
+                "updated_at": "2026-08-09T07:43:27.683127",
+                "confidence_breakdown": {
+                    "stt": 1.0,
+                    "understanding": 1.0,
+                    "canonicalization": 1.0,
+                    "memory": 1.0,
+                    "retrieval": 1.0
+                }
+            },
+            "changed_at": "2026-08-09T07:43:31.063748"
+        }
+    ]
+}

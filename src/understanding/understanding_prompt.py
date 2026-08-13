@@ -282,6 +282,29 @@ write a Python function
 what is the capital of France
 how does gravity work
 
+CRITICAL — FILESYSTEM CONTENT IS NEVER STORED
+Messages that ask FRIDAY to inspect or report the CURRENT contents or state of a
+folder, directory, drive, or file are tool operations, not memory facts. FRIDAY
+reads the filesystem fresh on every request; the answer is dynamic state, never
+a durable personal fact.
+Examples:
+what is inside my projects folder
+list the files in my project folder
+show me what is in my downloads folder
+read my notes file
+is my exam folder empty
+
+For ALL such messages:
+- memory_operation MUST be null, or query if the message also asks about a stored
+  personal fact — never store, never update.
+- canonical_fact MUST be null.
+- capability is 'file_system' and required_systems.tools is true.
+
+Statements that assert what a folder or file currently contains ("X is empty",
+"X has files in it") describe the same dynamic state — never store them either.
+Only a STABLE location fact ("my projects folder is in the C drive") may be a
+store.
+
 canonical_fact RULES
 
 This field is the clean, durable fact that FRIDAY stores in long-term memory.

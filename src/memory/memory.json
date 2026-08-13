@@ -708,28 +708,6 @@
             }
         },
         {
-            "id": 143,
-            "text": "I want to learn Python and have no prior experience with programming",
-            "category": "education",
-            "importance": 9,
-            "confidence": 100,
-            "persistence": "permanent",
-            "tags": [
-                "python",
-                "programming"
-            ],
-            "source_text": "i just want to learn python help me",
-            "created_at": "2026-08-06T21:22:16.009507",
-            "updated_at": "2026-08-06T21:22:16.009507",
-            "confidence_breakdown": {
-                "stt": 1.0,
-                "understanding": 1.0,
-                "canonicalization": 1.0,
-                "memory": 1.0,
-                "retrieval": 1.0
-            }
-        },
-        {
             "id": 144,
             "text": "launched at gbt",
             "category": "general",
@@ -844,6 +822,170 @@
             "source_text": "launch linkedin",
             "created_at": "2026-08-08T00:30:36.004180",
             "updated_at": "2026-08-08T00:30:36.004180",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 152,
+            "text": "You are mixing up things. I did not ask for the src folder, you asked for the srczip folder.",
+            "category": "general",
+            "importance": 1,
+            "confidence": 100,
+            "persistence": "temporal",
+            "tags": [],
+            "source_text": "you are mixing up things i didnt ask for src folder i asked for srczip folder",
+            "created_at": "2026-08-10T00:39:37.860191",
+            "updated_at": "2026-08-10T00:39:37.860191",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 153,
+            "text": "Lenovo Vantage is open.",
+            "category": "general",
+            "importance": 1,
+            "confidence": 100,
+            "persistence": "temporal",
+            "tags": [
+                "lenovo vantage"
+            ],
+            "source_text": "launch lenovo vantage",
+            "created_at": "2026-08-10T00:45:06.608563",
+            "updated_at": "2026-08-10T00:45:06.608563",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 154,
+            "text": "the weather of Siliguri",
+            "category": "general",
+            "importance": 1,
+            "confidence": 100,
+            "persistence": "temporal",
+            "tags": [],
+            "source_text": "thats the weather of siliguri in chrome",
+            "created_at": "2026-08-11T03:49:55.313631",
+            "updated_at": "2026-08-11T03:49:55.313631",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 155,
+            "text": "My favorite language is Python",
+            "category": "general",
+            "importance": 3,
+            "confidence": 100,
+            "persistence": "permanent",
+            "tags": [
+                "python"
+            ],
+            "source_text": "remember my favorite language is python",
+            "created_at": "2026-08-11T21:01:54.402153",
+            "updated_at": "2026-08-11T21:01:54.402153",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 156,
+            "text": "My favorite color is blue",
+            "category": "general",
+            "importance": 3,
+            "confidence": 100,
+            "persistence": "permanent",
+            "tags": [
+                "favorite color",
+                "blue"
+            ],
+            "source_text": "remember my favorite color is blue",
+            "created_at": "2026-08-11T22:07:08.523343",
+            "updated_at": "2026-08-11T22:07:08.523343",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 157,
+            "text": "My favorite animal is cat",
+            "category": "general",
+            "importance": 3,
+            "confidence": 100,
+            "persistence": "permanent",
+            "tags": [
+                "cat"
+            ],
+            "source_text": "remember my favorite animal is cat",
+            "created_at": "2026-08-11T22:59:33.144426",
+            "updated_at": "2026-08-11T22:59:33.144426",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 159,
+            "text": "Prepe is a coffee brand",
+            "category": "general",
+            "importance": 3,
+            "confidence": 100,
+            "persistence": "permanent",
+            "tags": [
+                "coffee",
+                "prepe"
+            ],
+            "source_text": "no no you are still doing it wrong prepe isnt a movie its a coffee brand that theres nothing called prepe",
+            "created_at": "2026-08-14T03:59:38.622677",
+            "updated_at": "2026-08-14T04:00:24.584638",
+            "confidence_breakdown": {
+                "stt": 1.0,
+                "understanding": 1.0,
+                "canonicalization": 1.0,
+                "memory": 1.0,
+                "retrieval": 1.0
+            }
+        },
+        {
+            "id": 160,
+            "text": "Frappe is a coffee brand, not a movie; Peep is not a known entity.",
+            "category": "general",
+            "importance": 1,
+            "confidence": 100,
+            "persistence": "temporal",
+            "tags": [],
+            "source_text": "no you got it wrong frappe isnt a movie frappe is a coffee brand and peep theres nothing called peep",
+            "created_at": "2026-08-14T04:01:12.839504",
+            "updated_at": "2026-08-14T04:01:12.839504",
             "confidence_breakdown": {
                 "stt": 1.0,
                 "understanding": 1.0,

@@ -37,6 +37,25 @@ def _float_or_none(value):
         return None
 
 
+def _float_confidence(value):
+    """Coerce a model-supplied confidence into a valid float.
+
+    The Understanding model can emit an explicit ``null`` (or any
+    non-numeric value) for ``confidence``; ``dict.get`` only defaults
+    when the key is missing, so a ``null`` previously survived as
+    ``None`` and crashed downstream comparisons (``None < 0.5``).
+    ``None``/invalid maps to 0.0 — identical to the pre-existing
+    missing-key default — so a malformed message now behaves exactly
+    like a message with no confidence field, never a crash.
+    """
+    try:
+        if value is None:
+            return 0.0
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
 # Closed-class English words that may appear capitalized mid-sentence
 # ("Priya and I built a chess bot") without being invented proper
 # nouns. A token is checked against this set, the user's message,
@@ -657,8 +676,8 @@ class UnderstandingOrchestrator:
         understanding.metadata = raw_understanding.get(
             "metadata", {}
         )
-        understanding.confidence = raw_understanding.get(
-            "confidence", 0.0
+        understanding.confidence = _float_confidence(
+            raw_understanding.get("confidence", 0.0)
         )
 
         # =====================================

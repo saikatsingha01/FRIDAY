@@ -244,10 +244,10 @@ _orchestrator: Optional[UniversalSearchOrchestrator] = None
 
 
 def get_orchestrator() -> UniversalSearchOrchestrator:
-    """Get or create the global search orchestrator."""
+    """Get or create the global search orchestrator with providers initialized."""
     global _orchestrator
     if _orchestrator is None:
-        _orchestrator = UniversalSearchOrchestrator()
+        _orchestrator = initialize_orchestrator()
     return _orchestrator
 
 

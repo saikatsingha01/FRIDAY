@@ -230,7 +230,8 @@ _VERSION_RE = _re.compile(r"\b\d+(?:\.\d+)+(?:[a-z]?)\b")
 _DATE_RE = _re.compile(r"\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{1,2},?\s+\d{4}\b", _re.IGNORECASE)
 _SPEC_RE = _re.compile(r"\b(?:rtx|gtx|rx|ryzen|core|i\d|ryzen)\s*\d{3,4}\b", _re.IGNORECASE)
 # Temperature/weather patterns (Celsius, Fahrenheit, Kelvin, degree symbols)
-_TEMP_RE = _re.compile(r"\b\d+(?:\.\d+)?\s*(?:°[cfk]|degrees?\s*(?:celsius|fahrenheit|kelvin)|[cfk])\b", _re.IGNORECASE)
+# Also accept quotation marks (U+201C/U+201D) which some search engines use as degree symbols
+_TEMP_RE = _re.compile(r"\b\d+(?:\.\d+)?\s*(?:[°\"\u201c\u201d][cfk]|degrees?\s*(?:celsius|fahrenheit|kelvin)|[cfk])\b", _re.IGNORECASE)
 # Weather condition patterns
 _WEATHER_CONDITION_RE = _re.compile(r"\b(?:sunny|cloudy|rainy|snowy|windy|humid|clear|overcast|partly\s+cloudy|mostly\s+(?:sunny|cloudy)|scattered\s+(?:showers|thunderstorms)|chance\s+of\s+(?:rain|snow|thunderstorms))\b", _re.IGNORECASE)
 # Humidity/pressure/wind patterns

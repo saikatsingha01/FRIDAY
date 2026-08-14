@@ -34,7 +34,7 @@ class GeminiSearchProvider(SearchProvider):
     """
 
     PROVIDER_NAME = "gemini"
-    DEFAULT_MODEL = "gemini-1.5-flash"
+    DEFAULT_MODEL = "gemini-2.5-flash"
     BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/"
 
     # Error message patterns for classification

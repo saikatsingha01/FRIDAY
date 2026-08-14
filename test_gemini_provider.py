@@ -186,12 +186,12 @@ def test_provider_initialization():
     
     assert provider.PROVIDER_NAME == "gemini"
     assert provider.get_key_id() == "test_1"
-    assert provider.model == "gemini-1.5-flash"
+    assert provider.model == "gemini-2.5-flash"
     assert provider.is_healthy() == True
     
     # Test with custom model
-    provider2 = GeminiSearchProvider(api_key="test_key", key_id="test_2", model="gemini-2.0-flash")
-    assert provider2.model == "gemini-2.0-flash"
+    provider2 = GeminiSearchProvider(api_key="test_key", key_id="test_2", model="gemini-2.5-flash")
+    assert provider2.model == "gemini-2.5-flash"
     
     print("[OK] test_provider_initialization passed")
 

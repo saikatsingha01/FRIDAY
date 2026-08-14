@@ -60,7 +60,7 @@ randomized stress run, seed 20260804, 2026-08-05).
 | Voice Pipeline | — | No coverage (see KI-02 STT accuracy) |
 | Planning | — | No coverage |
 | Reasoning | FRIDAY-008 (routing) | Only boolean use_memory/use_episodes covered |
-| Response Generation | — | No coverage |
+| Response Generation | FRIDAY-015 (KI-013) | Grounding guard rejects valid temp claims due to quote-degree symbols |
 | Performance | — | Serial LLM write phase is the test-run bottleneck |
 | Testing Infrastructure | FRIDAY-014 | Harness lives in %TEMP%; no write-outcome logging in R tests |
 | Other | — | Repo has large uncommitted working tree |
@@ -299,6 +299,7 @@ larger pools, per-5-test checkpointing.
 | FRIDAY-012 | Session-end/dismissal message stored as fact | RC-05 | Medium | 3 | Memory Storage | end-session analyzer, `memory_decision.py` | G: dismissal/session-end | no write | op=store (19) / op=update (1) | Extend dismissal classifier with observed phrasings | Low–med | Open | 2026-08-05 |
 | FRIDAY-013 | Conversational no-write message occasionally stored | RC-05 | Medium | 3 | Conversation Flow | `memory_decision.py` | D: conversational msg | no write | op=store (5) | Tighten store branch: require concrete value | Low–med | Open | 2026-08-05 |
 | FRIDAY-014 | R-sem/R-pro harness does not log write outcome | — | High | 2 | Testing Infrastructure | `random_stress.py` (exec_R block) | any R-sem/R-pro | write result recorded | results=0 only | Record mf1 op/present in `actual`; re-run R (60+30) | Low | Open | 2026-08-05 |
+| FRIDAY-015 | Grounding guard rejects valid temp claims (quote-degree symbols) | KI-013 | Medium | 3 | Response Generation | `response_generator.py` | "weather in siliguri" | Correct weather answer | "no verified weather info" | Expand `_TEMP_RE` to accept quote-degree symbols | Low | Fixed 2026-08-15 | 2026-08-15 |
 
 *Severity: Critical > High > Medium > Low > Cosmetic. Priority: 1 = next, 2 = soon, 3 = later.*
 
@@ -318,6 +319,7 @@ larger pools, per-5-test checkpointing.
 ## Medium
 - **FRIDAY-009 / FRIDAY-010 / FRIDAY-011** — Retrieval low-recall.
 - **FRIDAY-012 / FRIDAY-013** — Over-eager writes.
+- **FRIDAY-015** — Grounding guard rejects valid temp claims (quote-degree symbols) — **Fixed 2026-08-15**.
 
 ## Low
 - **FRIDAY-006** — Context followup ignored.
@@ -337,6 +339,7 @@ larger pools, per-5-test checkpointing.
 | Spec id-range overlap (D 13000 / E 14000) | 2026-08-05 | Non-overlapping ranges A=10000…R=16300; total 5000 confirmed | Guarded |
 | Pool exhaustion under 2-unique-strings load | 2026-08-05 | Pool headroom + DRINK expanded to 86; generation completes 0.03s | Guarded |
 | Education fact categorized as `device`; query fell back to `preference` (KI-004) | 2026-08-03 | KI-004 verification suite (lasagna store→forget round trip; general-to-food update) | Guarded (in SESSION_LOG) |
+| Grounding guard rejects valid temp claims — quote-degree symbols (KI-013) | 2026-08-15 | Weather query test; `_TEMP_RE` matches quote-degree symbols | Guarded |
 
 ---
 

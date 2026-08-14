@@ -1,3 +1,8 @@
+from dotenv import load_dotenv
+
+# Load .env file at startup - must be before any code that reads env vars
+load_dotenv()
+
 from src.greeting import start
 from src.utils.logger import log
 from src.utils.config import load_settings

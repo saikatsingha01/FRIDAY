@@ -1,3 +1,8 @@
+from dotenv import load_dotenv
+
+# Load .env file at startup - must be before any code that reads env vars
+load_dotenv()
+
 from src.speech.speech_speaker import speak
 from src.speech.speech_recognizer import transcribe
 from src.speech.voice_detector import listen

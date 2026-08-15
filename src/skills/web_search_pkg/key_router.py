@@ -109,6 +109,7 @@ class APIKeyRouter:
         Expected format:
         - {PREFIX}_API_KEY or {PREFIX}_API_KEY_1, {PREFIX}_API_KEY_2, ...
         - {PREFIX}_CSE_ID or {PREFIX}_CSE_ID_1, {PREFIX}_CSE_ID_2, ... (optional)
+        - {PREFIX}_MODEL or {PREFIX}_MODEL_1, {PREFIX}_MODEL_2, ... (optional, model override per key)
         
         Returns number of keys loaded.
         """
@@ -117,27 +118,31 @@ class APIKeyRouter:
         # Check for single key (no number suffix)
         base_key = f"{prefix}_API_KEY" if prefix else "GEMINI_API_KEY"
         base_cse = f"{prefix}_CSE_ID" if prefix else "GEMINI_CSE_ID"
+        base_model = f"{prefix}_MODEL" if prefix else "GEMINI_MODEL"
         
         if base_key in os.environ:
             cse_id = os.environ.get(base_cse, "")
-            self.add_key(f"{self.provider_name}_1", os.environ[base_key], cse_id=cse_id)
+            model = os.environ.get(base_model, "")
+            config = {"model": model} if model else {}
+            self.add_key(f"{self.provider_name}_1", os.environ[base_key], cse_id=cse_id, **config)
             loaded += 1
         
-        # Check for numbered keys
+        # Check for numbered keys: GEMINI_API_KEY_1, GEMINI_API_KEY_2, ...
         for i in range(1, 100):
-            key_name = f"{base_key}_{i}" if i > 1 else base_key
-            cse_name = f"{base_cse}_{i}" if i > 1 else base_cse
+            key_name = f"{base_key}_{i}"
+            cse_name = f"{base_cse}_{i}"
+            model_name = f"{base_model}_{i}"
             
             if key_name not in os.environ:
-                if i == 1 and loaded > 0:
-                    continue
                 break
             
             cse_id = os.environ.get(cse_name, "")
-            key_id = f"{self.provider_name}_{i}"
+            model = os.environ.get(model_name, "")
+            config = {"model": model} if model else {}
+            key_id = f"{self.provider_name}_{i + 1}"
             
             if key_id not in self._keys:
-                self.add_key(key_id, os.environ[key_name], cse_id=cse_id)
+                self.add_key(key_id, os.environ[key_name], cse_id=cse_id, **config)
                 loaded += 1
         
         return loaded

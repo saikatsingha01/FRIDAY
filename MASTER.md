@@ -4,8 +4,8 @@ This document is the permanent, detailed engineering handoff for the FRIDAY
 project. Its purpose is to let any future AI agent (or engineer) continue
 development without rewriting or breaking the architecture. Everything here
 was reconstructed from actual repository inspection on 2026-08-09 and
-refreshed on 2026-08-10; nothing is invented. Where the repo is silent, that
-is stated explicitly.
+refreshed on 2026-08-10 and 2026-08-18; nothing is invented. Where the repo
+is silent, that is stated explicitly.
 
 Canonical sources (never contradict them silently):
 `docs/ROADMAP.md`, `docs/PROJECT_BIBLE.md`, `docs/ARCHITECTURE.md`,
@@ -32,7 +32,7 @@ machine through permission-gated tools. V1 (Phases 1-5) is implemented,
 stable, and honest by construction: every machine claim is produced or
 verified by a deterministic layer, never by the small LLM's narration alone.
 
-### The three "filesystem truth" fix cycles — ALL COMPLETE (the current edge)
+### The filesystem-truth fix cycles — ALL COMPLETE (the current edge)
 1. **2026-08-09 — KI-013**: directory listings were stored as durable memory
    facts and the LLM answered contents questions from stale/contaminated
    data. Fixed: `memory_analyzer` Rule-14 store gate + "FILESYSTEM CONTENT IS
@@ -55,8 +55,39 @@ verified by a deterministic layer, never by the small LLM's narration alone.
    locate-ask pass-through, and `guard_path_response` (a local absolute path
    is spoken ONLY when a successful current `file_manager` result produced
    it), chained in `_final_response` after the listing guard. (§10)
+4. **2026-08-16/17 — deep-navigation hierarchy fix**: after deeper
+   navigation ("python revision" → "chapter 1" → "examples"), follow-up asks
+   ("tell me whats inside the examples folder") failed — the old Section 5b
+   relative resolution was broken (deterministic first-hit global fuzzy hits
+   picked stale leftover folders). Fixed: bounded session **discovery
+   registry** + **context chain** + `last_listed_scope`/`active_folder_context`
+   in `path_resolver.py` (new `_hierarchy_lookup` tiers, global search only
+   as fall-through), and `file_manager._list`/`_read`/`_locate` register
+   every verified object into the registry. (§11)
+5. **2026-08-17 — empty_path + spoken-number fix**: "tell me whats inside
+   the examples" and "chapter one folder" → `parameters={}` `empty_path`
+   failures. Root causes proven: (1) `_raw_filesystem_reference` had a
+   `len(keep) < 2` rule that killed single-word folder names ("examples",
+   "exam") whenever the small Understanding model dropped entities;
+   (2) "one" was a `_FS_FRAME_WORDS` member, stripping "chapter one" to
+   nothing. Fixed: single-token recovery; compound spoken-number parser
+   ("chapter twenty one"→21, "two hundred five"→205); same-parent
+   canonical ambiguity ("chapter one" never picks chapter 10). (§12)
+6. **2026-08-18 — routing-drift fix (KI-015)**: a REAL production log
+   (2026-08-17, 08:28–08:32) showed every folder-content query
+   ("tell me whats inside the exam folder", "the lab 3 folder", "its inside
+   the c lab folder…") firing `web_search` and the response model
+   hallucinating contents (exam1/exam2, "test.py"). Root cause: the
+   Understanding model classified the turns `category=search` and the
+   variant table maps `"search"→"web"` → capability=web; the fs-query
+   rescue was blocked by `goal not in _NON_FILE_GOALS` and
+   `tool_cap != "web"`. Fixed: decisive raw-text fs gate `_fs_decisive()`
+   (inside phrase + fs noun; list/show/read + fs noun; or a session-verified
+   object via new `context_knows()`), pins to file_manager and forces web
+   off; genuine web questions ("whats inside a black hole", "whats in the
+   news") are never hijacked. (§13)
 
-### Verified test state (all re-run 2026-08-10, all PASS)
+### Verified test state (latest re-run 2026-08-18, all PASS)
 | Suite | Result |
 |---|---|
 | `locate_guard_regression.py` | 25/25 (incl. contamination A→B→A, failure→success, web→locate) |
@@ -68,6 +99,10 @@ verified by a deterministic layer, never by the small LLM's narration alone.
 | `p9_fs_accuracy_suite.py` | 128/128 + 6/6 LIVE |
 | `fs14_analyzer_gate_suite.py` | 37/37 |
 | `manual_weather_real.py` | PASS (Siliguri → web only; srczip → 4 real matches; AC3 → honest not-found) |
+| `test_navigation_flow.py` (repo root, 18 tests) | 18/18 — the 9 navigation scenarios + 5 routing-drift regressions (folder asks with the worst-case fabricated web classification + `use_web=True` always land on `file_manager`; genuine web asks always stay on `web_search`) |
+| `test_hierarchy_resolution.py` (repo root, 13 tests) | 13/13 — session hierarchy/registry/context-chain resolution |
+| `test_universal_fix.py` (repo root, 6 tests) | 6/6 |
+| `test_scenario_b.py` / `test_c_lab_exam.py` / `test_fix.py` / `test_verify_fix.py` (repo root) | PASS — legacy live navigation on real `C:\c lab`/`C:\python revision` trees |
 Real `memory.json`: **40 facts, 0 listing facts** (additions are the user's
 real conversational facts, not contamination).
 
@@ -85,11 +120,18 @@ Phase-8 vector memory — deferred until ROADMAP allows.
 - `guard_listing_response` + `guard_path_response` run on every final reply
   (in that order, then TTS cleanup). They are deterministic and must never be
   bypassed or loosened.
-- No `tests/` directory, no CI; suites live in
+- No `tests/` directory, no CI; the newer filesystem suites live in the
+  REPO ROOT (`test_navigation_flow.py`, `test_hierarchy_resolution.py`,
+  `test_universal_fix.py`, `test_scenario_b.py`, `test_c_lab_exam.py`,
+  `test_fix.py`, `test_verify_fix.py`); the older suites live in
   `C:\Users\polis\AppData\Local\Temp\opencode\`; fixture roots
   `C:\Users\polis\friday_fs_suite` (persistent) and
   `C:\Users\polis\friday_locguard_suite` (created/deleted by suite teardown).
   Do not run suites without user approval.
+- Leftover machine artifacts from earlier sessions (cause deterministic
+  first-hit global fuzzy hits in tests): `C:\Users\polis\other_exam_final`,
+  `C:\Users\polis\other_chapter_1_final`, `C:\test_friday_bug\python
+  revision\chapter 1`. Do not delete without user approval.
 - Residual, documented, no code change made: KI-010 (open-file-explorer
   mis-launch), KI-011 (launch-turn reply echo), KI-012 (non-Windows
   known-folder OneDrive limitation). Live-voice validation still pending.
@@ -176,6 +218,26 @@ feature from the roadmap exists in code.
   result produced it) chained in `brain._final_response` after the listing
   guard. Closes fabricated local paths (srczip/python-installer/AC3 evidence
   in FILESYSTEM_AUDIT_REPORT §10; `locate_guard_regression` 25/25).
+- Session hierarchy fix (2026-08-16/17): `path_resolver.py` — bounded
+  discovery registry + context chain + `last_listed_scope`/
+  `active_folder_context`, `_hierarchy_lookup` replaces the broken Section
+  5b relative resolution, spoken compound numbers ("chapter twenty one"→21),
+  same-parent canonical ambiguity; `file_manager._list`/`_read`/`_locate`
+  register every verified object. (§11; `test_hierarchy_resolution` 13/13)
+- Router reference fix (2026-08-17): `_raw_filesystem_reference` accepts a
+  single surviving token ("examples", "exam") — the old `len(keep) < 2`
+  rule + "one" as a frame word killed single-word folder and "chapter one"
+  asks whenever the Understanding model dropped entities; compound number
+  parser applied through `_canonical_tokens`/`_parse_number_run` and
+  `_exact_children` ambiguity. (§12; `test_navigation_flow` 13/13 then)
+- Routing-drift fix (2026-08-18, KI-015): folder-content queries routed to
+  `web_search` (Understanding classified them `category=search` →
+  `_CAPABILITY_VARIANTS["search"]="web"`). Fixed by the decisive raw-text
+  gate `_fs_decisive()` (+ `_FS_INSIDE_TEXT_RE`/`_FS_OBJECT_NOUN_RE`/
+  `_FS_BARE_VERB_RE` in `tool_router.py` and `context_knows()` in
+  `path_resolver.py`): inside phrase + fs noun, list/show/read + fs noun, or
+  a session-verified object — pinned to file_manager, web forced off; genuine
+  web questions never hijacked. (§13; `test_navigation_flow` 18/18)
 
 ### PLANNED (in roadmap, NOT implemented)
 - Reflection Engine (Phase 6), Learning Engine (Phase 7), Knowledge Graph
@@ -275,7 +337,7 @@ numba, tqdm, requests, tiktoken, pywin32, comtypes).
 | `docs/SESSION_LOG.md` | ACTIVE (1417 lines) | Per-session detail through 2026-08-08. |
 | `docs/ISSUE_TRACKER.md` | ACTIVE | FRIDAY-001..014 ↔ root causes RC-01..06. |
 | `docs/engineering_report.md` | ACTIVE | 5000-test review + implementation prompt for memory fixes. |
-| `docs/FILESYSTEM_AUDIT_REPORT.md` | ACTIVE | Phase 5 universal filesystem audit (2026-08-08) + the three truth-fix rounds: §8 KI-013 store gate, §9 round-2 router fixes, §10 KI-014 local-path truth fix. |
+| `docs/FILESYSTEM_AUDIT_REPORT.md` | ACTIVE | Phase 5 universal filesystem audit (2026-08-08) + the truth-fix rounds: §8 KI-013 store gate, §9 round-2 router fixes, §10 KI-014 local-path truth fix, §11 session hierarchy fix, §12 empty_path + spoken-number fix, §13 routing-drift fix (KI-015). |
 | `docs/LAUNCHER_AUDIT_REPORT.md` | ACTIVE | Phase 5 launcher audit + follow-ups (2026-08-07/08). |
 | `docs/RANDOM_STRESS_TEST.md` | DATA | 5000 tests, seed 20260804. |
 | `docs/RANDOM_STRESS_1000_TEST.md` | DATA | 1000 tests, seed 20260805. |
@@ -493,6 +555,35 @@ successful directory list.
   ("what's/what is inside", "contents of", list/show/read verb + folder/file
   word) — pinned to automation before `open_application`/launch pins;
   explicit web goals never hijacked.
+- Session hierarchy (2026-08-16/17): `path_resolver.py` holds a bounded
+  discovery registry (`_DiscoveryRecord`, 512, oldest-evicted) fed by
+  `register_discovered()` (read/locate) and `set_last_listed_scope(path,
+  entries)` (successful lists); `active_folder_context`/
+  `clear_active_folder_context` manage the session context chain;
+  `_hierarchy_lookup` (exact children of the last-listed folder → context
+  chain → single verified record → relative path against chain bases, global
+  search only as fall-through) replaced the broken Section 5b. `context_knows()`
+  (registry/chain only, never a global disk search) is the public hook the
+  router uses to keep a bare "whats inside X"/"read X" ask on file_manager
+  once the object was verified this session.
+- Spoken numbers (2026-08-17): `_NUMBER_WORDS` values + `_canonical_tokens`/
+  `_parse_number_run` collapse compound runs ("chapter twenty one"→21, "two
+  hundred five"→205) applied in `_tokens_match`/`_norm_key`; `_exact_children`
+  + same-parent canonical ambiguity in tier 2 ("chapter 1"+"chapter one" in
+  the same parent = ambiguous; with chapter 10/11 present, "chapter one" →
+  deterministically chapter 1).
+- Routing drift decisive gate (KI-015, 2026-08-18): `_CAPABILITY_VARIANTS`
+  maps `"search"→"web"`, so a fabricated `category=search` made folder asks
+  fire web_search. New `_fs_decisive(raw_text)` + `_FS_INSIDE_TEXT_RE`
+  (whats/what is inside, whats in, its inside, contents of) +
+  `_FS_OBJECT_NOUN_RE` (folder/directory/dir/drive/desktop/downloads/
+  documents/file) + `_FS_BARE_VERB_RE` (list/show/read): decisive = inside
+  phrase + fs noun, list/show/read + fs noun, or verb/inside phrase with a
+  session-verified object. `route()` then pins `tool_cap="automation"` and
+  forces `use_web=False; goal_search_web=False` (same pattern as the
+  launch/locate rescues); `tool_required()` enters the tool path. Genuine
+  web asks ("whats inside a black hole", "whats in the news", "read me a
+  story", "show me pictures") never match and stay on web_search.
 - `has_launch_signal()`: `goal == "open_application"` or intent
   command/request with `application`-labeled entity; **now requires a raw
   launch verb** (`_raw_text_is_launch`: open/launch/start/run after
@@ -656,6 +747,27 @@ Verified tool capabilities (all permission-gated and regression-proven):
 ## 8. Known Phase 5 Problems (historical, fixed or documented)
 
 Fixed this cycle (all regression-proven, see FILESYSTEM_AUDIT_REPORT):
+- **Folder-content queries firing web_search (KI-015, 2026-08-18)**: a REAL
+  production log showed "tell me whats inside the exam folder" / "the lab 3
+  folder" / "its inside the c lab folder…" answering from `web_search` with
+  hallucinated contents (exam1/exam2, "test.py"). Root cause: Understanding
+  classified the turns `category=search` → `_CAPABILITY_VARIANTS["search"]`
+  = "web" → capability=web; the fs-query rescue was blocked by `goal not in
+  _NON_FILE_GOALS` and `tool_cap != "web"`. Fixed with the decisive raw-text
+  gate `_fs_decisive()` (+ `context_knows()`): folder asks are pinned to
+  file_manager and web is forced off; genuine web questions are never
+  hijacked. (§13; `test_navigation_flow` 18/18)
+- **`empty_path` on single-word folder / "chapter one" asks (2026-08-17)**:
+  `_raw_filesystem_reference` had `len(keep) < 2` (killed "examples",
+  "exam") and "one" was a frame word (stripped "chapter one"). Fixed:
+  single-token recovery + compound spoken-number parser +
+  `_exact_children` ambiguity. (§12; `test_navigation_flow` 13/13)
+- **Deep-navigation hierarchy resolution (2026-08-16/17)**: follow-up asks
+  after multi-level navigation hit the wrong folder (deterministic first-hit
+  global fuzzy matches, e.g. "examples" → stale leftover `other_exam_final`).
+  Fixed: session discovery registry + context chain + `last_listed_scope`
+  (`_hierarchy_lookup` replacing Section 5b, global search as fall-through
+  only). (§11; `test_hierarchy_resolution` 13/13)
 - Spider-Man 2 locate → web search. Fixed by `_filesystem_locate_signal`
   (pins locate, web off). Verified offline: `file_manager.locate` → `C:\games\Marvel's Spider-Man 2`.
 - "…in my pc" locate → app launcher. Fixed: locate rescue runs before launch pin.
@@ -754,14 +866,21 @@ py_compile` on touched modules.
 | `chat_regression.py` | pure chat: zero launches/web | 10/10 |
 | `random_stress_1000` (seed 20260805) | memory stress | 98.3% |
 | PHASE3 stress 100 | planning/convo stress | 98.0% |
+| `test_navigation_flow.py` (repo root) | 9 navigation scenarios + 5 routing-drift regressions, drives the REAL `FileManagerTool` with unique uuid fixture roots (avoids real-folder shadowing) | 18/18 |
+| `test_hierarchy_resolution.py` (repo root) | session hierarchy/registry/context-chain/spoken-number unit suite | 13/13 |
+| `test_universal_fix.py` (repo root) | universal reference + number regression | 6/6 |
+| `test_scenario_b.py` / `test_c_lab_exam.py` / `test_fix.py` / `test_verify_fix.py` (repo root) | legacy live navigation on real `C:\c lab` / `C:\python revision` trees | PASS |
 
-Harness location: `C:\Users\polis\AppData\Local\Temp\opencode\` (outside the
-repo; no `tests/` directory, no CI — known technical debt). Suite fixture
-root: `C:\Users\polis\friday_fs_suite` (temp suites moved here; old TEMP
-suite dir deleted). `locate_guard_regression.py` creates and removes its own
-fixture root `C:\Users\polis\friday_locguard_suite` on teardown. Probes delete
+Harness location: the NEW filesystem suites live in the REPO ROOT
+(`test_*.py`); the OLDER suites live in
+`C:\Users\polis\AppData\Local\Temp\opencode\` (outside the repo; no
+`tests/` directory, no CI — known technical debt). Suite fixture roots:
+`C:\Users\polis\friday_fs_suite` (persistent) and
+`C:\Users\polis\friday_locguard_suite` (created/deleted by suite teardown);
+`test_navigation_flow.py` builds its own uuid fixture root
+`C:\friday_nav_flow_<uuid>` and deletes it in teardown. Probes delete
 their machine fixtures after proof; machine state must be restored after every
-run. The table above was re-verified 2026-08-10 after the KI-014 fix.
+run. The table above was re-verified 2026-08-18 after the KI-015 fix.
 
 Stress-test philosophy (engineering_report): failure mass concentrates in
 LLM-driven predicates and extraction leaks, NOT hardware/pipeline faults;
@@ -812,6 +931,25 @@ no-write regression class.
   `brain._final_response` after the listing guard (FILESYSTEM_AUDIT section
   10; no KI file — same convention as KI-013). Verified: `locate_guard_regression`
   25/25, manual real-file locates, all prior suites green.
+- KI-015: **FIXED 2026-08-18** — folder-content queries ("tell me whats
+  inside the exam folder", "the lab 3 folder", "its inside the c lab folder
+  in my c drive") routed to `web_search` and the response model hallucinated
+  contents (exam1/exam2, "test.py"); real production log 2026-08-17
+  08:28–08:32 (Need Tools/Web both False, web still fired via the resolved
+  web capability). Root cause: Understanding classified the turns
+  `category=search / goal=search_web / capability=search` and
+  `_CAPABILITY_VARIANTS["search"]="web"`; the fs-query rescue was blocked by
+  `goal not in _NON_FILE_GOALS` and `tool_cap != "web"`. Fixed by the
+  decisive raw-text gate `_fs_decisive()` in `tool_router.py` (+
+  `context_knows()` in `path_resolver.py`), which pins unmistakable
+  filesystem-contents asks to `file_manager` and forces web off; genuine web
+  questions ("whats inside a black hole", "whats in the news", "read me a
+  story") are never hijacked (FILESYSTEM_AUDIT section 13; no KI file — same
+  convention as KI-013/014). Verified: `test_navigation_flow` 18/18 incl.
+  the 5 routing regressions; live simulation with the exact log flags routes
+  `['file_manager']`; all prior suites re-passed. The 2026-08-16/17 hierarchy
+  and empty_path/numbers cycles (§11/§12) are likewise documented inside
+  FILESYSTEM_AUDIT_REPORT, no KI files.
 
 ### DEFFERED_IMPROVEMENT
 - DI-001: AI intent detection (replace keyword `detect_intent()` with LLM;
@@ -923,7 +1061,9 @@ gates before the operation split; no value-origin guard in
 ## 14. Rules for Future Agents (operating constraints)
 
 1. Read section 0 (Current Situation) first. Only `python -m py_compile` for
-   verification unless the user explicitly approves running a suite (suites
+   verification unless the user explicitly approves running a suite (newer
+   filesystem suites live in the REPO ROOT — `test_navigation_flow.py`,
+   `test_hierarchy_resolution.py`, `test_universal_fix.py`; older suites
    live outside the repo in `%TEMP%\opencode\` or
    `C:\Users\polis\friday_fs_suite`).
 2. Do not commit without explicit user approval. Stage only intended files;
@@ -954,6 +1094,12 @@ gates before the operation split; no value-origin guard in
 12. If a user reports a fabricated local path, that is the KI-014 class —
     already fixed (section 0, §10). Classify it (section 9) before touching
     code, and re-run `locate_guard_regression.py` (25/25) after any change.
+13. If a user reports a folder-content query answered from the web, or an
+    invented folder listing, that is the KI-015 class — already fixed
+    (section 0, §13). Classify it (section 9) before touching code, and
+    re-run `test_navigation_flow.py` (18/18) after any change. A `parameters={}`
+    empty_path failure is the §12 class; a wrong-folder hit after deep
+    navigation is the §11 class (both fixed; see sections 0, 8, 16).
 
 ---
 
@@ -971,7 +1117,7 @@ Commits (newest → oldest):
 - `93a2e733` 2026-07-26 Voice recording stabilized and debug removed
 - `f42a8294` 2026-07-26 Friday Voice v1 - STT and TTS integration complete
 
-Uncommitted working tree (2026-08-09, still uncommitted 2026-08-10):
+Uncommitted working tree (2026-08-09, still uncommitted 2026-08-18):
 - Modified: `docs/KNOWN_ISSUE/KI-009.md`, `docs/LAUNCHER_AUDIT_REPORT.md`,
   `docs/SESSION_LOG.md`, `src/ai/model_router.py`, `src/ai/prompt_builder.py`,
   `src/core/tool_router.py`, `src/core/brain.py` (`_final_response`),
@@ -985,7 +1131,8 @@ Uncommitted working tree (2026-08-09, still uncommitted 2026-08-10):
   `src/understanding/understanding_prompt.py` (filesystem-never-stored
   section)
 - Untracked: `MASTER.md` (this doc), `docs/FILESYSTEM_AUDIT_REPORT.md`
-  (sections 8/9/10), `docs/KNOWN_ISSUE/KI-012.md`, `src/utils/path_resolver.py`,
+  (sections 8/9/10/11/12/13), `docs/KNOWN_ISSUE/KI-012.md`,
+  `src/utils/path_resolver.py`,
   plus runtime backups `src/memory/memory.json.bak-20260809-225311`,
   `src/memory/memory_history.json.bak-20260809-225311`.
 
@@ -999,6 +1146,23 @@ Uncommitted working tree additions (2026-08-10, location-truth fix):
   `src/core/brain.py` (path guard chained in `_final_response`),
   `docs/FILESYSTEM_AUDIT_REPORT.md` (section 10), `MASTER.md` (this entry).
 
+Uncommitted working tree additions (2026-08-16/17/18, hierarchy +
+numbers + routing-drift fixes):
+- `src/utils/path_resolver.py` (discovery registry, `_hierarchy_lookup`,
+  `register_discovered`, `set_last_listed_scope`, `active_folder_context`,
+  `context_knows`, compound spoken-number parser, `_exact_children`),
+  `src/core/tool_router.py` (`_raw_filesystem_reference` single-token
+  recovery, `"one"` removed from frame words, `_fs_decisive` +
+  `_FS_INSIDE_TEXT_RE`/`_FS_OBJECT_NOUN_RE`/`_FS_BARE_VERB_RE` decisive
+  gate, `tool_required`/`route` wiring),
+  `src/skills/file_manager.py` (listing entries registered into the
+  discovery registry),
+  `docs/FILESYSTEM_AUDIT_REPORT.md` (sections 11/12/13),
+  `test_navigation_flow.py` (18 tests), `test_hierarchy_resolution.py`
+  (13 tests), `test_universal_fix.py` (6 tests), `test_scenario_b.py`,
+  `test_c_lab_exam.py`, `test_fix.py`, `test_verify_fix.py` (legacy live
+  navigation scripts), `MASTER.md` (this entry).
+
 The uncommitted set is the Phase 5 stabilization work plus the 2026-08-09
 filesystem contents-retrieval fix (KI-013), the 2026-08-10 round-2 router
 fixes, and the 2026-08-10 local-path truth fix (KI-014). Do not commit it
@@ -1008,6 +1172,80 @@ without user approval.
 
 ## 16. Change Log
 
+- **2026-08-18** — **Routing-drift fix (KI-015)**. A REAL production log
+  (2026-08-17, 08:28–08:32) showed every folder-content query answering
+  from `web_search`: "tell me whats inside the exam folder" →
+  `Need Tools: False` + `web_search -> success` → hallucinated "The 'exam'
+  folder contains one entry: test.py" (real contents: ch1_function,
+  ch2_string, ch3_array, ch4_structure, exam_notes.txt, test.txt); "the
+  lab 3 folder" → web rate-limit failure; "its inside the c lab folder in
+  my c drive please check" → invented "exam1 (file), exam2 (file)".
+  Root cause (proven, not guessed): Understanding classified the turns
+  `category=search / goal=search_web / capability=search`, and
+  `_CAPABILITY_VARIANTS["search"]="web"` canonically resolved them to the
+  web capability — `tool_required()`'s `fs_query` gate was blocked by
+  `goal not in _NON_FILE_GOALS`, the `route()` fs rescue by `tool_cap !=
+  "web"`, and the web branch fired on `is_web_cap` with no tool flags set.
+  Fix (universal, no hardcoded names): new decisive raw-text gate
+  `_fs_decisive()` in `tool_router.py` — (1) inside/contents phrase +
+  filesystem noun ("whats inside the exam folder", "its inside the c lab
+  folder in my c drive"), (2) list/show/read + filesystem noun ("list my
+  downloads", "read the first.py file"), (3) verb/inside phrase with a
+  SESSION-VERIFIED object via new `context_knows()` in `path_resolver.py`
+  (registry/context chain only, never a global disk search — "read
+  first.py", "whats inside the examples" after being shown). `route()`
+  pins `tool_cap="automation"` and forces `use_web=False;
+  goal_search_web=False` (same pattern as the launch/locate rescues);
+  `tool_required()` enters the tool path. Genuine web asks are never
+  hijacked: "whats inside a black hole", "whats in the news", "show me
+  pictures", "read me a story", "list my books", weather, "search the web
+  for X" all stay on `web_search`; "open spotify" → app_launcher unchanged.
+  Results: `test_navigation_flow` 18/18 (5 new routing regressions, no new
+  files), `test_hierarchy_resolution` 13/13, `test_universal_fix` 6/6,
+  legacy live scripts PASS; live simulation with the exact log flags
+  (`Need Tools: False`, `Need Web: False`, `category=search`) →
+  `tool_required=True`, routes `['file_manager']`. Docs:
+  FILESYSTEM_AUDIT_REPORT section 13.
+- **2026-08-17** — **empty_path + spoken-number fix (router reference
+  recovery)**. "tell me whats inside the examples"/"chapter one folder"
+  failed with `parameters={}` `empty_path` even though parent-context
+  propagation was proven intact. Root causes: (1) `_raw_filesystem_reference`
+  dropped any reference with fewer than 2 surviving tokens (`len(keep) < 2`)
+  — single-word folder names ("examples", "exam") died whenever the small
+  Understanding model emitted `parameters={}`; (2) "one" was a
+  `_FS_FRAME_WORDS` member, so "chapter one" stripped to nothing. Fix:
+  single surviving token is now a valid recovery (junk words still
+  degrade to an honest not_found naming the word); "one" removed from the
+  frame words; compound spoken numbers parsed (`_canonical_tokens` +
+  conservative `_parse_number_run`: "chapter twenty one"→21, "one hundred
+  twenty two"→122, "two hundred five"→205, "one thousand two hundred"→1200;
+  "twenty twenty"/"three zero" stay literal) applied in `_tokens_match`
+  and `_norm_key`; `_exact_child` → `_exact_children` with same-parent
+  canonical ambiguity in `_hierarchy_lookup` tier 2 ("chapter 1" +
+  "chapter one" in one parent = ambiguous; with chapter 10/11 present,
+  "chapter one" deterministically → chapter 1). Results:
+  `test_navigation_flow` 13/13 (unique uuid fixture roots so real folders
+  can never shadow them), `test_hierarchy_resolution` 13/13,
+  `test_universal_fix` 6/6, legacy scripts PASS; live repro on the real
+  `C:\python revision` tree PASS. Docs: FILESYSTEM_AUDIT_REPORT section 12.
+- **2026-08-16/17** — **Session hierarchy fix (deep-navigation resolution)**.
+  Follow-up asks after multi-level navigation ("python revision" →
+  "chapter 1" → "whats inside the examples") hit the wrong folder: the old
+  Section 5b relative resolution was broken and the deterministic first-hit
+  global fuzzy search picked stale leftover folders (`C:\Users\polis\
+  other_exam_final` answered "examples"). Fix: `path_resolver.py` gains a
+  bounded session discovery registry (`_DiscoveryRecord`, 512, oldest
+  evicted) fed by `register_discovered()` (read/locate) and
+  `set_last_listed_scope(path, entries)` (successful lists); session context
+  chain via `active_folder_context`/`clear_active_folder_context` (clearing
+  also empties the registry); `_hierarchy_lookup` (exact children of the
+  last-listed folder → context chain → single verified record → relative
+  path against chain bases, global search only as fall-through) replaces the
+  broken Section 5b in both `resolve_reference` and `locate_reference`;
+  `file_manager._list`/`_read`/`_locate` register every verified object.
+  Results: `test_hierarchy_resolution` 13/13, `test_navigation_flow` 13/13,
+  `test_universal_fix` 6/6, legacy scripts PASS. Docs: FILESYSTEM_AUDIT_REPORT
+  section 11.
 - **2026-08-10** — **Universal local-path truth fix (KI-014 / locate guard)**.
   Closes the last fabrication class: FRIDAY speaking a confident absolute
   local path no current tool result produced (web info or memory became

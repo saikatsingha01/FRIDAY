@@ -1415,3 +1415,105 @@ open_application structs with no gate. Fix in `src/core/tool_router.py`:
 - `python -m py_compile` clean on all touched modules.
 - All 10 probe fixtures removed after proof; machine state restored.
 - No commit made (per standing instruction).
+
+---
+
+## Session: Deep-navigation hierarchy + spoken numbers + routing drift (2026-08-16/17/18)
+
+Three consecutive filesystem-truth sessions. Full detail:
+FILESYSTEM_AUDIT_REPORT sections 11-13, KI-015, MASTER.md sections 0/16.
+
+### Session A (2026-08-16/17) — session hierarchy resolution
+
+Follow-up asks after multi-level navigation failed: "python revision" →
+"chapter 1" → "tell me whats inside the examples folder" hit the wrong
+folder. Root cause: the old Section 5b relative resolution in
+`path_resolver.py` was broken and the deterministic first-hit global fuzzy
+search picked stale leftover folders (`C:\Users\polis\other_exam_final`
+answered "examples").
+
+Fix: bounded session discovery registry (`_DiscoveryRecord`, 512,
+oldest-evicted) fed by `register_discovered()` (read/locate) and
+`set_last_listed_scope(path, entries)` (successful lists); session context
+chain via `active_folder_context`/`clear_active_folder_context` (clearing
+also empties the registry); `_hierarchy_lookup` (exact children of the
+last-listed folder → context chain → single verified record → relative
+path against chain bases, global search only as fall-through) replaces the
+broken Section 5b in both `resolve_reference` and `locate_reference`;
+`file_manager._list`/`_read`/`_locate` register every verified object.
+
+Files: `src/utils/path_resolver.py`, `src/skills/file_manager.py`,
+`test_hierarchy_resolution.py` (13 tests).
+
+### Session B (2026-08-17) — empty_path + spoken numbers
+
+"tell me whats inside the examples" / "chapter one folder" → `parameters={}`
+`empty_path`. Parent-context propagation was proven intact (registry/chain
+persist in `src`, nothing clears them). Two real root causes:
+
+- `_raw_filesystem_reference` had `len(keep) < 2` — single-word folder
+  names ("examples", "exam") died whenever the small Understanding model
+  dropped entities (`parameters={}`).
+- `"one"` was a `_FS_FRAME_WORDS` member, so "chapter one" stripped to
+  nothing.
+
+Fix: single surviving token is now a valid recovery (junk words still
+degrade to an honest `not_found` naming the word); `"one"` removed from
+frame words; compound spoken numbers parsed (`_canonical_tokens` +
+conservative `_parse_number_run`: "chapter twenty one" → 21, "one hundred
+twenty two" → 122, "two hundred five" → 205, "one thousand two hundred" →
+1200; "twenty twenty"/"three zero" stay literal) applied in
+`_tokens_match`/`_norm_key`; `_exact_child` → `_exact_children` with
+same-parent canonical ambiguity in `_hierarchy_lookup` tier 2 ("chapter 1" +
+"chapter one" in the same parent = ambiguous; with chapter 10/11 present,
+"chapter one" deterministically → chapter 1).
+
+Files: `src/core/tool_router.py` (`_raw_filesystem_reference`),
+`src/utils/path_resolver.py`, `test_navigation_flow.py` (13 tests — drives
+the REAL `FileManagerTool` with unique uuid fixture roots so real folders
+can never shadow them).
+
+### Session C (2026-08-18) — folder queries routed to web_search (KI-015)
+
+Real production log (2026-08-17, 08:28–08:32): every folder-content query
+answered from `web_search` with hallucinated contents ("exam folder
+contains one entry: test.py", "exam1 (file), exam2 (file)"; real exam
+folder has ch1_function, ch2_string, ch3_array, ch4_structure,
+exam_notes.txt, test.txt). Root cause (proven): Understanding classified
+the turns `category=search / goal=search_web / capability=search` and
+`_CAPABILITY_VARIANTS["search"] = "web"` resolved them to the web
+capability — the fs-query rescue was blocked by `goal not in _NON_FILE_GOALS`
+and `tool_cap != "web"`, and the web branch fired on `is_web_cap` with no
+tool flags set.
+
+Fix: decisive raw-text gate `_fs_decisive()` in `tool_router.py`
+(`_FS_INSIDE_TEXT_RE` × `_FS_OBJECT_NOUN_RE`; list/show/read + filesystem
+noun; or verb/inside phrase + a SESSION-VERIFIED object via new
+`context_knows()` in `path_resolver.py` — registry/context chain only,
+never a global disk search). Decisive turns: `tool_cap="automation"`,
+`use_web=False`, `goal_search_web=False` (launch/locate rescue pattern);
+`tool_required()` enters the tool path even with a fabricated web
+classification.
+
+Safety verified: "whats inside a black hole", "whats in the news", "show
+me pictures", "read me a story", "read this article", "list my books",
+weather, "search the web for X" all stay on `web_search`; "open spotify" →
+app_launcher unchanged; deictic-only turns still degrade to the honest
+`empty_path`.
+
+Files: `src/core/tool_router.py`, `src/utils/path_resolver.py`,
+`test_navigation_flow.py` (extended to 18 tests — 5 routing regressions,
+no new files), docs (FILESYSTEM_AUDIT_REPORT §13, KI-015, MASTER.md).
+
+### Verification (all fresh, 2026-08-18)
+
+- `test_navigation_flow.py` 18/18, `test_hierarchy_resolution.py` 13/13,
+  `test_universal_fix.py` 6/6 — all PASS via pytest.
+- Legacy live scripts on real trees (`test_scenario_b.py`,
+  `test_c_lab_exam.py`, `test_fix.py`, `test_verify_fix.py`) — PASS
+  (`C:\c lab` → `exam`, `C:\python revision` navigation).
+- Live simulation with the exact failing log flags (`Need Tools: False`,
+  `Need Web: False`, `category=search`): "tell me whats inside the exam
+  folder" → `tool_required=True`, routes `['file_manager']`.
+- `python -m py_compile` clean on all touched modules.
+- No commit made (per standing instruction).

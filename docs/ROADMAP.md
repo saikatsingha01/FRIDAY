@@ -698,7 +698,7 @@ Switch tabs, bookmark pages. Continue interrupted sessions.
 Perform research and comparison tasks. Read documentation and
 summarize results.
 
-## Architecture
+## Architectureok
 - `skills/browser/` — new skills package
 - Browser Agent handles execution
 - Page content enters the retrieval pipeline alongside memory
